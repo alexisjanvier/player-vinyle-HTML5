@@ -1,0 +1,1257 @@
+html, body {
+ margin:0px;
+ padding:0px;
+}
+
+body {
+ background:#fff;
+ font:normal 12px "helvetica neue",helvetica,arial,verdana,tahoma,"sans serif";
+ color:#000;
+ _border:1px solid #fff; /* IE 6 image display WTF */
+}
+
+a img {
+ border:none;
+}
+
+p {
+ margin:0px;
+ padding:0px;
+ font-size:14px;
+ margin-bottom:1.5em;
+}
+
+hr {
+ display:none;
+}
+
+#site,
+#content,
+#container,
+#header,
+#header-content,
+#main-content,
+#entry-content {
+ position:relative;
+}
+
+#site {
+ min-width: 54.40em; /* ocean pearl, etc. :D */
+}
+
+#header {
+ background:#111;
+ color:#fff;
+ zoom:1;
+}
+
+#logo {
+ position:relative;
+}
+
+#logo a {
+/*
+ background:#993333;
+*/
+ background:#fff;
+ color:#000;
+/*
+ font:2em "Century Gothic","Helvetica Neue Light","Helvetica Neue",helvetica,verdana,tahoma,arial,"sans serif";
+*/
+ font-size:18px;
+ font-weight:bold;
+ padding:0.125em 0.5em;
+ margin-left:-0.3em;
+ text-decoration:none;
+ display:inline-block;
+ letter-spacing:-1px;
+}
+
+#header-content,
+#main-content {
+ position:relative;
+ min-width:40em;
+ max-width:73em;
+ max-width:77.5em; /* 2011 styles */
+ _width:960px;
+ margin:0px auto;
+ _zoom:1; /* stupid IE 6 */
+}
+
+#main-content {
+ margin-top:2em;
+}
+
+h1, h2, h3, h4, h5 {
+/*
+ font:2em "helvetica neue light","helvetica neue",helvetica,verdana,tahoma,arial,"sans serif";
+ font-weight:normal;
+*/
+ font:24px helvetica,verdana,tahoma,arial,"sans serif";
+ font-weight:bold;
+ letter-spacing:-0.025em; /* ZOMG web x.0 */
+ /* and just because we can, some gratuitous blurring on headers. */
+/*
+ text-shadow:-1px -1px 3px #ddd;
+*/
+ clear:both;
+ margin:0px;
+ margin-top:1em;
+ margin-bottom:1em;
+ padding:0px;
+ vertical-align:middle;
+/*
+ font-family:helvetica,arial,verdana,tahoma,"sans serif";
+*/
+ border-top:3px solid #000;
+ border-bottom:1px solid #000;
+ padding:0.2em;
+ margin-left:-0.3em;
+ font-size:24px;
+ background:#111;
+ border-bottom-color:#999;
+ color:#fff;
+ margin-bottom:1em;
+ padding:6px 0.5em;
+ margin-left:-0.5em;
+}
+
+h1 {
+ border-color:#000;
+ margin-top:0px;
+}
+
+h3 {
+ font-size:21px;
+}
+
+h4 {
+ font-size:18px;
+}
+
+h5 {
+ font-size:16px;
+}
+
+#right h2,
+#right h3,
+#right h4,
+#right h5 {
+ display:block;
+ margin-left:0px;
+ border-color:#000;
+}
+
+#right h4 {
+ font-size:16px;
+ background-color:transparent;
+ border-top:none;
+ color:#333;
+ border-color:#555;
+ margin-left:0.5em;
+ padding-left:0px;
+ margin-right:0.5em;
+ text-indent:0px;
+ 
+}
+
+#entry-content {
+ display:inline-block;
+ min-width:29em;
+ max-width:48.5em;
+ max-width:53em; /* 2011 styles */
+ padding-right:0.5em;
+ margin:0.5em;
+ margin-top:0px;
+ margin-right:22.5em;
+ color:#111;
+}
+
+#entry-content h1 {
+ *zoom:1;
+}
+
+#entry-content h1 .icon {
+ /* legacy shiz */
+ display:none;
+}
+
+#entry-content h2,
+#entry-content h3,
+#entry-content h4,
+#entry-content h5 {
+/*
+ border-color:#999;
+ border-bottom-color:#999;
+ background-color:#999;
+ color:#fff;
+*/
+ margin-top:1.5em;
+ line-height: 1.2em;
+ background-color:transparent;
+ border-top:none;
+ color:#111;
+}
+
+#entry-content h4,
+#entry-content h5 {
+ border-bottom:none;
+}
+
+/* Safari doesn't do as nice a job, it seems, at really small letter-spacing. */
+html.isSafari h1,
+html.isSafari h2,
+html.isSafari h3,
+html.isSafari h4,
+html.isSafari h5 {
+ letter-spacing: -0.05em;
+}
+
+
+#entry-content p {
+ /* 14.6 px */
+ line-height:1.6em;
+}
+
+#entry-content ul,
+#entry-content ol {
+ padding-left:1.5em;
+}
+
+#entry-content ul li,
+#entry-content ol li {
+ line-height:1.5em;
+ margin-bottom:1em;
+}
+
+#entry-content a {
+ margin-top:-0.3em;
+ padding:0.2em 0.25em;
+ text-decoration:none;
+ color:#336699;
+ background:#f3f9ff;
+ -khtml-border-radius:0.25em;
+ -moz-border-radius:0.25em;
+ border-radius:0.25em;
+ margin-left:-0.2em;
+ margin-right:-0.2em;
+ zoom:1;
+}
+
+#entry-content a:hover,
+#entry-content div.image p a:hover,
+#entry-content div.imageFloatRight p a:hover {
+ background:#3399cc;
+ border-color:#3399cc;
+ color:#fff;
+ text-decoration:none;
+}
+
+#entry-content dt {
+ margin-top:1em;
+ margin-bottom:1em;
+}
+
+#right {
+ position:absolute;
+ right:0px;
+ top:0px;
+ width:22em;
+/*
+ margin-right:-20em;
+ margin-left:1em;
+*/
+ _right:auto;
+ _left:800px;
+}
+
+/*
+#nav-list > li:first-child h2:first-child {
+ margin-top:0px;
+}
+*/
+
+#external h2:first-child,
+#external h3:first-child {
+ margin-top:0px;
+}
+
+#right p {
+ font-size:0.9em;
+ margin-left:0.65em;
+ font-style:italic;
+}
+
+#right ul {
+ list-style-type:none;
+ margin:0px;
+ padding:0px;
+}
+
+#right ul li {
+ margin:0px;
+ padding:0px;
+}
+
+#right h3 {
+ background-color:#fff;
+ color:#000;
+/*
+ font-family:"helvetica neue light","helvetica neue",helvetica,verdana,arial;
+ font-size:1.33em;
+ font-weight:normal;
+ font-size:1.33em;
+*/
+ font-size:16px;
+}
+
+#right dl,
+#right dt,
+#right dd {
+ position:relative;
+ margin:0px;
+ padding:0px;
+}
+
+#right dt a {
+ display:block;
+ font-size:0.93em;
+ text-decoration:none;
+ padding:1px 0.85em;
+ line-height:16px;
+ padding-right:0px;
+ color:#333;
+ vertical-align:middle;
+}
+
+#right dt:hover {
+ background:transparent url(/2009/image/wedge-left.png) no-repeat 0px 50%;
+ margin-left:-10px;
+}
+
+#right dt:hover a,
+#right dt:hover a:hover {
+ margin-left:14px;
+ padding-left:0.5em;
+ background:#000;
+ color:#fff;
+}
+
+#nav-list>li:first-child {
+ margin-top:0px;
+}
+
+#nav-list>li:hover {
+ border-bottom-color:#445566;
+}
+
+#nav-list h2 span {
+ color:#99ccff;
+ visibility:hidden;
+}
+
+#nav-list>li:hover>h2 {
+ border-top-color:#99ccff;
+ border-bottom-color:#002244;
+}
+
+#nav-list>li:hover>h2 span {
+ visibility:visible;
+}
+
+#nav-list>li:hover>h2 {
+ background-color:#003366;
+}
+
+#nav-list>li:hover ul {
+ background-color:#f9fcff;
+}
+
+#nav {
+ position:relative;
+}
+
+#nav dd {
+ position:absolute;
+ background:#000;
+ z-index:10;
+ width:20em;
+ left:0px;
+ border-top:2px solid #99ccff;
+ border-bottom:1px solid #333;
+ padding:1em 1.5em 1em 1em;
+ visibility:hidden;
+ margin-left:0px;
+ margin-top:1px;
+ margin:-3em 0px 0px -23.4em;
+ color:#fff;
+}
+
+#nav dt .r-wedge {
+ position:absolute;
+ left:0px;
+ background:transparent url(/2009/image/wedge-right.png) no-repeat 0% 50%;
+ width:11px;
+ height:18px;
+ margin-left:-11px;
+ margin-top:-17px;
+ z-index:11;
+ display:none;
+}
+
+#nav dt:hover .r-wedge {
+ display:block;
+}
+
+#nav dt:hover+dd {
+ visibility:visible;
+}
+
+/*
+#nav dd:hover {
+ visibility:hidden;
+}
+*/
+
+pre {
+ border-left:2px solid #f3f3f3;
+ padding-left:0.5em;
+}
+
+dl pre {
+ border-color:#e9f3ff;
+ margin-left:-0.5em;
+}
+
+dl.alt pre {
+ border-color:#f3f3f3;
+}
+
+pre,
+code,
+.code,
+#soundmanager-debug {
+ font-family:monaco,"VT-100","lucida console",monospace,courier,system,sans-serif;
+ font-size:0.9em;
+ font-weight:normal;
+ color:#339933;
+ background:#f6fff6;
+ font-smooth:never; /* We don't need no steenkeng font smoothing! - http://www.w3.org/TR/css3-fonts/#font-smooth-prop */
+}
+
+pre {
+ font-size:11px; /* x-small */
+ line-height:1.75em;
+}
+
+pre span span {
+ /* font-size:x-small; */
+}
+
+pre code {
+font-family:monaco,"VT-100","lucida console",courier,system,sans-serif;
+ font-size:11px;
+}
+
+pre {
+ white-space:-moz-pre-wrap;
+ white-space:pre-wrap;
+ word-wrap:break-word; /* IE */
+}
+
+pre span,
+code span,
+dt span {
+ color:#339933;	
+}
+
+pre span span,
+code span span,
+dt span span {
+ color:#666;
+}
+
+pre.block,
+pre.block code,
+div.block div.code {
+ position:relative;
+ display:table;
+ *display:block;
+ border:1px solid #ccc;
+ -moz-border-radius:3px;
+ -khtml-border-radius:3px;
+ -webkit-border-radius:3px;
+}
+
+div.block,
+pre.block {
+ background:#e9f3ff;
+ border-color:#eee;
+ padding:3px;
+}
+
+pre.block code,
+div.block div.code {
+ background:#fff;
+ border:1px solid #ccddee;
+ padding:0.5em;
+ font-size:11px;
+}
+
+pre.block code {
+ color:#003399;
+}
+
+/* floating entry images */
+
+#main-content .imageFloat .image a,
+#main-content .imageFloatRight .image a {
+ -moz-border-radius:0px;
+ -khtml-border-radius:0px;
+ border-radius:0px;
+ background-color:transparent;
+ height:auto;
+ margin:0px;
+ padding:0px;
+}
+
+#main-content .imageFloatRight div.image {
+ float:right;
+ display:inline;
+ margin-left:1.5em;
+}
+
+#main-content .imageFloat div.image {
+ float:left;
+ display:inline;
+ margin-right:1.5em;
+}
+
+#main-content .imageFloat span,
+#main-content .imageFloatRight span {
+ display:block;
+}
+
+#main-content .flex-600 {
+ position:relative;
+ margin-bottom:1.5em;
+ height:auto;
+}
+
+#main-content .flex-600 .link {
+ vertical-align:bottom;
+ margin:0px;
+ padding:0px;
+ text-decoration:none;
+}
+
+#main-content .flex-600 .link span.comment {
+ display:block;
+ font-size:x-small;
+ line-height:2em;
+ text-align:right;
+ color:#888;
+ margin-bottom:-1em;
+}
+
+#main-content .flex-600 .thumb {
+ position:relative;
+ float:right;
+ display:inline;
+ margin-right:0px;
+ padding:3px;
+ border:1px solid #eee;
+ background:#f6f6f6;
+ width:100%;
+ max-width:600px;
+ min-width:100px;
+ -ms-interpolation-mode:bicubic; /* better IE 7+ image resampling */
+ _width:auto; /* IE 6 */
+ _margin-left:1.5em;
+ height:auto;
+ -moz-border-radius:3px;
+ -khtml-border-radius:3px;
+ -webkit-border-radius:3px;
+ -border-radius:3px;
+}
+
+#main-content .flex-600 .link:hover {
+ background-color:transparent;
+}
+
+#main-content .flex-600 .link:hover .thumb {
+ border-color:#ccddee;
+ background:#ddeeff;
+}
+
+#sm2-container {
+ position:relative;
+}
+
+#sm2-container object,
+#sm2-container embed {
+ position:absolute;
+ left:0px;
+ top:0px;
+ width:100%;
+ height:100%;
+ margin-left:-9999px; /* repositioned later by JS */
+ background:#000;
+}
+
+#sm2-container .sm2-object-box {
+ /* DIV which contains movie, inserted by SM2 */
+ position:absolute;
+ left:0px;
+ top:0px;
+ width:100%;
+ height:100%;
+}
+
+#sm2-container.video {
+ /* 640x480 video container */
+ position:relative;
+ width:auto;
+ max-width:640px;
+ _width:320px; /* IE 6 */
+ height:auto;
+ _height:240px;
+}
+
+.icon-play {
+ position:absolute;
+ display:block;
+ _display:none; /* screw IE 6. */
+ bottom:1em;
+ left:1em;
+ background:transparent url(/2008/image/icon_play.png) no-repeat 0px 0px;
+ width:18px;
+ height:18px;
+}
+
+#main-content div.image.png {
+ width:204px;
+ background:transparent url(http://www.schillmania.com/2005/image/common/image_shadow_2005.png) no-repeat 0px 0px;
+ _background-image:url(http://www.schillmania.com/2005/image/common/image_shadow_2005.gif);
+ font-size:x-small;
+ line-height:1.3em;
+ padding-bottom:1em;
+}
+
+#main-content div.image.png a {
+ float:none;
+ margin-right:0px;
+}
+
+#main-content div.image.png img {
+ margin:5px 0px 10px 6px;
+}
+
+ul.flat li {
+ margin-bottom:0.25em;
+}
+
+dl.flat,
+dl.flat dt,
+dl.flat dd {
+ margin:0px;
+ padding:0px;
+}
+
+dl.flat dt {
+ margin-top:1em;
+}
+
+dl.flat dt:first-child {
+ margin-top:0px;
+}
+
+dl.album p {
+ margin:0px;
+ margin-top:1em;
+}
+
+dl.album dt p {
+ font-weight:bold;
+}
+
+dl.album dd blockquote {
+ margin:0px;
+ padding:0px;
+}
+
+dl.album dd blockquote p {
+ font-style:italic;
+ opacity:0.75;
+ margin-top:0.25em;
+ margin-bottom:0.5em !important; /* override last-child */
+}
+
+dl.album dd p:last-child {
+ margin-bottom:1.5em;
+}
+
+#content .copy .imageFloat .image p,
+#content .copy .imageFloatRight .image p {
+ color:#666;
+ font-size:x-small;
+ letter-spacing:0px;
+ margin:-0.25em 0.5em 1em 0.5em;
+}
+
+#site-archives {
+ position:absolute;
+ right:0px;
+ bottom:0px;
+}
+
+#site-archives a {
+ position:relative;
+ padding:0.25em 0.33em;
+ display:inline-block;
+ text-align:center;
+ background:#000;
+ color:#999;
+ font-weight:bold;
+ font-size:xx-small;
+ text-decoration:none;
+}
+
+#site-archives a.current,
+#site-archives a:hover {
+ background:#fff;
+ color:#000;
+}
+
+#entry-content ul.graphic {
+ list-style-type:none;
+ padding-left:0px;
+ margin-left:0px;
+}
+
+/* background-image-based CSS3 example */
+
+#entry-content ul.graphic {
+ list-style-type:none;
+ margin:0px;
+ padding:0px;
+}
+
+#entry-content ul.graphic li {
+ margin-bottom:2px;
+}
+
+#entry-content ul.graphic li a,
+#entry-content ul.graphic li a.sm2_link {
+ /* assume all items will be sounds rather than wait for onload etc. in this example.. may differ for your uses. */
+ display:inline-block;
+ padding-left:22px;
+ min-height:16px;
+ border:3px solid #665544;
+ background:#665544 url(/2008/image/icon_play.png) no-repeat 0px 50%;
+ _background-image:url(/2008/image/icon_play.gif);
+ -moz-border-radius:3px;
+ -webkit-border-radius:3px;
+ border-radius:3px;
+ padding:0px 3px 0px 20px;
+ min-width:19em;
+ _width:19em;
+ text-decoration:none;
+ font-weight:bold;
+ color:#fff;
+ text-shadow: 0 0 0 #000; /* stupid Safari "fat" font rendering tweak */
+}
+
+#entry-content ul.graphic li a.sm2_link {
+ /* safari 3.1+ fun (or, proprietary crap. TBD.) */
+ -webkit-transition-property: hover;
+ -webkit-transition: all 0.15s ease-in-out;
+ margin:0px;
+}
+
+#entry-content ul.graphic li a.sm2_paused:hover,
+#entry-content ul.graphic li a.sm2_link:hover {
+ background:#664422 url(/2008/image/icon_play.png) no-repeat 0px 50%;
+ _background-image:url(/2008/image/icon_play.gif); /* IE 6 */
+ border-color:#664422;
+}
+
+#entry-content ul.graphic li a.sm2_playing,
+#entry-content ul.graphic li a.sm2_playing:hover {
+ background:#993300 url(/2008/image/icon_pause.png) no-repeat 0px 50%;
+ _background-image:url(/2008/image/icon_pause.gif);
+ border-color:#993300;
+ text-decoration:none;
+ outline:none;
+}
+
+/* wedges */
+
+#right h2 {
+ position:relative;
+ z-index:1;
+ text-indent:1px;
+ margin-bottom:0.75em;
+/*
+ font-size:19px;
+*/
+/*
+ line-height:26px; */ /* Firefox 3, mac? */
+/*
+line-height:33px; *//* er'body else */
+}
+
+#right h2 .l,
+#right h2 .r {
+ display:block;
+ border-top:none;
+ opacity:1;
+}
+
+#right h2 .l,
+#right h2 .r {
+ border-top:none;
+ z-index:-1;
+}
+
+#right h2 .l {
+ background:transparent url(/2009/image/wedge.png) no-repeat -64px 0px;
+ background-color:#fff;
+ position:absolute;
+ left:0px;
+ bottom:0px;
+ margin-bottom:-1px;
+ margin-top:0px;
+ width:14px;
+ height:14px;
+ margin-left:-16px;
+ margin-left:0px;
+ border-top:none;
+}
+
+#right h2 .r {
+ background:transparent url(/2009/image/wedge.png) no-repeat -48px 0px;
+ position:absolute;
+ right:0px;
+ top:0px;
+ width:14px;
+ height:100%;
+ margin-right:-16px;
+}
+
+#right h2 .l {
+ background-position:-64px 0px;
+}
+
+#right h2 .r {
+ margin-top:-14px;
+ border-top:none;
+ height:16px;
+ background-position:0px -128px;
+}
+
+#right h2 .r.up {
+ margin-top:-16px;
+ border-top:none;
+ height:16px;
+ border-bottom:24px solid #003366;
+ background-position:0px -128px;
+}
+
+#external h3 span {
+ display:block;
+ font-size:11px;
+ font-weight:normal;
+ letter-spacing:0px;
+ margin-top:0.125em;
+}
+
+#external h3 span.opt {
+ display:none;
+}
+
+#external ul {
+ list-style-type:none;
+}
+
+#external ul {
+ margin:0px;
+ padding:0px;
+ margin-top:0.5em;
+}
+
+#external .item ul {
+ margin-top:0.75em;
+}
+
+#external ul.thumbs {
+ margin-left:0.5em;
+}
+
+#external ul.thumbs li {
+ position:relative;
+ float:left;
+ display:inline;
+ margin-right:2px;
+ margin-bottom:2px;
+}
+
+#external ul.thumbs li a,
+#external ul.thumbs li a {
+ position:relative;
+ display:block;
+}
+
+#external h3 {
+ position:relative;
+}
+
+#external h3 a {
+ color:#000;
+ padding:0.2em;
+ margin:-0.2em 0px 0px -0.2em;
+ -khtml-border-radius:0.25em;
+ -moz-border-radius:0.25em;
+ border-radius:0.25em;
+ padding:1px 2px;
+}
+
+#external .cta a {
+ color:#000;
+ -khtml-border-radius:0.25em;
+ -moz-border-radius:0.25em;
+ border-radius:0.25em;
+}
+
+#external h3 a:hover,
+#external .cta a:hover {
+ color:#fff;
+ background:#000;
+}
+
+#external .arkanoid h3 {
+ background:#fff url(/arkanoid/image/ball_static_0.gif) no-repeat 99% 75%;
+}
+
+#external .arkanoid:hover h3 {
+ background:#fff url(/arkanoid/image/ball_static_0_1.gif) no-repeat 99% 75%;
+}
+
+#external .flickr h3 {
+ background:#fff url(/2009/image/flickr-balls.gif) no-repeat 98% 50%;
+}
+
+#external .flickr:hover h3 {
+ background:#fff url(/2009/image/flickr-balls-1.gif) no-repeat 98% 50%;
+}
+
+#external .lastfm .record {
+ position:absolute;
+ right:0px;
+ top:0px;
+ width:24px;
+ height:28px;
+ padding:2px 4px;
+ background:transparent url(/2009/image/record_icon_0.png) no-repeat 50% 0px;
+}
+
+#external .lastfm:hover .record {
+ background:transparent url(/2009/image/record_icon_1.png) no-repeat 50% 0px;
+}
+
+#external .arkanoid ul li {
+ margin-right:1px;
+ margin-bottom:1px;
+}
+
+#external .arkanoid ul li,
+#external .arkanoid ul li a,
+#external .arkanoid ul li a img {
+ width:38px;
+ height:32px;
+}
+
+#external .flickr ul li,
+#external .flickr ul li a,
+#external .flickr ul li a img {
+ width:60px;
+ height:60px;
+}
+
+#external .lastfm ul li,
+#external .lastfm ul li a,
+#external .lastfm ul li a img {
+ width:48px;
+ height:48px;
+}
+
+#external .lastfm ul li {
+ margin-right:2px;
+ margin-bottom:2px;
+}
+
+#external .flickr ul li {
+ margin-right:3px;
+ margin-bottom:3px;
+}
+
+#external ul.thumbs li a:hover {
+ z-index:3;
+}
+
+#external .arkanoid ul li {
+ border:1px solid #eee;
+}
+
+#external .arkanoid ul li a img {
+ opacity:0.8;
+/*
+ margin-left:2px;
+*/
+}
+
+/*
+#external .arkanoid ul li a img,
+#external .flickr ul li a img {
+ opacity:0.45;
+}
+*/
+
+/*
+#external .arkanoid ul li a:visited img,
+#external .flickr ul li a:visited img {
+ opacity:0.25;
+}
+*/
+
+#external .arkanoid:hover a img,
+#external .flickr:hover a img {
+ opacity:1;
+}
+
+#external .arkanoid a img:hover,
+#external .flickr a img:hover,
+#external .lastfm img:hover {
+ outline:2px solid #000;
+}
+
+#external .arkanoid .cta {
+ margin-bottom:0.5em;
+}
+
+#external .cta {
+ margin:0px;
+ padding:0px;
+ text-align:right;
+ font-style:normal;
+ font-size:x-small;
+ clear:both;
+}
+
+#external .item {
+ clear:both;
+ margin-top:0px;
+}
+
+#content #external .item ul.list li:last-child {
+ background-image:none;
+}
+
+#external .item:last-child {
+ padding-bottom:0.5em;
+ margin-top:1em;
+}
+
+#external .divider {
+ opacity:0.5;
+}
+
+#external .item .note {
+ opacity:0.5;
+ font-size:x-small;
+}
+
+#external .lastfm .clear {
+ /* bottom of column */
+ padding-top:1em;
+}
+
+/*
+#external .lastfm ul {
+ margin-top:0.25em !important;
+}
+*/
+
+#external .lastfm li {
+ margin-right:1px;
+ margin-bottom:1px;
+/*
+ padding:0.5em 0px;
+*/
+}
+
+#external .lastfm li.top-artist {
+ position:relative;
+/*
+ height:44px;
+*/
+}
+
+#external .lastfm li.top-artist img {
+/*
+ opacity:0.5;
+*/
+/*
+ border:1px solid #ccc;
+ padding:1px;
+ background:#fff;
+*/
+}
+
+#external .lastfm:hover li.top-artist img {
+ opacity:1;
+}
+
+#external .lastfm li.top-artist .artist {
+ position:absolute;
+ left:0px;
+ top:0px;
+ background:#000;
+ color:#fff;
+ padding:0.2em;
+ opacity:0.9;
+ font-family:"arial",tahoma,verdana;
+ font-style:normal;
+ font-weight:bold;
+ z-index:2;
+ white-space:nowrap;
+ margin-top:-1.7em;
+}
+
+#external .lastfm li.top-artist .playcount {
+ position:absolute;
+ right:0px;
+ bottom:0px;
+ padding:0.2em;
+ background:#990000;
+ color:#fff;
+ opacity:0.9;
+ font-style:normal;
+ font-weight:bold;
+ z-index:2;
+ margin-bottom:-1.8em;
+}
+
+#external .lastfm li.top-artist .artist,
+#external .lastfm li.top-artist .playcount {
+ visibility:hidden;
+}
+
+#external .lastfm li.top-artist:hover .artist,
+#external .lastfm li.top-artist:hover .playcount {
+ visibility:visible;
+}
+
+#external .lastfm li.top-artist:hover img {
+ opacity:1;
+}
+
+#external .lastfm li:last-child {
+ padding-bottom:0px;
+}
+
+#external .lastfm .opt {
+ display:none;
+}
+
+#external .lastfm .track,
+#external .lastfm .artist,
+#external .lastfm .playcount {
+ font-size:x-small;
+ display:block;
+}
+
+#external .lastfm .artist {
+ font-style:italic;
+ opacity:0.5;
+}
+
+#external .stub {
+ margin-bottom:-1px;
+ height:2px;
+ background:transparent url(image/lineitem-alt-black.png) no-repeat right top;
+ overflow:hidden;
+}
+
+.clear {
+ clear:both;
+ font-size:1px;
+ line-height:1px;
+ overflow:hidden;
+}
+
+.header-comment {
+ font-size:0.9em;
+ color:#666;
+}
+
+#lights {
+ position:absolute;
+ left:0px;
+ top:2.2em;
+ border-top:2px solid #006600;
+ width:100%;
+ height:100%;
+ overflow:hidden;
+}
+
+.xlsf-light {
+ position:absolute;
+ z-index:2;
+}
+
+body.fast .xlsf-light {
+ opacity:0.9;
+}
+
+.xlsf-fragment {
+ position:absolute;
+ background:transparent url(/projects/snowstorm/lights/image/bulbs-50x50-fragments.png) no-repeat 0px 0px;
+ width:50px;
+ height:50px;
+ z-index:2;
+}
+
+.xlsf-fragment-box {
+ position:absolute;
+ left:0px;
+ top:0px;
+ width:50px;
+ height:50px;
+ *width:100%;
+ *height:100%;
+ display:none;
+}
+
+.xlsf-cover {
+ position:fixed;
+ left:0px;
+ top:0px;
+ width:100%;
+ height:100%;
+ background:#fff;
+ opacity:1;
+ z-index:999;
+ display:none;
+}
+
+/* 2011 YouTube iframe hacks - if showing video, hide the video text links */
+
+body .video_iframe,
+body.video_ok .video-link {
+ display: none;
+}
+
+body.video_ok .iframe {
+ display: block;
+}
