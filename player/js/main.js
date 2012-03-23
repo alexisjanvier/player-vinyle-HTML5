@@ -305,9 +305,9 @@ var script = {
 			var 
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 			  pos = (this._player.currentTime / this._player.duration) * 100,
-			  deg = pos * 62 / 100
+			  deg = pos * (90 - 28) / 100
 		  ;
-			this._armFt.attrs.rotate = 28;
+			this._armFt.attrs.rotate = 28 + deg;
 			this._armFt.apply();
 			console.log(deg, 28 + deg);
 		}
@@ -386,13 +386,18 @@ var script = {
 					rotateRange: [0, 90]
 				}, 
 				function(ft, events) {
+	        console.log(events);
 	        console.log(ft.attrs);
-	        if ( 
+	        if (events.indexOf('rotate') != -1) {
+	        	that._armInPlace = false;
+	        	that._player.pause();
+	        }
+	        else if ( 
 	        	events.indexOf('rotate end') != -1
 	        	&& ft.attrs.rotate > 28 && ft.attrs.rotate < 90
         	) {
 	        	var 
-	        		percent = ft.attrs.rotate * 100 / 90,
+	        		percent = (ft.attrs.rotate - 28) * 100 / (90 - 28),
 	        		currentTime = that._player.duration * percent / 100
         		;	
 	        	that._player.currentTime = currentTime;
