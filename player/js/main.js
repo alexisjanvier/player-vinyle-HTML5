@@ -105,6 +105,9 @@ var script = {
 		audio.addEventListener('pause', function (event) { 
 			that.playerPaused(event);
 		}, false);
+		audio.addEventListener('ended', function (event) { 
+			that.playerEnded(event);
+		}, false);
 	},
 
 	initInfos : function () {
@@ -270,8 +273,11 @@ var script = {
 
 		if (this._autoPlay)
 			this._player.play();
-		else
+		else {
 			this._player.pause();
+			this._armFt.attrs.rotate = 0;
+			this._armFt.apply();
+		}
 		console.log('Player track ok.');
 	},
 
@@ -298,6 +304,12 @@ var script = {
 		this._playPause.innerHTML = 'play';
 		this._disc.stop();
 		console.log('Player pausing.');
+	},
+
+	playerEnded : function (event) {
+		this._playPause.innerHTML = 'play';
+		this._disc.stop();
+		console.log('Player ended.');
 	},
 
 	playerTimeUpdated : function (event) {
