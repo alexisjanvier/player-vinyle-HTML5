@@ -1,0 +1,27 @@
+* { margin: 0; padding: 0; }
+article, aside, figure, footer, header, hgroup, menu, nav, section { display: block; }
+#main {
+	background-color: #eee;
+	height: 500px;
+	margin: 50px auto;
+	position: relative;
+	width: 960px;
+}
+#player, #turntable {
+	border: 1px solid #999;
+	position: absolute;
+}
+#player {
+	height: 170px;
+	left: 10px;
+	padding: 10px;
+	top: 10px;
+	width: 400px;
+}
+#turntable {
+	bottom: 10px;
+	height: 250px;
+	right: 10px;
+	width: 800px;
+}
+
