@@ -27,6 +27,15 @@ var script = {
 	_autoPlay : false,
 	_mainId: 'player',
 	_logMethodNames: ["log", "debug", "warn", "info"],
+	_colors: {
+		discBg: '#000',
+		discFurrows: '#333',
+		discFg: '#666',
+		armBg: '#000',
+		armFg: '#000',
+		armNeedleBg: '#999',
+		armNeedleFg: '#999'
+	},
 
 	// parameters which will be overriden
 	_main: null,
@@ -275,8 +284,10 @@ var script = {
 			this._player.play();
 		else {
 			this._player.pause();
-			this._armFt.attrs.rotate = 0;
-			this._armFt.apply();
+			if (this._armFt) {
+				this._armFt.attrs.rotate = 0;
+				this._armFt.apply();
+			}
 		}
 		console.log('Player track ok.');
 	},
@@ -291,12 +302,13 @@ var script = {
 			roundPerMinute = 45,
 			rem = this._player.duration - this._player.currentTime,
 		  deg = parseInt(roundPerMinute * 360 * rem / 60)
-		  ms = parseInt(rem * 100, 10)
+		  ms = parseInt(rem * 1000)
 	  ;
 
 		this._playPause.innerHTML = 'pause';
 		this._disc.animate({ transform: 'r' +  deg}, ms, '<>');
 
+		console.log('Transform rotation : ' + deg + '° for ' + ms + 'ms.');
 		console.log('Player playing.');
 	},
 
@@ -321,7 +333,7 @@ var script = {
 		  ;
 			this._armFt.attrs.rotate = 28 + deg;
 			this._armFt.apply();
-			console.log(deg, 28 + deg);
+			//console.log(deg, 28 + deg);
 		}
 		this._range.value = this._player.currentTime;
 		this.updateInfos();
@@ -385,13 +397,14 @@ var script = {
 			paper = Raphael(turntable, 0, 0, w - 2, h - 2),
 			rect = paper
 				.rect(250, 20, 1, 200)
-				.attr('fill', '#999')
+				.attr('fill', this._colors.armBg)
+				.attr('stroke', this._colors.armFg)
 				.attr('x', 250)
 				.attr('y', 20),
 			ft = paper.freeTransform(
 				rect, 
 				{ 
-					attrs: { fill: '#999', stroke: '#999' },
+					attrs: { fill: this._colors.armNeedleBg, stroke: this._colors.armNeedleFg },
 					distance: 1,
 					drag: false,
 					scale: false,
@@ -420,13 +433,13 @@ var script = {
     	),
     	discBg = paper
     		.circle(125, 125, 115)
-				.attr('fill', '#000'),
+				.attr('fill', this._colors.discBg),
     	disc = paper
     		.path(this.initTurntableDisc(125, 125, 130, 115))
-    		.attr({ fill: "#000", stroke: "#333" }),
+    		.attr({ fill: this._colors.discBg, stroke: this._colors.discFurrows }),
     	discFg = paper
     		.circle(125, 125, 25)
-				.attr('fill', '#eee')
+				.attr('fill', this._colors.discFg)
     ;
 
     this._armFt = ft;
