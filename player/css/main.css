@@ -19,9 +19,11 @@ article, aside, figure, footer, header, hgroup, menu, nav, section { display: bl
 	width: 400px;
 }
 #turntable {
-	bottom: 10px;
-	height: 250px;
+	height: 450px;
+	padding: 0 50px;
+	overflow: hidden;
 	right: 10px;
-	width: 800px;
+	top: 10px;
+	width: 350px;
 }
 

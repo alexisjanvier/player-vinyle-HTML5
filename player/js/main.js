@@ -26,28 +26,53 @@ var script = {
 	_debugMode : true,
 	_autoPlay : false,
 	_mainId: 'player',
+	_playlistIndex: 0,
+	_buttonLabels: {
+		play: 'play',
+		pause: 'pause'
+	},
 	_logMethodNames: ["log", "debug", "warn", "info"],
-	_colors: {
-		discBg: '#000',
-		discFurrows: '#333',
-		discFg: '#666',
-		armBg: '#000',
-		armFg: '#000',
-		armNeedleBg: '#999',
-		armNeedleFg: '#999'
+	_theme: 'default',
+	_themes : {
+		default: { 
+			armSrc: 'img/vinyl-arm-200-314.png', 
+			// positions and radius
+			armX: 230, 
+			armY: -40, 
+			armW: 63, 
+			armH: 314,
+			armStart: 22, 
+			armEnd: 55,
+			discX: 125, 
+			discY: 175, 
+			discR: 115,
+			discFW: 130,
+			discBgR: 115,
+			discFgR: 25,
+			discAxisR: 3,
+			// colors
+			discBg: '#000',
+			discFurrows: '#333',
+			discFg: '#666',
+			discAxis: '#000',
+			armBg: '#999',
+			armFg: '#000',
+			armNeedleBg: '#999',
+			armNeedleFg: '#000'
+		}
 	},
 
-	// parameters which will be overriden
+	// reserved parameters which will be overriden
 	_main: null,
 	_player: null,
 	_playlist: null,
-	_playlistIndex: 0,
 	_playPause: null,
 	_range: {},
 	_infos: {},
 	_disc: null,
 	_arm: null,
 	_armInPlace: null,
+	_armRotation: 0,
 	_logMethods: [],
 
 	// functions
@@ -208,11 +233,11 @@ var script = {
 		;
 
 		if (this._autoPlay) {
-			button.innerHTML = 'pause';
+			button.innerHTML = this._buttonLabels.pause;
 			button.data = true;
 		}
 		else {
-			button.innerHTML = 'start';
+			button.innerHTML = this._buttonLabels.play;
 			button.data = false;
 		}
 		button.addEventListener('click', function (event) { 
@@ -244,7 +269,14 @@ var script = {
 		this._player.src = track.src;
 		this._player.load();
 		this._playlistIndex = i;
+
 		console.log('Track #' + i + ' ok.');
+	},
+
+	stop : function () {
+  	this._player.pause();
+		this._player.currentTime = 0;
+		this.updateInfos();
 	},
 
 	initPlaylist : function () {
@@ -293,11 +325,15 @@ var script = {
 	},
 
 	playerPlayed : function (event) {
-		if (this._armInPlace != true) {
-			this._armFt.attrs.rotate = 28;
+		if (this._armInPlace != true && this._armRotation == 0) {
+			this._armFt.attrs.rotate = this._themes[this._theme].armStart;
 			this._armFt.apply();
 			this._armInPlace = true;
+      console.log('Arm rotation : ' + this._themes[this._theme].armStart + '°.');
 		}
+		else if (this._armInPlace != true)
+			this._armInPlace = true;
+
 		var 
 			roundPerMinute = 45,
 			rem = this._player.duration - this._player.currentTime,
@@ -305,22 +341,26 @@ var script = {
 		  ms = parseInt(rem * 1000)
 	  ;
 
-		this._playPause.innerHTML = 'pause';
-		this._disc.animate({ transform: 'r' +  deg}, ms, '<>');
+		this._playPause.innerHTML = this._buttonLabels.pause;
+		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear');
 
 		console.log('Transform rotation : ' + deg + '° for ' + ms + 'ms.');
 		console.log('Player playing.');
 	},
 
 	playerPaused : function (event) {
-		this._playPause.innerHTML = 'play';
+		this._playPause.innerHTML = this._buttonLabels.play;
 		this._disc.stop();
 		console.log('Player pausing.');
 	},
 
 	playerEnded : function (event) {
-		this._playPause.innerHTML = 'play';
+		this._playPause.innerHTML = this._buttonLabels.play;
 		this._disc.stop();
+
+		this._armFt.attrs.rotate = 0;
+		this._armFt.apply();
+
 		console.log('Player ended.');
 	},
 
@@ -329,11 +369,10 @@ var script = {
 			var 
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 			  pos = (this._player.currentTime / this._player.duration) * 100,
-			  deg = pos * (90 - 28) / 100
+			  deg = pos * (this._themes[this._theme].armEnd - this._themes[this._theme].armStart) / 100
 		  ;
-			this._armFt.attrs.rotate = 28 + deg;
+			this._armFt.attrs.rotate = this._themes[this._theme].armStart + deg;
 			this._armFt.apply();
-			//console.log(deg, 28 + deg);
 		}
 		this._range.value = this._player.currentTime;
 		this.updateInfos();
@@ -341,6 +380,10 @@ var script = {
 
 	playlistButtonClicked : function (event) {
 		this.loadTrack(event.target.data);
+		if (this._disc)
+			this._disc.stop();
+
+		this._playPause.innerHTML = this._buttonLabels.play;
 	},
 
 	rangeClicked : function (event) {
@@ -395,55 +438,78 @@ var script = {
 			h = document.getElementById(id).offsetHeight,
 			turntable = document.getElementById(id),
 			paper = Raphael(turntable, 0, 0, w - 2, h - 2),
-			rect = paper
-				.rect(250, 20, 1, 200)
-				.attr('fill', this._colors.armBg)
-				.attr('stroke', this._colors.armFg)
-				.attr('x', 250)
-				.attr('y', 20),
+    	discBg = paper
+    		.circle(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discR)
+				.attr('fill', this._themes[this._theme].discBg),
+    	disc = paper
+    		.path(this.initTurntableDisc(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discFW, 
+    			this._themes[this._theme].discR))
+    		.attr({ fill: this._themes[this._theme].discBg, stroke: this._themes[this._theme].discFurrows }),
+    	discFg = paper
+    		.circle(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discFgR)
+				.attr('fill', this._themes[this._theme].discFg),
+    	discAxis = paper
+    		.circle(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discAxisR)
+				.attr('fill', this._themes[this._theme].discAxis),
+			arm = paper
+				.image(
+					this._themes[this._theme].armSrc, 
+					this._themes[this._theme].armX, 
+					this._themes[this._theme].armY, 
+					this._themes[this._theme].armW, 
+					this._themes[this._theme].armH),
 			ft = paper.freeTransform(
-				rect, 
+				arm, 
 				{ 
-					attrs: { fill: this._colors.armNeedleBg, stroke: this._colors.armNeedleFg },
-					distance: 1,
+					attrs: { 
+						fill: this._themes[this._theme].armNeedleBg, 
+						stroke: this._themes[this._theme].armNeedleFg,
+						opacity: 0 
+					},
+					distance: .95,
+					size: 20,
 					drag: false,
 					scale: false,
-					rotateRange: [0, 90]
+					rotateRange: [0, this._themes[this._theme].armEnd]
 				}, 
 				function(ft, events) {
-	        console.log(events);
-	        console.log(ft.attrs);
-	        if (events.indexOf('rotate') != -1) {
-	        	that._armInPlace = false;
-	        	that._player.pause();
-	        }
-	        else if ( 
+					that._armRotation = ft.attrs.rotate;
+	        console.log('Arm rotation : ' + ft.attrs.rotate + '°.');
+	        if ( 
 	        	events.indexOf('rotate end') != -1
-	        	&& ft.attrs.rotate > 28 && ft.attrs.rotate < 90
+	        	&& ft.attrs.rotate > that._themes[that._theme].armStart 
+	        	&& ft.attrs.rotate < that._themes[that._theme].armEnd
         	) {
 	        	var 
-	        		percent = (ft.attrs.rotate - 28) * 100 / (90 - 28),
+	        		percent = (ft.attrs.rotate - that._themes[that._theme].armStart) * 100 / (that._themes[that._theme].armEnd - that._themes[that._theme].armStart),
 	        		currentTime = that._player.duration * percent / 100
         		;	
 	        	that._player.currentTime = currentTime;
 	        	that._player.play();
 	        	console.log('Player track is at ' + Math.floor(percent, 10) + '%.');
 	        }
+	        else if (events.indexOf('rotate') != -1 || events.indexOf('rotate end') != -1) {
+				  	that._armInPlace = false;
+	        	that.stop();
+	        }
 	    	}
-    	),
-    	discBg = paper
-    		.circle(125, 125, 115)
-				.attr('fill', this._colors.discBg),
-    	disc = paper
-    		.path(this.initTurntableDisc(125, 125, 130, 115))
-    		.attr({ fill: this._colors.discBg, stroke: this._colors.discFurrows }),
-    	discFg = paper
-    		.circle(125, 125, 25)
-				.attr('fill', this._colors.discFg)
+    	)
     ;
 
     this._armFt = ft;
-    this._arm = rect;
+    this._arm = arm;
     this._disc = disc;
 	}
 
