@@ -44,18 +44,19 @@ var script = {
 			armW: 63, 
 			armH: 314,
 			armStart: 22, 
-			armEnd: 55,
+			armEnd: 45,
 			discX: 125, 
 			discY: 175, 
 			discR: 115,
-			discFW: 130,
+			discFW: 140,
 			discBgR: 115,
-			discFgR: 25,
+			discFgR: 55,
 			discAxisR: 3,
 			// colors
 			discBg: '#000',
 			discFurrows: '#333',
 			discFg: '#666',
+			discTitle: '#eee',
 			discAxis: '#000',
 			armBg: '#999',
 			armFg: '#000',
@@ -73,6 +74,7 @@ var script = {
 	_playerPaused: null,
 	_infos: {},
 	_disc: null,
+	_discTitle: null,
 	_arm: null,
 	_armFt: null,
 	_armFtCallback: null,
@@ -83,7 +85,7 @@ var script = {
 	// functions
 	init : function () {
 		this.loadLogger();
-		console.log('Init!');
+		this.log('Init!');
 		this.initPlayer();
 		this.initRemote();
 		this.initPlaylist();
@@ -91,7 +93,7 @@ var script = {
 	},
 
 	initOnDomReady : function () {
-		console.log('DOM ready!');
+		this.log('DOM ready!');
 		this.initTurntable();
 	},
 
@@ -119,12 +121,25 @@ var script = {
 		}
 	},
 
+	log : function (s) {
+		console.log(s);
+	},
+
 	formatTime : function (t) {
 		return t.mins + ':' + (t.secs > 9 ? t.secs : '0' + t.secs);
 	},
 
 	formatTrackTitle : function (t) {
 		return t.artist + ' - ' + t.title;
+	},
+
+	getTrackTitle : function () {
+		var 
+			i = this._playlistIndex,
+			track = this.tracks[i]
+		;
+
+		return this.formatTrackTitle(track).replace(' - ', '\n \n');
 	},
 
 	arcString : function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
@@ -267,7 +282,7 @@ var script = {
 
 		this._playlist = playlist;
 		this._main.appendChild(playlist);
-		console.log('Playlist ok.');
+		this.log('Playlist ok.');
 	},
 
 	initTurntable : function () {
@@ -297,6 +312,15 @@ var script = {
     			this._themes[this._theme].discY, 
     			this._themes[this._theme].discFgR)
 				.attr('fill', this._themes[this._theme].discFg),
+				bbox = disc.getBBox(),
+			discTitle = paper
+				.text(
+					bbox.x + bbox.width/2, 
+					bbox.y + bbox.height/2,
+					this.getTrackTitle())
+				.attr('fill', this._themes[this._theme].discTitle)
+				.attr('height', this._themes[this._theme].discFgR * 1.25)
+				.attr('width', this._themes[this._theme].discFgR * 1.25),
     	discAxis = paper
     		.circle(
     			this._themes[this._theme].discX, 
@@ -311,11 +335,10 @@ var script = {
 					this._themes[this._theme].armW, 
 					this._themes[this._theme].armH),
 			ftCallback = function(ft, events) {
-        console.log('FT events : ' + events + '.');
+        that.log('FT events : ' + events + '.');
 				that._armRotation = ft.attrs.rotate;
-        console.log('Arm rotation : ' + ft.attrs.rotate + '°.');
+        that.log('Arm rotation : ' + ft.attrs.rotate + '°.');
         if (events.indexOf('rotate') != -1) {
-			  	// that._armInPlace = false;
         	that.pause();	
         }
         else if ( 
@@ -329,7 +352,7 @@ var script = {
       		;	
         	that._player.currentTime = currentTime;
         	that.start();
-        	console.log('Player track is at ' + Math.floor(percent, 10) + '%.');
+        	that.log('Player track is at ' + Math.floor(percent, 10) + '%.');
         }
         else if (events.indexOf('rotate end') != -1) {
         	that.stop();
@@ -358,6 +381,7 @@ var script = {
     this._armFtCallback = ftCallback;
     this._arm = arm;
     this._disc = disc;
+    this._discTitle = discTitle;
 	},
 
 	updateTrackInfos : function () {
@@ -365,6 +389,9 @@ var script = {
 			i = this._playlistIndex,
 			track = this.tracks[i]
 		;
+
+		if (this._discTitle)
+			this._discTitle.attr('text', this.getTrackTitle());
 
 		if (this._infos['title'] != undefined)
 			this._infos['title'].innerHTML = 'Title : '  + this.formatTrackTitle(track);
@@ -417,7 +444,7 @@ var script = {
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = true;
 		}
-		console.log('Remote disabled (' + s + ').');
+		this.log('Remote disabled (' + s + ').');
 	},
 
 	enableRemote : function (s) {
@@ -425,7 +452,7 @@ var script = {
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = false;
 		}
-		console.log('Remote enabled (' + s + ').');
+		this.log('Remote enabled (' + s + ').');
 	},
 
 	loadTrack : function (i) {
@@ -440,7 +467,29 @@ var script = {
 
 		this.disableRemote('loadTrack');
 
-		console.log('Track #' + i + ' ok.');
+		this.log('Track #' + i + ' ok.');
+	},
+
+	startDiscRotation : function () {
+		var 
+			roundPerMinute = 45,
+			rem = this._player.duration - this._player.currentTime,
+		  deg = parseInt(roundPerMinute * 360 * rem / 60)
+		  ms = parseInt(rem * 1000)
+	  ;
+
+		this._buttons.playPause.innerHTML = this._buttonLabels.pause;
+		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear');
+		this._discTitle.animate({ transform: 'r' +  deg}, ms, 'linear');
+
+		this.log('Transform rotation : ' + deg + '° for ' + ms + 'ms.');
+	},
+
+	stopDiscRotation : function () {
+		if (this._disc)
+			this._disc.stop();
+		if (this._discTitle)
+			this._discTitle.stop();
 	},
 
 	start : function () {
@@ -451,36 +500,25 @@ var script = {
 			this._armFt.attrs.rotate = this._themes[this._theme].armStart;
 			this._armFt.apply(function (ft) {
 				ft.setOpts({ animate: false }, that._armFtCallback);
+				that.startDiscRotation();
 				that._player.play();
 		  	that._playerPaused = false;
 				that.enableRemote('start');
 			});
 			this._armInPlace = true;
-      console.log('Arm rotation : ' + this._themes[this._theme].armStart + '°.');
+      this.log('Arm rotation : ' + this._themes[this._theme].armStart + '°.');
 		}
 		else {
 			this._armInPlace = true;
 			this._player.play();
 	  	this._playerPaused = false;
+	  	this.startDiscRotation();
 		}
-
-		var 
-			roundPerMinute = 45,
-			rem = this._player.duration - this._player.currentTime + (this._animateDelay / 1000),
-		  deg = parseInt(roundPerMinute * 360 * rem / 60)
-		  ms = parseInt(rem * 1000)
-	  ;
-
-		this._buttons.playPause.innerHTML = this._buttonLabels.pause;
-		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear');
-
-		console.log('Transform rotation : ' + deg + '° for ' + ms + 'ms.');
 	},
 
 	pause : function () {
 		this._buttons.playPause.innerHTML = this._buttonLabels.play;
-		if (this._disc)
-			this._disc.stop();
+		this.stopDiscRotation();
   	this._player.pause();
   	this._playerPaused = true;
 	},
@@ -490,8 +528,7 @@ var script = {
 
 		if (this._buttons.playPause)
 			this._buttons.playPause.innerHTML = this._buttonLabels.play;
-		if (this._disc)
-			this._disc.stop();
+		this.stopDiscRotation();
   	this._playerPaused = true;
 
 		if (this._armFt) {
@@ -518,7 +555,7 @@ var script = {
 		else {
 			this.stop();
 		}
-		console.log('Player event : loaded.');
+		this.log('Player event : loaded.');
 	},
 
 	playPauseButtonClicked : function (event) {
@@ -529,17 +566,17 @@ var script = {
 	},
 
 	playerPlayed : function (event) {
-		console.log('Player event : play.');
+		this.log('Player event : play.');
 		this.start();
 	},
 
 	playerPaused : function (event) {
-		console.log('Player event : pause.');
+		this.log('Player event : pause.');
 		this.pause();
 	},
 
 	playerEnded : function (event) {
-		console.log('Player event : ended.');
+		this.log('Player event : ended.');
 		this.stop();
 	},
 

@@ -26,3 +26,7 @@ article, aside, figure, footer, header, hgroup, menu, nav, section { display: bl
 	top: 10px;
 	width: 350px;
 }
+#turntable text,
+#turntable tspan {
+	font-family: Impact;
+}
