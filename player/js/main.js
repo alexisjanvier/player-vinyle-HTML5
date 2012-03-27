@@ -23,9 +23,11 @@ var script = {
 			src: "/ogg/Tool%20-%2010.000%20Days/Tool%20-%2003%20-%20Wings%20For%20Marie%20%28Pt%201%29.ogg"
 		}
 	],
+	_animateDelay : 2000,
 	_debugMode : true,
 	_autoPlay : false,
 	_mainId: 'player',
+	_turntableId: 'turntable',
 	_playlistIndex: 0,
 	_buttonLabels: {
 		play: 'play',
@@ -58,7 +60,7 @@ var script = {
 			armBg: '#999',
 			armFg: '#000',
 			armNeedleBg: '#999',
-			armNeedleFg: '#000'
+			armNeedleFg: 'transparent'
 		}
 	},
 
@@ -67,10 +69,12 @@ var script = {
 	_player: null,
 	_playlist: null,
 	_playPause: null,
-	_range: {},
+	_playerPaused: null,
 	_infos: {},
 	_disc: null,
 	_arm: null,
+	_armFt: null,
+	_armFtCallback: null,
 	_armInPlace: null,
 	_armRotation: 0,
 	_logMethods: [],
@@ -114,6 +118,45 @@ var script = {
 		}
 	},
 
+	formatTime : function (t) {
+		return t.mins + ':' + (t.secs > 9 ? t.secs : '0' + t.secs);
+	},
+
+	formatTrackTitle : function (t) {
+		return t.artist + ' - ' + t.title;
+	},
+
+	arcString : function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
+	  // opts 4 and 5 are:
+	  // large-arc-flag: 0 for smaller arc
+	  // sweep-flag: 1 for clockwise
+
+	  largeArcFlag = largeArcFlag || 0;
+	  var arcSVG = [radius1, radius2, angle, largeArcFlag, 1, endX, endY].join(' ');
+	  return startX + ' ' + startY + " a " + arcSVG;
+	},
+
+	getFurrowsPath : function (centerX, centerY, spacing, maxRadius) {
+		var
+			pathAttributes = ['M', centerX, centerY],
+	  	angle = 0,
+	  	startX = centerX,
+	  	startY = centerY
+		;
+
+	  for (var radius = 0; radius < maxRadius; radius++) {
+	    angle += spacing;
+	    var endX = centerX + radius * Math.cos(angle * Math.PI / 180);
+	    var endY = centerY + radius * Math.sin(angle * Math.PI / 180);
+
+	    pathAttributes.push(this.arcString(startX, startY, endX - startX, endY - startY, radius, radius, 0));
+	    startX = endX; 
+	    startY = endY;
+	  }
+
+	  return pathAttributes.join(' ');
+	},
+
 	initPlayer : function () {
 		var 
 			that = this,
@@ -121,8 +164,8 @@ var script = {
 		;
 		this._main = document.getElementById(this._mainId);
 
-		if (this._debugMode)
-			audio.controls = true;
+		// if (this._debugMode)
+			// audio.controls = true;
 		this._main.appendChild(audio);
 		this._player = audio;
 		this.loadTrack(this._playlistIndex);
@@ -176,6 +219,144 @@ var script = {
 		};
 	},
 
+	initRemote : function () {
+		var
+			that = this,
+			remote = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
+			button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
+		;
+
+		if (this._autoPlay) {
+			button.innerHTML = this._buttonLabels.pause;
+			button.data = true;
+		}
+		else {
+			button.innerHTML = this._buttonLabels.play;
+			button.data = false;
+		}
+		button.addEventListener('click', function (event) { 
+			that.playPauseButtonClicked(event);
+		}, false);
+
+		remote.appendChild(button);
+		this._main.appendChild(remote);
+
+		this._playPause = button;
+	},
+
+	initPlaylist : function () {
+		var 
+			that = this,
+			playlist = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
+		;
+
+		for (var i = 0; i < this.tracks.length; i++) {
+			var 
+				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
+			;
+			button.innerHTML = i + 1;
+			button.data = i;
+			playlist.appendChild(button);
+			button.addEventListener('click', function (event) { 
+				that.playlistButtonClicked(event);
+			}, false);
+		}
+
+		this._playlist = playlist;
+		this._main.appendChild(playlist);
+		console.log('Playlist ok.');
+	},
+
+	initTurntable : function () {
+		var 
+			that = this,
+			id = this._turntableId,
+			w = document.getElementById(id).offsetWidth,
+			h = document.getElementById(id).offsetHeight,
+			turntable = document.getElementById(id),
+			paper = Raphael(turntable, 0, 0, w - 2, h - 2),
+    	discBg = paper
+    		.circle(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discR)
+				.attr('fill', this._themes[this._theme].discBg),
+    	disc = paper
+    		.path(this.getFurrowsPath(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discFW, 
+    			this._themes[this._theme].discR))
+    		.attr({ fill: this._themes[this._theme].discBg, stroke: this._themes[this._theme].discFurrows }),
+    	discFg = paper
+    		.circle(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discFgR)
+				.attr('fill', this._themes[this._theme].discFg),
+    	discAxis = paper
+    		.circle(
+    			this._themes[this._theme].discX, 
+    			this._themes[this._theme].discY, 
+    			this._themes[this._theme].discAxisR)
+				.attr('fill', this._themes[this._theme].discAxis),
+			arm = paper
+				.image(
+					this._themes[this._theme].armSrc, 
+					this._themes[this._theme].armX, 
+					this._themes[this._theme].armY, 
+					this._themes[this._theme].armW, 
+					this._themes[this._theme].armH),
+			ftCallback = function(ft, events) {
+        console.log('FT events : ' + events + '.');
+				that._armRotation = ft.attrs.rotate;
+        console.log('Arm rotation : ' + ft.attrs.rotate + '°.');
+        if (events.indexOf('rotate') != -1) {
+			  	// that._armInPlace = false;
+        	that.pause();	
+        }
+        else if ( 
+        	events.indexOf('rotate end') != -1
+        	&& ft.attrs.rotate > that._themes[that._theme].armStart 
+        	&& ft.attrs.rotate < that._themes[that._theme].armEnd
+      	) {
+        	var 
+        		percent = (ft.attrs.rotate - that._themes[that._theme].armStart) * 100 / (that._themes[that._theme].armEnd - that._themes[that._theme].armStart),
+        		currentTime = that._player.duration * percent / 100
+      		;	
+        	that._player.currentTime = currentTime;
+        	that.start();
+        	console.log('Player track is at ' + Math.floor(percent, 10) + '%.');
+        }
+        else if (events.indexOf('rotate end') != -1) {
+        	that.stop();
+        }
+    	},
+			ft = paper.freeTransform(
+				arm, 
+				{
+					attrs: { 
+						fill: this._themes[this._theme].armNeedleBg, 
+						stroke: this._themes[this._theme].armNeedleFg,
+						opacity: 0 
+					},
+					animate: false,
+					distance: .95,
+					size: 20,
+					drag: false,
+					scale: false,
+					rotateRange: [0, this._themes[this._theme].armEnd]
+				}, 
+				ftCallback
+    	)
+    ;
+
+    this._armFt = ft;
+    this._armFtCallback = ftCallback;
+    this._arm = arm;
+    this._disc = disc;
+	},
+
 	updateTrackInfos : function () {
 		var 
 			i = this._playlistIndex,
@@ -216,51 +397,6 @@ var script = {
 			});
 	},
 
-	formatTime : function (t) {
-		return t.mins + ':' + (t.secs > 9 ? t.secs : '0' + t.secs);
-	},
-
-	formatTrackTitle : function (t) {
-		return t.artist + ' - ' + t.title;
-	},
-
-	initRemote : function () {
-		var
-			that = this,
-			remote = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
-			button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button'),
-			range = document.createElementNS('http://www.w3.org/1999/xhtml', 'input')
-		;
-
-		if (this._autoPlay) {
-			button.innerHTML = this._buttonLabels.pause;
-			button.data = true;
-		}
-		else {
-			button.innerHTML = this._buttonLabels.play;
-			button.data = false;
-		}
-		button.addEventListener('click', function (event) { 
-			that.playPauseButtonClicked(event);
-		}, false);
-		
-		range.type = 'range';
-		range.step = 'any';
-		range.value = 0;
-		range.min = 0;
-		range.max = 100;
-		range.addEventListener('click', function (event) { 
-			that.rangeClicked(event);
-		}, false);
-
-		remote.appendChild(button);
-		remote.appendChild(range);
-		this._main.appendChild(remote);
-
-		this._playPause = button;
-		this._range = range;
-	},
-
 	loadTrack : function (i) {
 		var 
 			i = i || 0,
@@ -273,70 +409,28 @@ var script = {
 		console.log('Track #' + i + ' ok.');
 	},
 
-	stop : function () {
-  	this._player.pause();
-		this._player.currentTime = 0;
-		this.updateInfos();
-	},
-
-	initPlaylist : function () {
-		var 
-			that = this,
-			playlist = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
-		;
-
-		for (var i = 0; i < this.tracks.length; i++) {
-			var 
-				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
-			;
-			button.innerHTML = i + 1;
-			button.data = i;
-			playlist.appendChild(button);
-			button.addEventListener('click', function (event) { 
-				that.playlistButtonClicked(event);
-			}, false);
-		}
-
-		this._playlist = playlist;
-		this._main.appendChild(playlist);
-		console.log('Playlist ok.');
-	},
-
-	// events
-	playerLoaded : function (event) {
-		if (this._range != undefined) {
-			this._range.value = 0;
-		  this._range.min = 0;
-		  this._range.max = this._player.duration;
-		}
-		this.updateTrackInfos();
-		this.updateInfos();
-
-		if (this._autoPlay)
-			this._player.play();
-		else {
-			this._player.pause();
-			if (this._armFt) {
-				this._armFt.attrs.rotate = 0;
-				this._armFt.apply();
-			}
-		}
-		console.log('Player track ok.');
-	},
-
-	playerPlayed : function (event) {
+	start : function () {
 		if (this._armInPlace != true && this._armRotation == 0) {
+			var that = this;
+			this._armFt.setOpts({ animate: true }, this._armFtCallback);
 			this._armFt.attrs.rotate = this._themes[this._theme].armStart;
-			this._armFt.apply();
+			this._armFt.apply(function (ft) {
+				ft.setOpts({ animate: false }, that._armFtCallback);
+				that._player.play();
+		  	that._playerPaused = false;
+			});
 			this._armInPlace = true;
       console.log('Arm rotation : ' + this._themes[this._theme].armStart + '°.');
 		}
-		else if (this._armInPlace != true)
+		else {
 			this._armInPlace = true;
+			this._player.play();
+	  	this._playerPaused = false;
+		}
 
 		var 
 			roundPerMinute = 45,
-			rem = this._player.duration - this._player.currentTime,
+			rem = this._player.duration - this._player.currentTime + (this._animateDelay / 1000),
 		  deg = parseInt(roundPerMinute * 360 * rem / 60)
 		  ms = parseInt(rem * 1000)
 	  ;
@@ -345,27 +439,69 @@ var script = {
 		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear');
 
 		console.log('Transform rotation : ' + deg + '° for ' + ms + 'ms.');
-		console.log('Player playing.');
+	},
+
+	pause : function () {
+		this._playPause.innerHTML = this._buttonLabels.play;
+		if (this._disc)
+			this._disc.stop();
+  	this._player.pause();
+  	this._playerPaused = true;
+	},
+
+	stop : function () {
+		var that = this;
+
+		this._playPause.innerHTML = this._buttonLabels.play;
+		this._disc.stop();
+  	this._playerPaused = true;
+
+		this._armFt.setOpts({ animate: true }, this._armFtCallback);
+		this._armFt.attrs.rotate = 0;
+		this._armFt.apply(function (ft) {
+			ft.setOpts({ animate: false }, that._armFtCallback);
+			that._armInPlace = false;
+			that._armRotation = 0;
+		});
+	},
+
+	// events
+	playerLoaded : function (event) {
+		this.updateTrackInfos();
+		this.updateInfos();
+
+		if (this._autoPlay)
+			this.start();
+		else {
+			this.stop();
+		}
+		console.log('Player event : loaded.');
+	},
+
+	playPauseButtonClicked : function (event) {
+		if (this._playerPaused == true)
+			this.start();
+		else
+			this.pause();
+	},
+
+	playerPlayed : function (event) {
+		console.log('Player event : play.');
+		this.start();
 	},
 
 	playerPaused : function (event) {
-		this._playPause.innerHTML = this._buttonLabels.play;
-		this._disc.stop();
-		console.log('Player pausing.');
+		console.log('Player event : pause.');
+		this.pause();
 	},
 
 	playerEnded : function (event) {
-		this._playPause.innerHTML = this._buttonLabels.play;
-		this._disc.stop();
-
-		this._armFt.attrs.rotate = 0;
-		this._armFt.apply();
-
-		console.log('Player ended.');
+		console.log('Player event : ended.');
+		this.stop();
 	},
 
 	playerTimeUpdated : function (event) {
-		if (this._armInPlace == true) {
+		if (this._armInPlace) {
 			var 
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 			  pos = (this._player.currentTime / this._player.duration) * 100,
@@ -374,7 +510,6 @@ var script = {
 			this._armFt.attrs.rotate = this._themes[this._theme].armStart + deg;
 			this._armFt.apply();
 		}
-		this._range.value = this._player.currentTime;
 		this.updateInfos();
 	},
 
@@ -384,141 +519,10 @@ var script = {
 			this._disc.stop();
 
 		this._playPause.innerHTML = this._buttonLabels.play;
-	},
-
-	rangeClicked : function (event) {
-		this._player.currentTime = this._range.value;
-	},
-
-	playPauseButtonClicked : function (event) {
-		if (this._player.paused == true)
-			this._player.play();
-		else
-			this._player.pause();
-	},
-
-
-	// Turntable
-	arcString : function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
-	  // opts 4 and 5 are:
-	  // large-arc-flag: 0 for smaller arc
-	  // sweep-flag: 1 for clockwise
-
-	  largeArcFlag = largeArcFlag || 0;
-	  var arcSVG = [radius1, radius2, angle, largeArcFlag, 1, endX, endY].join(' ');
-	  return startX + ' ' + startY + " a " + arcSVG;
-	},
-
-	initTurntableDisc : function (centerX, centerY, spacing, maxRadius) {
-		var
-			pathAttributes = ['M', centerX, centerY],
-	  	angle = 0,
-	  	startX = centerX,
-	  	startY = centerY
-		;
-
-	  for (var radius = 0; radius < maxRadius; radius++) {
-	    angle += spacing;
-	    var endX = centerX + radius * Math.cos(angle * Math.PI / 180);
-	    var endY = centerY + radius * Math.sin(angle * Math.PI / 180);
-
-	    pathAttributes.push(this.arcString(startX, startY, endX - startX, endY - startY, radius, radius, 0));
-	    startX = endX; 
-	    startY = endY;
-	  }
-
-	  return pathAttributes.join(' ');
-	},
-
-	initTurntable : function () {
-		var 
-			that = this,
-			id = 'turntable',
-			w = document.getElementById(id).offsetWidth,
-			h = document.getElementById(id).offsetHeight,
-			turntable = document.getElementById(id),
-			paper = Raphael(turntable, 0, 0, w - 2, h - 2),
-    	discBg = paper
-    		.circle(
-    			this._themes[this._theme].discX, 
-    			this._themes[this._theme].discY, 
-    			this._themes[this._theme].discR)
-				.attr('fill', this._themes[this._theme].discBg),
-    	disc = paper
-    		.path(this.initTurntableDisc(
-    			this._themes[this._theme].discX, 
-    			this._themes[this._theme].discY, 
-    			this._themes[this._theme].discFW, 
-    			this._themes[this._theme].discR))
-    		.attr({ fill: this._themes[this._theme].discBg, stroke: this._themes[this._theme].discFurrows }),
-    	discFg = paper
-    		.circle(
-    			this._themes[this._theme].discX, 
-    			this._themes[this._theme].discY, 
-    			this._themes[this._theme].discFgR)
-				.attr('fill', this._themes[this._theme].discFg),
-    	discAxis = paper
-    		.circle(
-    			this._themes[this._theme].discX, 
-    			this._themes[this._theme].discY, 
-    			this._themes[this._theme].discAxisR)
-				.attr('fill', this._themes[this._theme].discAxis),
-			arm = paper
-				.image(
-					this._themes[this._theme].armSrc, 
-					this._themes[this._theme].armX, 
-					this._themes[this._theme].armY, 
-					this._themes[this._theme].armW, 
-					this._themes[this._theme].armH),
-			ft = paper.freeTransform(
-				arm, 
-				{ 
-					attrs: { 
-						fill: this._themes[this._theme].armNeedleBg, 
-						stroke: this._themes[this._theme].armNeedleFg,
-						opacity: 0 
-					},
-					distance: .95,
-					size: 20,
-					drag: false,
-					scale: false,
-					rotateRange: [0, this._themes[this._theme].armEnd]
-				}, 
-				function(ft, events) {
-					that._armRotation = ft.attrs.rotate;
-	        console.log('Arm rotation : ' + ft.attrs.rotate + '°.');
-	        if ( 
-	        	events.indexOf('rotate end') != -1
-	        	&& ft.attrs.rotate > that._themes[that._theme].armStart 
-	        	&& ft.attrs.rotate < that._themes[that._theme].armEnd
-        	) {
-	        	var 
-	        		percent = (ft.attrs.rotate - that._themes[that._theme].armStart) * 100 / (that._themes[that._theme].armEnd - that._themes[that._theme].armStart),
-	        		currentTime = that._player.duration * percent / 100
-        		;	
-	        	that._player.currentTime = currentTime;
-	        	that._player.play();
-	        	console.log('Player track is at ' + Math.floor(percent, 10) + '%.');
-	        }
-	        else if (events.indexOf('rotate') != -1 || events.indexOf('rotate end') != -1) {
-				  	that._armInPlace = false;
-	        	that.stop();
-	        }
-	    	}
-    	)
-    ;
-
-    this._armFt = ft;
-    this._arm = arm;
-    this._disc = disc;
 	}
-
 };
 
 script.init();
 window.addEventListener('load', function () {
 	script.initOnDomReady();
 }, false);
-// jQuery(document).ready(function () {
-// 	script.initOnDomReady();
-// });

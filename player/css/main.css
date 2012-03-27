@@ -2,7 +2,7 @@
 article, aside, figure, footer, header, hgroup, menu, nav, section { display: block; }
 #main {
 	background-color: #eee;
-	height: 500px;
+	height: 400px;
 	margin: 50px auto;
 	position: relative;
 	width: 960px;
@@ -19,11 +19,10 @@ article, aside, figure, footer, header, hgroup, menu, nav, section { display: bl
 	width: 400px;
 }
 #turntable {
-	height: 450px;
+	height: 350px;
 	padding: 0 50px;
 	overflow: hidden;
 	right: 10px;
 	top: 10px;
 	width: 350px;
 }
-
