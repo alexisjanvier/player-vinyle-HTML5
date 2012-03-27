@@ -453,16 +453,19 @@ var script = {
 		var that = this;
 
 		this._playPause.innerHTML = this._buttonLabels.play;
-		this._disc.stop();
+		if (this._disc)
+			this._disc.stop();
   	this._playerPaused = true;
 
-		this._armFt.setOpts({ animate: true }, this._armFtCallback);
-		this._armFt.attrs.rotate = 0;
-		this._armFt.apply(function (ft) {
-			ft.setOpts({ animate: false }, that._armFtCallback);
-			that._armInPlace = false;
-			that._armRotation = 0;
-		});
+		if (this._armFt) {
+			this._armFt.setOpts({ animate: true }, this._armFtCallback);
+			this._armFt.attrs.rotate = 0;
+			this._armFt.apply(function (ft) {
+				ft.setOpts({ animate: false }, that._armFtCallback);
+				that._armInPlace = false;
+				that._armRotation = 0;
+			});
+		}
 	},
 
 	// events
