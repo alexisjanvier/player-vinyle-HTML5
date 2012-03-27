@@ -68,6 +68,7 @@ var script = {
 	_main: null,
 	_player: null,
 	_playlist: null,
+	_buttons: {},
 	_playPause: null,
 	_playerPaused: null,
 	_infos: {},
@@ -241,7 +242,7 @@ var script = {
 		remote.appendChild(button);
 		this._main.appendChild(remote);
 
-		this._playPause = button;
+		this._buttons.playPause = button;
 	},
 
 	initPlaylist : function () {
@@ -260,6 +261,8 @@ var script = {
 			button.addEventListener('click', function (event) { 
 				that.playlistButtonClicked(event);
 			}, false);
+
+			this._buttons[i] = button;
 		}
 
 		this._playlist = playlist;
@@ -397,14 +400,45 @@ var script = {
 			});
 	},
 
+	updateDiscNeedlePosition : function () {
+		if (this._armInPlace) {
+			var 
+				rem = parseInt(this._player.duration - this._player.currentTime, 10),
+			  pos = (this._player.currentTime / this._player.duration) * 100,
+			  deg = pos * (this._themes[this._theme].armEnd - this._themes[this._theme].armStart) / 100
+		  ;
+			this._armFt.attrs.rotate = this._themes[this._theme].armStart + deg;
+			this._armFt.apply();
+		}
+	},
+
+	disableRemote : function (s) {
+		var s = s || '-';
+		for (var button in this._buttons) {
+			this._buttons[button].disabled = true;
+		}
+		console.log('Remote disabled (' + s + ').');
+	},
+
+	enableRemote : function (s) {
+		var s = s || '-';
+		for (var button in this._buttons) {
+			this._buttons[button].disabled = false;
+		}
+		console.log('Remote enabled (' + s + ').');
+	},
+
 	loadTrack : function (i) {
 		var 
 			i = i || 0,
 			track = this.tracks[i]
 		;
+		this.stop();
 		this._player.src = track.src;
 		this._player.load();
 		this._playlistIndex = i;
+
+		this.disableRemote('loadTrack');
 
 		console.log('Track #' + i + ' ok.');
 	},
@@ -412,12 +446,14 @@ var script = {
 	start : function () {
 		if (this._armInPlace != true && this._armRotation == 0) {
 			var that = this;
+			this.disableRemote('start');
 			this._armFt.setOpts({ animate: true }, this._armFtCallback);
 			this._armFt.attrs.rotate = this._themes[this._theme].armStart;
 			this._armFt.apply(function (ft) {
 				ft.setOpts({ animate: false }, that._armFtCallback);
 				that._player.play();
 		  	that._playerPaused = false;
+				that.enableRemote('start');
 			});
 			this._armInPlace = true;
       console.log('Arm rotation : ' + this._themes[this._theme].armStart + '°.');
@@ -435,14 +471,14 @@ var script = {
 		  ms = parseInt(rem * 1000)
 	  ;
 
-		this._playPause.innerHTML = this._buttonLabels.pause;
+		this._buttons.playPause.innerHTML = this._buttonLabels.pause;
 		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear');
 
 		console.log('Transform rotation : ' + deg + '° for ' + ms + 'ms.');
 	},
 
 	pause : function () {
-		this._playPause.innerHTML = this._buttonLabels.play;
+		this._buttons.playPause.innerHTML = this._buttonLabels.play;
 		if (this._disc)
 			this._disc.stop();
   	this._player.pause();
@@ -452,24 +488,28 @@ var script = {
 	stop : function () {
 		var that = this;
 
-		this._playPause.innerHTML = this._buttonLabels.play;
+		if (this._buttons.playPause)
+			this._buttons.playPause.innerHTML = this._buttonLabels.play;
 		if (this._disc)
 			this._disc.stop();
   	this._playerPaused = true;
 
 		if (this._armFt) {
+			this.disableRemote('stop');
 			this._armFt.setOpts({ animate: true }, this._armFtCallback);
 			this._armFt.attrs.rotate = 0;
 			this._armFt.apply(function (ft) {
 				ft.setOpts({ animate: false }, that._armFtCallback);
 				that._armInPlace = false;
 				that._armRotation = 0;
+				that.enableRemote('stop');
 			});
 		}
 	},
 
 	// events
 	playerLoaded : function (event) {
+		this.enableRemote('playerLoaded');
 		this.updateTrackInfos();
 		this.updateInfos();
 
@@ -504,24 +544,12 @@ var script = {
 	},
 
 	playerTimeUpdated : function (event) {
-		if (this._armInPlace) {
-			var 
-				rem = parseInt(this._player.duration - this._player.currentTime, 10),
-			  pos = (this._player.currentTime / this._player.duration) * 100,
-			  deg = pos * (this._themes[this._theme].armEnd - this._themes[this._theme].armStart) / 100
-		  ;
-			this._armFt.attrs.rotate = this._themes[this._theme].armStart + deg;
-			this._armFt.apply();
-		}
+		this.updateDiscNeedlePosition();
 		this.updateInfos();
 	},
 
 	playlistButtonClicked : function (event) {
 		this.loadTrack(event.target.data);
-		if (this._disc)
-			this._disc.stop();
-
-		this._playPause.innerHTML = this._buttonLabels.play;
 	}
 };
 
