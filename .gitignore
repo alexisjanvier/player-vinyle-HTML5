@@ -1,3 +1,4 @@
+onfig/deploy.rb
 /web/bundles/
 /app/bootstrap*
 /app/cache/*
