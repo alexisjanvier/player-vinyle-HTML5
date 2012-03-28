@@ -1,0 +1,17 @@
+[
+	{
+		artist: "Tool",
+		title: "Vicarious",
+		src: "/ogg/Tool%20-%2010.000%20Days/Tool%20-%2001%20-%20Vicarious.ogg"
+	},
+	{
+		artist: "Tool",
+		title: "Jambi",
+		src: "/ogg/Tool%20-%2010.000%20Days/Tool%20-%2002%20-%20Jambi.ogg"
+	},
+	{
+		artist: "Tool",
+		title: "Wings For Marie (Pt 1)",
+		src: "/ogg/Tool%20-%2010.000%20Days/Tool%20-%2003%20-%20Wings%20For%20Marie%20%28Pt%201%29.ogg"
+	}
+]
