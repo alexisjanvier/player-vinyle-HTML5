@@ -9,13 +9,16 @@
 	<![endif]-->
 </head>
 <body>
-  <div id="main">
-	  <div id="player"></div>
-	  <div id="turntable"></div> 	
-  </div>
+  <div id="player"></div>
 
 	<script src="vendor/raphael-min.js" type="text/javascript"></script>
 	<script src="vendor/raphael.free_transform_animate.js" type="text/javascript"></script>
 	<script src="js/main.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var turntablePlayer = new turntablePlayerEngine();
+		window.addEventListener('load', function () {
+			turntablePlayer.init();
+		}, false);
+	</script>
 </body>
 </html>

@@ -4,25 +4,23 @@ turntablePlayerEngine.prototype = {
 
 	// parameters
 	options: {
-		enable: true,
-		animateDelay : 2000,
-		debugMode : true,
-		autoPlay : false,
-		mainId: 'player',
-		turntableId: 'turntable',
-		playlistLocation: '/data/playlist.json',
-		buttonLabels: {
-			play: 'play',
-			pause: 'pause'
+		enable: true, // Load on init
+		animateDelay : 2000, // Delay for the animations of the arm and the disc
+		debugMode : false, // Show log infos
+		autoPlay : false, // Play at start
+		mainId: 'player', // Dom ID to use to build the player
+		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
+		buttonLabels: { // Customize the labels of the buttons
+			play: 'ON',
+			pause: 'OFF'
 		},
-		easing: {
+		easing: { // Easing customization
 			start: '<',
 			pause: 'cubic-bezier(.81, .79, .57, 1.01)',
 			stop: 'cubic-bezier(.81, .79, .57, 1.01)'
 		},
-		logMethodNames: ["log", "debug", "warn", "info"],
-		theme: 'default',
-		themes : {
+		theme: 'default', // The name of the theme
+		themes : { // The list of the available themes with their settings
 			default: {
 				armSrc: 'img/vinyl-arm-200-314.png',
 				// positions and radius
@@ -51,11 +49,11 @@ turntablePlayerEngine.prototype = {
 				armNeedleFg: 'transparent'
 			}
 		},
-
+		logMethodNames: ["log", "debug", "warn", "info"]
 	},
 
 	// reserved parameters which will be overriden
-	_main: null,
+	_wrapper: null,
 	_player: null,
 	_playlist: null,
 	_playlistIndex: 0,
@@ -192,7 +190,11 @@ turntablePlayerEngine.prototype = {
 			track = this._tracks[i]
 		;
 
-		return this.formatTrackTitle(track).replace(' - ', '\n \n');
+		return this.formatTrackTitle(track);
+	},
+
+	getTrackTitleLineBreak : function () {
+		return this.getTrackTitle().replace(' - ', '\n \n');
 	},
 
 	arcString : function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
@@ -253,17 +255,33 @@ turntablePlayerEngine.prototype = {
 		return this.options.enable;
 	},
 
+	getWrapper : function () {
+		if (!this._wrapper) {
+			var 
+				id = this.options.mainId,
+				wrapper = document.getElementById(id)
+			;
+			if (!wrapper) {
+				wrapper = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+				document.body.appendChild(wrapper);
+			}
+			this._wrapper = wrapper;
+		}
+
+		return this._wrapper;
+	},
+
 	initPlayer : function () {
 		if (!this._player) {
 			var
 				that = this,
 				audio = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio')
 			;
-			this._main = document.getElementById(this.options.mainId);
+			this._wrapper = this.getWrapper();
 
 			// if (this.options.debugMode)
 				// audio.controls = true;
-			this._main.appendChild(audio);
+			this._wrapper.appendChild(audio);
 			this._player = audio;
 			this.loadTrack(this._playlistIndex);
 
@@ -286,7 +304,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	initInfos : function () {
-		if (!this._infos.title) {
+		if (this.options.debugMode && !this._infos.title) {
 			var
 				infos = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
 				infosTitle = document.createElementNS('http://www.w3.org/1999/xhtml', 'p')
@@ -307,7 +325,7 @@ turntablePlayerEngine.prototype = {
 			infos.appendChild(infosPosition);
 			infos.appendChild(infosCurrentTime);
 			infos.appendChild(infosTimer);
-			this._main.appendChild(infos);
+			this._wrapper.appendChild(infos);
 
 			this._infos = {
 				'title' : infosTitle,
@@ -327,6 +345,8 @@ turntablePlayerEngine.prototype = {
 				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
 			;
 
+			remote.setAttribute('class', 'remote');
+
 			if (this.options.autoPlay) {
 				button.innerHTML = this.options.buttonLabels.pause;
 				button.data = true;
@@ -340,7 +360,7 @@ turntablePlayerEngine.prototype = {
 			}, false);
 
 			remote.appendChild(button);
-			this._main.appendChild(remote);
+			this._wrapper.appendChild(remote);
 
 			this._buttons.playPause = button;
 		}
@@ -354,12 +374,13 @@ turntablePlayerEngine.prototype = {
 			;
 
 			this.resetRemote();
+			playlist.setAttribute('class', 'playlist');
 
 			for (var i = 0; i < this._tracks.length; i++) {
 				var
 					button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
 				;
-				button.innerHTML = i + 1;
+				button.innerHTML = this.getTrackTitle(i);
 				button.data = i;
 				playlist.appendChild(button);
 				button.addEventListener('click', function (event) {
@@ -370,7 +391,7 @@ turntablePlayerEngine.prototype = {
 			}
 
 			this._playlist = playlist;
-			this._main.appendChild(playlist);
+			this._wrapper.appendChild(playlist);
 			this.logInfo('Playlist ok.');
 		}
 	},
@@ -379,10 +400,9 @@ turntablePlayerEngine.prototype = {
 		if (!this._disc) {
 			var
 				that = this,
-				id = this.options.turntableId,
-				w = document.getElementById(id).offsetWidth,
-				h = document.getElementById(id).offsetHeight,
-				turntable = document.getElementById(id),
+				turntable = this.getWrapper(),
+				w = turntable.offsetWidth,
+				h = turntable.offsetHeight,
 				paper = Raphael(turntable, 0, 0, w - 2, h - 2),
 	    	discBg = paper
 	    		.circle(
@@ -408,7 +428,7 @@ turntablePlayerEngine.prototype = {
 					.text(
 						bbox.x + bbox.width/2,
 						bbox.y + bbox.height/2,
-						this.getTrackTitle())
+						this.getTrackTitleLineBreak())
 					.attr('fill', this.options.themes[this.options.theme].discTitle)
 					.attr('height', this.options.themes[this.options.theme].discFgR * 1.25)
 					.attr('width', this.options.themes[this.options.theme].discFgR * 1.25),
@@ -493,7 +513,7 @@ turntablePlayerEngine.prototype = {
 		;
 
 		if (this._discTitle)
-			this._discTitle.attr('text', this.getTrackTitle());
+			this._discTitle.attr('text', this.getTrackTitleLineBreak());
 
 		if (this._infos['title'] != undefined)
 			this._infos['title'].innerHTML = 'Title : '  + this.formatTrackTitle(track);
@@ -741,9 +761,3 @@ turntablePlayerEngine.prototype = {
 		this.loadTrack(event.target.data);
 	}
 };
-
-var turntablePlayer = new turntablePlayerEngine();
-
-window.addEventListener('load', function () {
-	turntablePlayer.init();
-}, false);
