@@ -184,9 +184,9 @@ turntablePlayerEngine.prototype = {
 		return t.artist + ' - ' + t.title;
 	},
 
-	getTrackTitle : function () {
+	getTrackTitle : function (i) {
 		var
-			i = this._playlistIndex,
+			i = i || this._playlistIndex,
 			track = this._tracks[i]
 		;
 
