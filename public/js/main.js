@@ -15,6 +15,11 @@ turntablePlayerEngine.prototype = {
 			play: 'play',
 			pause: 'pause'
 		},
+		easing: {
+			start: '<',
+			pause: 'cubic-bezier(.81, .79, .57, 1.01)',
+			stop: 'cubic-bezier(.81, .79, .57, 1.01)'
+		},
 		logMethodNames: ["log", "debug", "warn", "info"],
 		theme: 'default',
 		themes : {
@@ -64,20 +69,23 @@ turntablePlayerEngine.prototype = {
 	_armFt: null,
 	_armFtCallback: null,
 	_armInPlace: null,
+	_discRotation: 0,
 	_armRotation: 0,
 	_logMethods: [],
 	_tracks: [],
+	_rpm: 45,
+	_rpmTransition: 3,
 
 	// functions
 	init : function (options) {
 		this.loadLogger();
-		this.log('Init!');
+		this.logInfo('Init!');
 		this.setOptions(options);
 		this.load();
 	},
 
 	load : function () {
-		this.log('Load!');
+		this.logInfo('Load!');
 		if (this.check()) {
 			this.initPlayer();
 			this.initRemote();
@@ -118,8 +126,16 @@ turntablePlayerEngine.prototype = {
 		}
 	},
 
-	log : function (s) {
-		console.log(s);
+	log : function () {
+		console.log.apply(this, arguments);
+	},
+
+	logInfo : function () {
+		console.info.apply(this, arguments);
+	},
+
+	logError : function () {
+		console.error.apply(this, arguments);
 	},
 
 	createXHR : function ()
@@ -147,17 +163,18 @@ turntablePlayerEngine.prototype = {
 	},
 
 	getResponseXHR : function (httpRequest) {
+		var that = this;
 	  try {
 	    if (httpRequest.readyState === 4) {
 	      if (httpRequest.status === 200) {
 	        return(httpRequest.responseText);
 	      } else {
-	        console.error('There was a problem with the request.');
+	        that.logError('There was a problem with the request.');
 	      }
 	    }
 	  }
 	  catch( e ) {
-	    console.error('Caught Exception: ' + e.description);
+	    that.logError('Caught Exception: ' + e.description);
 	  }
 	},
 
@@ -218,7 +235,7 @@ turntablePlayerEngine.prototype = {
 		req.open("GET", uri, false);
 		req.onreadystatechange = function () {
 			var tracks = eval(that.getResponseXHR(req));
-			if (tracks.length) {
+			if (typeof(tracks) == 'object' && tracks.length) {
 				that._tracks = tracks;
 				that.options.enable = true;
 				that.load();
@@ -228,8 +245,6 @@ turntablePlayerEngine.prototype = {
 	},
 
 	check : function () {
-		var tracks = this._tracks;
-
 		if (!this._tracks.length && this.options.enable) {
 			this.options.enable = false;
 			this.getPlaylist();
@@ -356,7 +371,7 @@ turntablePlayerEngine.prototype = {
 
 			this._playlist = playlist;
 			this._main.appendChild(playlist);
-			this.log('Playlist ok.');
+			this.logInfo('Playlist ok.');
 		}
 	},
 
@@ -411,7 +426,7 @@ turntablePlayerEngine.prototype = {
 						this.options.themes[this.options.theme].armW,
 						this.options.themes[this.options.theme].armH),
 				ftCallback = function(ft, events) {
-	        that.log('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
+	        that.logInfo('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
 					that._armRotation = ft.attrs.rotate;
 	        if (events.indexOf('rotate') != -1) {
 	        	that.pause();
@@ -427,7 +442,7 @@ turntablePlayerEngine.prototype = {
 	      		;
 	        	that._player.currentTime = currentTime;
 	        	that.start();
-	        	that.log('Player track is at ' + Math.floor(percent, 10) + '%.');
+	        	that.logInfo('Player track is at ' + Math.floor(percent, 10) + '%.');
 	        }
 	        else if (events.indexOf('rotate end') != -1) {
 	        	that.stop();
@@ -531,7 +546,7 @@ turntablePlayerEngine.prototype = {
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = true;
 		}
-		this.log('Remote disabled (' + s + ').');
+		this.logInfo('Remote disabled (' + s + ').');
 	},
 
 	enableRemote : function (s) {
@@ -539,7 +554,7 @@ turntablePlayerEngine.prototype = {
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = false;
 		}
-		this.log('Remote enabled (' + s + ').');
+		this.logInfo('Remote enabled (' + s + ').');
 	},
 
 	loadTrack : function (i) {
@@ -555,38 +570,78 @@ turntablePlayerEngine.prototype = {
 
 			this.disableRemote('loadTrack');
 
-			this.log('Track #' + i + ' ok.');
+			this.logInfo('Track #' + i + ' ok.');
 		}
 		else
-			this.log('No track in the playlist.');
+			this.logInfo('No track in the playlist.');
 	},
 
 	startDiscRotation : function () {
 		var
-			roundPerMinute = 45,
+			that = this,
 			rem = this._player.duration - this._player.currentTime,
-		  deg = parseInt(roundPerMinute * 360 * rem / 60)
-		  s = parseInt(rem),
+		  deg = parseInt(this._rpm * 360 * rem / 60) + this._discRotation,
 		  ms = parseInt(rem * 1000)
 	  ;
 
 		this._buttons.playPause.innerHTML = this.options.buttonLabels.pause;
 
-		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear');
+		this._disc.animate({ transform: 'r' +  deg}, ms, 'linear', function () {
+			that.updateDiscRotationIndex(this);
+		});
 		this._discTitle.animate({ transform: 'r' +  deg}, ms, 'linear');
 
-		this.log('Transform rotation : ' + deg + 'deg for ' + ms + 'ms.');
+		this.logInfo('Transform rotation [start] : ' + deg + 'deg for ' + ms + 'ms.');
 	},
 
 	stopDiscRotation : function () {
 		if (this._disc)
-			this._disc.stop();
+			this.updateDiscRotationIndex(this._disc.stop());
 		if (this._discTitle)
 			this._discTitle.stop();
 	},
 
+	startDiscRotationTransition : function (easing) {
+		if (this._disc && (
+			(this._armRotation != 0 && this._discRotation != 0)
+			|| (this._armInPlace != true && this._armRotation == 0)
+		)) {		
+			var
+				that = this,
+				easing = easing || 'linear',
+				rem = this.options.animateDelay / 1000,
+			  deg = parseInt(this._rpm * 360 * rem / 60) + this._discRotation,
+			  ms = parseInt(this.options.animateDelay)
+		  ;
+
+			this._disc.animate({ transform: 'r' +  deg}, ms, easing, function () {
+				that.updateDiscRotationIndex(this);
+			});
+			this._discTitle.animate({ transform: 'r' +  deg}, ms, easing);
+
+			this.logInfo('Transform rotation [stop] : ' + deg + 'deg for ' + ms + 'ms with easing ' + easing + '.');
+		}
+	},
+
+	updateDiscRotationIndex : function (element) {
+		if (element) {
+			var 
+				t = element.transform(),
+				rIndex = t[0] && t[0].indexOf('r') != -1 ? t[0].indexOf('r') : null,
+				r = rIndex != null ? t[0][rIndex + 1] : null
+			;
+
+			if (r) {
+				this._discRotation = parseInt(r);
+				this.logInfo('Disc rotation index is now : ' + this._discRotation + 'deg.')
+			}
+		}
+	},
+
 	start : function () {
+		this.logInfo('START');
 		if (this._armInPlace != true && this._armRotation == 0) {
+			this.startDiscRotationTransition(this.options.easing.start);
 			var that = this;
 			this.disableRemote('start');
 			this._armFt.setOpts({ animate: true }, this._armFtCallback);
@@ -599,7 +654,7 @@ turntablePlayerEngine.prototype = {
 				that.enableRemote('start');
 			});
 			this._armInPlace = true;
-      this.log('Arm rotation : ' + this.options.themes[this.options.theme].armStart + '°.');
+      this.logInfo('Arm rotation : ' + this.options.themes[this.options.theme].armStart + '°.');
 		}
 		else if (this._playerPaused == true) {
 			this._armInPlace = true;
@@ -610,18 +665,24 @@ turntablePlayerEngine.prototype = {
 	},
 
 	pause : function () {
-		this._buttons.playPause.innerHTML = this.options.buttonLabels.play;
-		this.stopDiscRotation();
-  	this._player.pause();
-  	this._playerPaused = true;
+		this.logInfo('PAUSE');
+		if (this._playerPaused != true) {
+			this._buttons.playPause.innerHTML = this.options.buttonLabels.play;
+			this.stopDiscRotation();
+			this.startDiscRotationTransition(this.options.easing.pause);
+	  	this._player.pause();
+	  	this._playerPaused = true;
+	  }
 	},
 
 	stop : function () {
+		this.logInfo('STOP');
 		var that = this;
 
 		if (this._buttons.playPause)
 			this._buttons.playPause.innerHTML = this.options.buttonLabels.play;
 		this.stopDiscRotation();
+		this.startDiscRotationTransition(this.options.easing.stop);
   	this._playerPaused = true;
 
 		if (this._armFt) {
@@ -639,16 +700,14 @@ turntablePlayerEngine.prototype = {
 
 	// events
 	playerLoaded : function (event) {
+		this.logInfo('Player event : loaded.');
+
 		this.enableRemote('playerLoaded');
 		this.updateTrackInfos();
 		this.updateInfos();
 
 		if (this.options.autoPlay)
 			this.start();
-		else {
-			this.stop();
-		}
-		this.log('Player event : loaded.');
 	},
 
 	playPauseButtonClicked : function (event) {
@@ -659,17 +718,17 @@ turntablePlayerEngine.prototype = {
 	},
 
 	playerPlayed : function (event) {
-		this.log('Player event : play.');
+		this.logInfo('Player event : play.');
 		this.start();
 	},
 
 	playerPaused : function (event) {
-		this.log('Player event : pause.');
+		this.logInfo('Player event : pause.');
 		this.pause();
 	},
 
 	playerEnded : function (event) {
-		this.log('Player event : ended.');
+		this.logInfo('Player event : ended.');
 		this.stop();
 	},
 
