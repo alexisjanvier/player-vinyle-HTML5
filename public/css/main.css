@@ -1,15 +1,101 @@
 * { margin: 0; padding: 0; }
+button::-moz-focus-inner { border: none; }
 article, aside, figure, footer, header, hgroup, menu, nav, section { display: block; }
+body {
+	background-color: #999;
+}
 #player {
-	background-color: #eee;
-	border: 1px solid #999;
-	height: 400px;
-	margin: 50px auto 0;
 	overflow: hidden;
 	position: relative;
-	width: 500px;
 }
 #player text,
 #player tspan {
 	font-family: Impact;
+}
+
+#player.default {
+	background-color: #151515;
+	background-size: 20px 20px;
+	border: 2px solid #000;
+	border-radius: 3px;
+	box-shadow: 0 0 30px 10px #000;
+	height: 320px;
+	margin: 50px auto 0;
+	width: 500px;
+}
+#player.default,
+#player.default button {
+	color: #aaa;
+	font: 11px "Arial Black";
+	text-shadow: 0 0 2px #000;
+	text-transform: uppercase;
+}
+#player.default button:active,
+#player.default button:focus,
+#player.default button:hover {
+	cursor: pointer;
+	outline: 0;
+}
+#player.default .infos {
+	background-color: #111;
+	border: 2px solid #000;
+	border-radius: 3px;
+	box-shadow: 0 0 5px #333 inset;
+	color: #444;
+	padding: 10px;
+	position: absolute;
+	right: 10px;
+	text-align: right;
+	top: 10px;
+}
+#player.default .infos p span {
+	color: #999;
+	display: inline-block;
+	min-width: 35px;
+}
+#player.default .remote {
+	bottom: 10px;
+	left: 10px;
+	position: absolute;
+}
+#player.default .remote button {
+	background-color: #000;
+	background-image: -moz-radial-gradient(#111 30%, #000);
+	border: 2px solid #000;
+	border-radius: 4px;
+	box-shadow: 0 0 20px #222;
+	color: #444;
+	display: block;	
+	height: 60px;
+	position: relative;
+	text-align: center;
+	width: 60px;
+}
+#player.default .remote button:active {
+	top: -1px;
+}
+#player.default .remote button.active {
+	border-color: green;
+	box-shadow: 0 0 20px green;
+	text-shadow: 0 0 10px green;
+	color: green;
+}
+#player.default .playlist {
+	bottom: 10px;
+	position: absolute;
+	right: 10px;
+}
+#player.default .playlist button {
+	background: transparent;
+	border: none;
+	display: block;	
+	font-size: 11px;
+	position: relative;
+}
+#player.default .playlist button:active {
+	top: -1px;
+}
+#player.default .playlist button.active {
+	color: green;
+	text-shadow: 0 0 5px green;
 }
