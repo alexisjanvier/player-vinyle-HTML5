@@ -4,6 +4,22 @@ article, aside, figure, footer, header, hgroup, menu, nav, section { display: bl
 body {
 	background-color: #999;
 }
+footer {
+	font-size: 10px;
+	margin: 10px auto 0;
+	text-align: center;
+}
+footer span {
+	border-left: 1px solid;
+	margin-left: 10px;
+	padding-left: 10px;
+}
+footer span:first-child {
+	border-left: none;
+	margin-left: 0;
+	padding-left: 0;
+}
+
 #player {
 	overflow: hidden;
 	position: relative;
@@ -136,4 +152,9 @@ body {
 	-ms-text-shadow: 0 0 5px green;
 	-o-text-shadow: 0 0 5px green;
 	text-shadow: 0 0 5px green;
+}
+#player.default audio[controls] {
+	left: 0;
+	position: absolute;
+	top: 0;
 }

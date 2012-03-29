@@ -83,12 +83,12 @@ turntablePlayerEngine.prototype = {
 	init : function (options) {
 		this.setOptions(options);
 		this.loadLogger();
-		this.logInfo('Init!');
+		console.info('Init!');
 		this.load();
 	},
 
 	load : function () {
-		this.logInfo('Load!');
+		console.info('Load!');
 		if (this.check()) {
 			this.initPlayer();
 			this.initRemote();
@@ -127,18 +127,6 @@ turntablePlayerEngine.prototype = {
 				console[methods[i]] = this._logMethods[methods[i]];
 			}
 		}
-	},
-
-	log : function () {
-		console.log.apply(this, arguments);
-	},
-
-	logInfo : function () {
-		console.info.apply(this, arguments);
-	},
-
-	logError : function () {
-		console.error.apply(this, arguments);
 	},
 
 	toggleClass : function (element, className, operation) {
@@ -197,12 +185,12 @@ turntablePlayerEngine.prototype = {
 				if (httpRequest.status === 200) {
 					return(httpRequest.responseText);
 				} else {
-					that.logError('There was a problem with the request.');
+					console.error('There was a problem with the request.');
 				}
 			}
 		}
 		catch( e ) {
-			that.logError('Caught Exception: ' + e.description);
+			console.error('Caught Exception: ' + e.description);
 		}
 	},
 
@@ -310,12 +298,18 @@ turntablePlayerEngine.prototype = {
 			;
 			this._wrapper = this.getWrapper();
 
-			// if (this.options.debugMode)
-				// audio.controls = true;
-			this._wrapper.appendChild(audio);
+			if (this.options.debugMode) {
+				this._wrapper.appendChild(audio);
+				audio.controls = 'controls';
+			}
+			audio.preload = 'metadata';
 			this._player = audio;
 			this.loadTrack(this._playlistIndex);
 
+			audio.addEventListener('loadedmetadata', function (event) {
+				that.updateInfos();
+				that.updateTrackInfos();
+			}, false);
 			audio.addEventListener('loadeddata', function (event) {
 				that.playerLoaded(event);
 			}, false);
@@ -327,7 +321,7 @@ turntablePlayerEngine.prototype = {
 			}, false);
 			audio.addEventListener('pause', function (event) {
 				that.playerPaused(event);
-			}, faarlse);
+			}, false);
 			audio.addEventListener('ended', function (event) {
 				that.playerEnded(event);
 			}, false);
@@ -425,7 +419,7 @@ turntablePlayerEngine.prototype = {
 
 			this._playlist = playlist;
 			this._wrapper.appendChild(playlist);
-			this.logInfo('Playlist ok.');
+			console.info('Playlist ok.');
 		}
 	},
 
@@ -493,7 +487,7 @@ turntablePlayerEngine.prototype = {
 						this.options.themes[this.options.theme].armW,
 						this.options.themes[this.options.theme].armH),
 				ftCallback = function(ft, events) {
-					that.logInfo('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
+					console.info('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
 					that._armRotation = ft.attrs.rotate;
 					if (events.indexOf('rotate') != -1) {
 						that.pause();
@@ -509,7 +503,7 @@ turntablePlayerEngine.prototype = {
 						;
 						that._player.currentTime = currentTime;
 						that.start();
-						that.logInfo('Player track is at ' + Math.floor(percent, 10) + '%.');
+						console.info('Player track is at ' + Math.floor(percent, 10) + '%.');
 					}
 					else if (events.indexOf('rotate end') != -1) {
 						that.stop();
@@ -620,7 +614,7 @@ turntablePlayerEngine.prototype = {
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = true;
 		}
-		this.logInfo('Remote disabled (' + s + ').');
+		console.info('Remote disabled (' + s + ').');
 	},
 
 	enableRemote : function (s) {
@@ -628,7 +622,7 @@ turntablePlayerEngine.prototype = {
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = false;
 		}
-		this.logInfo('Remote enabled (' + s + ').');
+		console.info('Remote enabled (' + s + ').');
 	},
 
 	loadTrack : function (i) {
@@ -640,8 +634,13 @@ turntablePlayerEngine.prototype = {
 
 			if (this._playerPaused == true || this._playerPaused == null)
 				this.stop();
-			
-			this._player.src = track.src;
+
+			if (this._player.canPlayType('audio/mpeg') && track.src.mp3)
+				this._player.src = track.src.mp3;
+			else if (this._player.canPlayType('audio/ogg') && track.src.ogg)
+				this._player.src = track.src.ogg;
+			else
+				this._player.src = track.src;
 			this._player.load();
 			this._playlistIndex = i;
 
@@ -654,10 +653,10 @@ turntablePlayerEngine.prototype = {
 					this.toggleClass(this._buttons[button], 'active', 'remove');
 			}
 
-			this.logInfo('Track #' + i + ' ok.');
+			console.info('Track #' + i + ' ok.');
 		}
 		else
-			this.logInfo('No track in the playlist.');
+			console.info('No track in the playlist.');
 	},
 
 	startDiscRotation : function () {
@@ -675,7 +674,7 @@ turntablePlayerEngine.prototype = {
 		});
 		this._discTitle.animate({ transform: 'r' +	deg}, ms, 'linear');
 
-		this.logInfo('Transform rotation [start] : ' + deg + 'deg for ' + ms + 'ms.');
+		console.info('Transform rotation [start] : ' + deg + 'deg for ' + ms + 'ms.');
 	},
 
 	stopDiscRotation : function () {
@@ -703,7 +702,7 @@ turntablePlayerEngine.prototype = {
 			});
 			this._discTitle.animate({ transform: 'r' +	deg}, ms, easing);
 
-			this.logInfo('Transform rotation [stop] : ' + deg + 'deg for ' + ms + 'ms with easing ' + easing + '.');
+			console.info('Transform rotation [stop] : ' + deg + 'deg for ' + ms + 'ms with easing ' + easing + '.');
 		}
 	},
 
@@ -717,13 +716,13 @@ turntablePlayerEngine.prototype = {
 
 			if (r) {
 				this._discRotation = parseInt(r);
-				this.logInfo('Disc rotation index is now : ' + this._discRotation + 'deg.')
+				console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
 			}
 		}
 	},
 
 	start : function () {
-		this.logInfo('START');
+		console.info('START');
 		if (this._armInPlace != true && this._armRotation == 0) {
 			this.startDiscRotationTransition(this.options.easing.start);
 			var that = this;
@@ -738,7 +737,7 @@ turntablePlayerEngine.prototype = {
 				that.enableRemote('start');
 			});
 			this._armInPlace = true;
-			this.logInfo('Arm rotation : ' + this.options.themes[this.options.theme].armStart + '°.');
+			console.info('Arm rotation : ' + this.options.themes[this.options.theme].armStart + '°.');
 		}
 		else if (this._playerPaused == true) {
 			this._armInPlace = true;
@@ -753,7 +752,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	pause : function () {
-		this.logInfo('PAUSE');
+		console.info('PAUSE');
 		if (this._playerPaused != true) {
 			this._playPause.innerHTML = this.options.buttonLabels.play;
 			this.stopDiscRotation();
@@ -765,7 +764,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	stop : function () {
-		this.logInfo('STOP');
+		console.info('STOP');
 		var that = this;
 
 		if (this._playPause) {
@@ -792,7 +791,7 @@ turntablePlayerEngine.prototype = {
 
 	// events
 	playerLoaded : function (event) {
-		this.logInfo('Player event : loaded.');
+		console.info('Player event : loaded.');
 
 		this.enableRemote('playerLoaded');
 		this.updateTrackInfos();
@@ -810,17 +809,17 @@ turntablePlayerEngine.prototype = {
 	},
 
 	playerPlayed : function (event) {
-		this.logInfo('Player event : play.');
+		console.info('Player event : play.');
 		this.start();
 	},
 
 	playerPaused : function (event) {
-		this.logInfo('Player event : pause.');
+		console.info('Player event : pause.');
 		this.pause();
 	},
 
 	playerEnded : function (event) {
-		this.logInfo('Player event : ended.');
+		console.info('Player event : ended.');
 		this.stop();
 	},
 

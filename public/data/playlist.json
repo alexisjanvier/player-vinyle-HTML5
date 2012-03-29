@@ -1,17 +1,30 @@
 [
 	{
-		artist: "Tool",
-		title: "Vicarious",
-		src: "/ogg/Tool%20-%2010.000%20Days/Tool%20-%2001%20-%20Vicarious.ogg"
+		artist: "Epoq",
+		title: "Lepidoptera",
+		src: {
+			ogg: "/ogg/Epoq-Lepidoptera.ogg"
+		}
 	},
 	{
-		artist: "Tool",
-		title: "Jambi",
-		src: "/ogg/Tool%20-%2010.000%20Days/Tool%20-%2002%20-%20Jambi.ogg"
+		artist: "Kenny Beltrey",
+		title: "Hydrate",
+		src: {
+			ogg: "/ogg/Hydrate-Kenny_Beltrey.ogg"
+		}
 	},
 	{
-		artist: "Lampchop",
-		title: "Gone Tomorrow",
-		src: "/ogg/Lambchop/gonetommorow.ogg"
+		artist: "Badloop",
+		title: "Lumme",
+		src: {
+			ogg: "/ogg/Lumme-Badloop.ogg"
+		}
+	},
+	{
+		artist: "4T Thieves",
+		title: "Mists of Time",
+		src: {
+			ogg: "/ogg/Mists_of_Time-4T.ogg"
+		}
 	}
 ]
