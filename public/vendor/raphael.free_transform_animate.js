@@ -481,7 +481,7 @@ Raphael.fn.freeTransform = function(subject, options, callback) {
 			window.setTimeout(function () {
 				if (typeof callback == 'function')
 					callback(ft);
-					ft.updateHandles();
+				ft.updateHandles();
 			}, ft.opts.delay);
 		}
 		else

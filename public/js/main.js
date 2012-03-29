@@ -307,11 +307,10 @@ turntablePlayerEngine.prototype = {
 			this.loadTrack(this._playlistIndex);
 
 			audio.addEventListener('loadedmetadata', function (event) {
-				that.updateInfos();
-				that.updateTrackInfos();
+				that.playerLoadedMetaData(event);
 			}, false);
 			audio.addEventListener('loadeddata', function (event) {
-				that.playerLoaded(event);
+				that.playerLoadedData(event);
 			}, false);
 			audio.addEventListener('timeupdate', function (event) {
 				that.playerTimeUpdated(event);
@@ -598,7 +597,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	updateDiscNeedlePosition : function () {
-		if (this._armInPlace) {
+		if (this._armInPlace && this._playerPaused == false) {
 			var
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 				pos = (this._player.currentTime / this._player.duration) * 100,
@@ -606,11 +605,14 @@ turntablePlayerEngine.prototype = {
 			;
 			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart + deg;
 			this._armFt.apply();
+			console.info('Arm rotation : ' + deg + 'deg.');
 		}
 	},
 
 	disableRemote : function (s) {
 		var s = s || '-';
+		if (this._playPause)
+			this._playPause.disabled = true;
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = true;
 		}
@@ -619,6 +621,8 @@ turntablePlayerEngine.prototype = {
 
 	enableRemote : function (s) {
 		var s = s || '-';
+		if (this._playPause)
+			this._playPause.disabled = false;
 		for (var button in this._buttons) {
 			this._buttons[button].disabled = false;
 		}
@@ -667,14 +671,14 @@ turntablePlayerEngine.prototype = {
 			ms = parseInt(rem * 1000)
 		;
 
-		this._playPause.innerHTML = this.options.buttonLabels.pause;
+		this.stopDiscRotation();
 
 		this._disc.animate({ transform: 'r' +	deg}, ms, 'linear', function () {
 			that.updateDiscRotationIndex(this);
 		});
 		this._discTitle.animate({ transform: 'r' +	deg}, ms, 'linear');
 
-		console.info('Transform rotation [start] : ' + deg + 'deg for ' + ms + 'ms.');
+		console.info('Rotation : ' + deg + 'deg for ' + ms + 'ms.');
 	},
 
 	stopDiscRotation : function () {
@@ -702,7 +706,7 @@ turntablePlayerEngine.prototype = {
 			});
 			this._discTitle.animate({ transform: 'r' +	deg}, ms, easing);
 
-			console.info('Transform rotation [stop] : ' + deg + 'deg for ' + ms + 'ms with easing ' + easing + '.');
+			console.info('Transition : ' + deg + 'deg for ' + ms + 'ms with easing ' + easing + '.');
 		}
 	},
 
@@ -731,22 +735,26 @@ turntablePlayerEngine.prototype = {
 			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart;
 			this._armFt.apply(function (ft) {
 				ft.setOpts({ animate: false }, that._armFtCallback);
+				that._playPause.innerHTML = that.options.buttonLabels.pause;
 				that.startDiscRotation();
 				that._player.play();
 				that._playerPaused = false;
 				that.enableRemote('start');
 			});
 			this._armInPlace = true;
-			console.info('Arm rotation : ' + this.options.themes[this.options.theme].armStart + '°.');
+			console.info('Arm rotation : ' + this.options.themes[this.options.theme].armStart + 'deg.');
 		}
 		else if (this._playerPaused == true) {
+			this._playPause.innerHTML = this.options.buttonLabels.pause;
 			this._armInPlace = true;
 			this._player.play();
 			this._playerPaused = false;
 			this.startDiscRotation();
 		}
-		else
+		else {
+			this._playPause.innerHTML = this.options.buttonLabels.pause;
 			this._player.play();
+		}
 
 		this.toggleClass(this._playPause, 'active', 'add');
 	},
@@ -754,22 +762,26 @@ turntablePlayerEngine.prototype = {
 	pause : function () {
 		console.info('PAUSE');
 		if (this._playerPaused != true) {
-			this._playPause.innerHTML = this.options.buttonLabels.play;
-			this.stopDiscRotation();
-			this.startDiscRotationTransition(this.options.easing.pause);
 			this._player.pause();
 			this._playerPaused = true;
-			this.toggleClass(this._playPause, 'active', 'remove');
 		}
 	},
 
-	stop : function () {
+	stop : function (withStart) {
 		console.info('STOP');
-		var that = this;
+		var 
+			that = this,
+			withStart = withStart || false;
+		;
 
 		if (this._playPause) {
 			this._playPause.innerHTML = this.options.buttonLabels.play;
 			this.toggleClass(this._playPause, 'active', 'remove');
+		}
+
+		if (this._player.currentTime) {
+			this._player.pause();
+			this._player.currentTime = 0;
 		}
 
 		this.stopDiscRotation();
@@ -785,41 +797,55 @@ turntablePlayerEngine.prototype = {
 				that._armInPlace = false;
 				that._armRotation = 0;
 				that.enableRemote('stop');
+				if (withStart)
+					that.start();
 			});
 		}
 	},
 
+	restart : function () {
+		console.info('RESTART');
+		this.stop(true);
+	},
+
 	// events
-	playerLoaded : function (event) {
-		console.info('Player event : loaded.');
+	playerLoadedData : function (event) {
+		console.info('Player event: loadedData.');
 
 		this.enableRemote('playerLoaded');
 		this.updateTrackInfos();
 		this.updateInfos();
 
-		if (this.options.autoPlay || this._playerPaused == false)
+		if (this.options.autoPlay)
 			this.start();
+		else if (this._playerPaused == false)
+			this.restart();
+	},
+	playerLoadedMetaData : function (event) {
+		console.info('Player event: loadedMetaData.');
+		this.updateTrackInfos();
+		this.updateInfos();
 	},
 
 	playPauseButtonClicked : function (event) {
 		if (this._playerPaused == true)
 			this.start();
 		else
-			this.pause();
+			this.stop();
 	},
 
 	playerPlayed : function (event) {
-		console.info('Player event : play.');
-		this.start();
+		console.info('Player event: play.');
+		// this.start();
 	},
 
 	playerPaused : function (event) {
-		console.info('Player event : pause.');
-		this.pause();
+		console.info('Player event: pause.');
+		// this.pause();
 	},
 
 	playerEnded : function (event) {
-		console.info('Player event : ended.');
+		console.info('Player event: ended.');
 		this.stop();
 	},
 
