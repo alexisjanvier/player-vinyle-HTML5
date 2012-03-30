@@ -70,6 +70,14 @@ footer span:first-child {
 	cursor: pointer;
 	outline: 0;
 }
+#player.default button.active {
+	color: green;
+	-webkit-text-shadow: 0 0 5px green;
+	-moz-text-shadow: 0 0 5px green;
+	-ms-text-shadow: 0 0 5px green;
+	-o-text-shadow: 0 0 5px green;
+	text-shadow: 0 0 5px green;
+}
 #player.default .infos {
 	background-color: #111;
 	border: 2px solid #000;
@@ -127,12 +135,6 @@ footer span:first-child {
 	-ms-box-shadow: 0 0 20px green;
 	-o-box-shadow: 0 0 20px green;
 	box-shadow: 0 0 20px green;
-	-webkit-text-shadow: 0 0 10px green;
-	-moz-text-shadow: 0 0 10px green;
-	-ms-text-shadow: 0 0 10px green;
-	-o-text-shadow: 0 0 10px green;
-	text-shadow: 0 0 10px green;
-	color: green;
 }
 #player.default .playlist {
 	bottom: 10px;
@@ -144,14 +146,6 @@ footer span:first-child {
 	border: none;
 	display: block;	
 	font-size: 11px;
-}
-#player.default .playlist button.active {
-	color: green;
-	-webkit-text-shadow: 0 0 5px green;
-	-moz-text-shadow: 0 0 5px green;
-	-ms-text-shadow: 0 0 5px green;
-	-o-text-shadow: 0 0 5px green;
-	text-shadow: 0 0 5px green;
 }
 #player.default audio[controls] {
 	left: 0;

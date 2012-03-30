@@ -598,7 +598,7 @@ turntablePlayerEngine.prototype = {
 				secs: secs
 			});
 
-		console.info('Infos updated.');
+		//console.info('Infos updated.');
 	},
 
 	updateDiscNeedlePosition : function () {
