@@ -54,7 +54,7 @@ foreach ($keys as $key)
 ?>
 <body>
 	<div id="player"></div>
-	
+
 	<article>
 		<h1>Vinyl player</h1>
 		<p>Technologies : HTML, CSS, JavaScript and SVG thanks to <a href="http://raphaeljs.com/">Raphaël</a></p>
@@ -119,6 +119,12 @@ foreach ($keys as $key)
 		window.addEventListener('load', function () {
 			turntablePlayer.init(<?php echo json_encode($options); ?>);
 		}, false);
+	</script>
+	<script type="text/javascript">
+		var _gaq=[['_setAccount','UA–17311686–7'],['_trackPageview']];
+		(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+		g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+		s.parentNode.insertBefore(g,s)}(document,'script'));
 	</script>
 </body>
 </html>
