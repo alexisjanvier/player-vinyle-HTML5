@@ -4,6 +4,7 @@
 	<meta charset=utf-8 />
 	<title>Vinyle Player in pure HTML, CSS and JS</title>
 	<link rel="stylesheet" href="css/main.css" type="text/css" />
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 	<!--[if IE]>
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -56,6 +57,7 @@ foreach ($keys as $key)
 	<footer>
 		<span>Développement : <a href="http://www.amanca.fr/">Aurélien MANCA</a> pour <a href="http://www.le-vinyle.com">Le-vinyle.com</a></span>
 		<span>Musique : <a href="http://www.kahvi.org/">Courtoisie de Kahvi Collective</a></span>
+		<span>Favicon : <a href="http://www.iconfinder.com/icondetails/23864/16/">Oliver Scholtz (and others)</a></span>
 	</footer>
 
 	<script src="vendor/raphael-min.js" type="text/javascript"></script>

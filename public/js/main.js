@@ -11,8 +11,8 @@ turntablePlayerEngine.prototype = {
 		mainId: 'player', // Dom ID to use to build the player
 		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
 		buttonLabels: { // Customize the labels of the buttons
-			play: 'POWER',
-			pause: 'POWER'
+			play: 'POWER ON',
+			pause: 'POWER OFF'
 		},
 		easing: { // Easing customization
 			start: '<',
@@ -686,6 +686,7 @@ turntablePlayerEngine.prototype = {
 			this.updateDiscRotationIndex(this._disc.stop());
 		if (this._discTitle)
 			this._discTitle.stop();
+		console.info('Rotations stopped.');
 	},
 
 	startDiscRotationTransition : function (easing) {
@@ -700,6 +701,8 @@ turntablePlayerEngine.prototype = {
 				deg = parseInt(this._rpm * 360 * rem / 60) + this._discRotation,
 				ms = parseInt(this.options.animateDelay)
 			;
+
+			this.stopDiscRotation();
 
 			this._disc.animate({ transform: 'r' +	deg}, ms, easing, function () {
 				that.updateDiscRotationIndex(this);
@@ -735,7 +738,6 @@ turntablePlayerEngine.prototype = {
 			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart;
 			this._armFt.apply(function (ft) {
 				ft.setOpts({ animate: false }, that._armFtCallback);
-				that._playPause.innerHTML = that.options.buttonLabels.pause;
 				that.startDiscRotation();
 				that._player.play();
 				that._playerPaused = false;
@@ -745,17 +747,15 @@ turntablePlayerEngine.prototype = {
 			console.info('Arm rotation : ' + this.options.themes[this.options.theme].armStart + 'deg.');
 		}
 		else if (this._playerPaused == true) {
-			this._playPause.innerHTML = this.options.buttonLabels.pause;
 			this._armInPlace = true;
 			this._player.play();
 			this._playerPaused = false;
 			this.startDiscRotation();
 		}
-		else {
-			this._playPause.innerHTML = this.options.buttonLabels.pause;
+		else
 			this._player.play();
-		}
 
+		this._playPause.innerHTML = this.options.buttonLabels.pause;
 		this.toggleClass(this._playPause, 'active', 'add');
 	},
 
@@ -774,19 +774,17 @@ turntablePlayerEngine.prototype = {
 			withStart = withStart || false;
 		;
 
-		if (this._playPause) {
-			this._playPause.innerHTML = this.options.buttonLabels.play;
-			this.toggleClass(this._playPause, 'active', 'remove');
-		}
 
 		if (this._player.currentTime) {
 			this._player.pause();
 			this._player.currentTime = 0;
 		}
 
-		this.stopDiscRotation();
-		this.startDiscRotationTransition(this.options.easing.stop);
-		this._playerPaused = true;
+		if (this._playerPaused != true) {
+			this.stopDiscRotation();
+			this.startDiscRotationTransition(this.options.easing.stop);
+			this._playerPaused = true;
+		}
 
 		if (this._armFt) {
 			this.disableRemote('stop');
@@ -797,6 +795,10 @@ turntablePlayerEngine.prototype = {
 				that._armInPlace = false;
 				that._armRotation = 0;
 				that.enableRemote('stop');
+				if (that._playPause && !withStart) {
+					that._playPause.innerHTML = that.options.buttonLabels.play;
+					that.toggleClass(that._playPause, 'active', 'remove');
+				}
 				if (withStart)
 					that.start();
 			});
