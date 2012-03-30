@@ -831,6 +831,8 @@ turntablePlayerEngine.prototype = {
 		console.info('Player event: loadedMetaData.');
 		this.updateTrackInfos();
 		this.updateInfos();
+		if (this._playerPaused == true)
+			this.updateDiscInfos();
 	},
 
 	playPauseButtonClicked : function (event) {
