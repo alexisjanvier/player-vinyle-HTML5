@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset=utf-8 />
-	<title>Vinyle Player in pure HTML, CSS and JS</title>
+	<title>Vinyle Player</title>
 	<link rel="stylesheet" href="css/main.css" type="text/css" />
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 	<!--[if IE]>
@@ -54,11 +54,62 @@ foreach ($keys as $key)
 ?>
 <body>
 	<div id="player"></div>
-	<footer>
-		<span>Développement : <a href="http://www.amanca.fr/">Aurélien MANCA</a> pour <a href="http://www.le-vinyle.com">Le-vinyle.com</a></span>
-		<span>Musique : <a href="http://www.kahvi.org/">Courtoisie de Kahvi Collective</a></span>
-		<span>Favicon : <a href="http://www.iconfinder.com/icondetails/23864/16/">Oliver Scholtz (and others)</a></span>
-	</footer>
+	
+	<article>
+		<h1>Vinyl player</h1>
+		<p>Technologies : HTML, CSS, JavaScript and SVG thanks to <a href="http://raphaeljs.com/">Raphaël</a></p>
+		<p>All the magic is in <a href="js/main.js">js/main.js</a>.</p>
+		<h2>Examples :</h2>
+		<p>You can customize the settings sent to the player through the url, for example :</p>
+		<ul>
+			<li><a href="index.php">Default options<a>
+			<li><a href="index.php?buttonLabels=play|on,pause|off">Change the power button labels to "on" and "off"<a>
+				<br />buttonLabels=play|on,pause|off</li>
+			<li><a href="index.php?animateDelay=5000">Change the animation delay to 5 seconds<a>
+				<br />animateDelay=5000</li>
+			<li><a href="index.php?infos=duration,current,timer,position">Change the track informations<a>
+				<br />infos=duration,current,timer,position</li>
+			<li><a href="index.php?autoPlay=true">Autoplay on load<a>
+				<br />autoPlay=true</li>
+		</ul>
+		<h2>All the config settings :</h2>
+		<pre>
+{
+  // Load on init
+  enable: true, 
+  // Delay for the animations of the arm and the disc
+  animateDelay : 2000, 
+  // Show log infos
+  debugMode : false, 
+  // Play at start
+  autoPlay : false, 
+  // Dom ID to use to build the player, if not found, the element will be created
+  mainId: 'player', 
+  // Uri of the playlist in json format
+  playlistLocation: '/data/playlist.json', 
+  // Customize the labels of the buttons
+  buttonLabels: { 
+    play: 'POWER ON',
+    pause: 'POWER OFF'
+  },
+  // Easing customization
+  easing: { 
+    start: '<',
+    pause: 'cubic-bezier(.81, .79, .57, 1.01)',
+    stop: 'cubic-bezier(.81, .79, .57, 1.01)'
+  },
+  // Choices : duration, current, timer, position
+  infos: ["duration", "timer"], 
+  // Log informations in the console
+  logMethodNames: ["log", "debug", "warn", "info"], 
+}
+		</pre>
+		<footer>
+			<p>Developed by <a href="http://www.amanca.fr/">Aurélien MANCA</a> for <a href="http://www.le-vinyle.com">Le-vinyle.com</a></p>
+			<p>Music is courtesy of <a href="http://www.kahvi.org/">Kahvi Collective</a></p>
+			<p>Favicon from <a href="http://www.iconfinder.com/icondetails/23864/16/">Oliver Scholtz (and others)</a></p>
+		</footer>
+	</article>
 
 	<script src="vendor/raphael-min.js" type="text/javascript"></script>
 	<script src="vendor/raphael.free_transform_animate.js" type="text/javascript"></script>

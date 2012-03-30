@@ -4,20 +4,28 @@ article, aside, figure, footer, header, hgroup, menu, nav, section { display: bl
 body {
 	background-color: #999;
 }
-footer {
-	font-size: 10px;
-	margin: 10px auto 0;
+article {
+	font: 14px Courier, "Lucida Console", monospace;
+	margin: 20px auto;
+	text-align: justify;
+	width: 500px;
+}
+article h1,
+article h2 {
+	margin: 15px 0 10px;
+}
+article ul {
+	margin-left: 2em;
+}
+article pre {
+	background-color: #aaa;
+	border: 1px solid #666;
+	padding: 5px;
+	overflow-x: scroll;
+}
+article footer {
+	margin-top: 40px;
 	text-align: center;
-}
-footer span {
-	border-left: 1px solid;
-	margin-left: 10px;
-	padding-left: 10px;
-}
-footer span:first-child {
-	border-left: none;
-	margin-left: 0;
-	padding-left: 0;
 }
 
 #player {

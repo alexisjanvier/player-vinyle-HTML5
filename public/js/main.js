@@ -20,6 +20,7 @@ turntablePlayerEngine.prototype = {
 			stop: 'cubic-bezier(.81, .79, .57, 1.01)'
 		},
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
+		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'default', // The name of the theme
 		themes : { // The list of the available themes with their settings
 			default: {
@@ -52,8 +53,7 @@ turntablePlayerEngine.prototype = {
 				armNeedleBg: '#999',
 				armNeedleFg: 'transparent'
 			}
-		},
-		logMethodNames: ["log", "debug", "warn", "info"]
+		}
 	},
 
 	// reserved parameters which will be overriden
@@ -822,9 +822,9 @@ turntablePlayerEngine.prototype = {
 		this.updateTrackInfos();
 		this.updateInfos();
 
-		if (this.options.autoPlay)
+		if (this._playerPaused && this.options.autoPlay)
 			this.start();
-		else if (this._playerPaused == false)
+		else if (!this._playerPaused)
 			this.restart();
 	},
 	playerLoadedMetaData : function (event) {
