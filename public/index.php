@@ -62,7 +62,7 @@ foreach ($keys as $key)
 		<h2>Examples :</h2>
 		<p>You can customize the settings sent to the player through the url, for example :</p>
 		<ul>
-			<li><a href="index.php">Default options<a>
+			<li><a href="index.php">Default options<a></li>
 			<li><a href="index.php?buttonLabels=play|on,pause|off">Change the power button labels to "on" and "off"<a>
 				<br />buttonLabels=play|on,pause|off</li>
 			<li><a href="index.php?animateDelay=5000">Change the animation delay to 5 seconds<a>
