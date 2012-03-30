@@ -3,28 +3,32 @@
 		artist: "Epoq",
 		title: "Lepidoptera",
 		src: {
-			ogg: "/ogg/Epoq-Lepidoptera.ogg"
+			mp3: "/music/Epoq-Lepidoptera.mp3",
+			ogg: "/music/Epoq-Lepidoptera.ogg"
 		}
 	},
 	{
 		artist: "Kenny Beltrey",
 		title: "Hydrate",
 		src: {
-			ogg: "/ogg/Hydrate-Kenny_Beltrey.ogg"
+			mp3: "/music/Hydrate-Kenny_Beltrey.mp3",
+			ogg: "/music/Hydrate-Kenny_Beltrey.ogg"
 		}
 	},
 	{
 		artist: "Badloop",
 		title: "Lumme",
 		src: {
-			ogg: "/ogg/Lumme-Badloop.ogg"
+			mp3: "/music/Lumme-Badloop.mp3",
+			ogg: "/music/Lumme-Badloop.ogg"
 		}
 	},
 	{
 		artist: "4T Thieves",
 		title: "Mists of Time",
 		src: {
-			ogg: "/ogg/Mists_of_Time-4T.ogg"
+			mp3: "/music/Mists_of_Time-4T.mp3",
+			ogg: "/music/Mists_of_Time-4T.ogg"
 		}
 	}
 ]
