@@ -15,7 +15,7 @@ $keys_string = array(
 	'mainId', 'playlistLocation', 'theme'
 );
 $keys_boolean = array(
-	'enable', 'debugMode', 'autoPlay'
+	'enable', 'debugMode', 'autoPlay', 'useTransitions'
 );
 $keys_int = array(
 	'animateDelay'
@@ -101,7 +101,9 @@ foreach ($keys as $key)
   // Choices : duration, current, timer, position
   infos: ["duration", "timer"], 
   // Log informations in the console
-  logMethodNames: ["log", "debug", "warn", "info"], 
+  logMethodNames: ["log", "debug", "warn", "info"],
+  // Use audio transition at the beginning and the end of the track
+  useTransitions: true,
 }
 		</pre>
 		<footer>
