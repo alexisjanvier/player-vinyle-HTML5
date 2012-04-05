@@ -5,7 +5,7 @@ set :deploy_via, :remote_cache
 set :git_enable_submodules, 0
 
 set :application, "player-vinyle-HTML5"
-set :repository,  "git@github.com:alexisjanvier/player-vinyle-HTML5.git"
+set :repository,  "git@github.com:Le-Vinyle/player-vinyle-HTML5.git"
 
 set :scm, "git"
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
