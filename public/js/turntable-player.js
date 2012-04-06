@@ -7,12 +7,9 @@ turntablePlayerEngine.prototype = {
 	 * @type {Object}
 	 */
 	options: {
-		enable: true, // Load on init
 		animateDelay : 2000, // Delay for the animations of the arm and the disc
-		debugMode : false, // Show log infos
-		autoPlay : false, // Play at start
-		mainId: 'player', // Dom ID to use to build the player
-		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
+		autoPlay : false, // Automatic turntable
+		autoStop: 60000, // Time in ms when the turntable auto-shutdowns when it turns with no track in manual mode
 		buttonLabels: { // Customize the labels of the buttons
 			play: 'POWER ON',
 			pause: 'POWER OFF'
@@ -22,9 +19,15 @@ turntablePlayerEngine.prototype = {
 			pause: 'cubic-bezier(.81, .79, .57, 1.01)',
 			stop: 'cubic-bezier(.81, .79, .57, 1.01)'
 		},
+		enable: true, // Load on init
+		debugMode : false, // Show log infos
+		mainId: 'player', // Dom ID to use to build the player
+		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'default', // The name of the theme
+		useTransitions: true,
+
 		themes : { // The list of the available themes with their settings
 			default: {
 				class: 'default',
@@ -37,12 +40,13 @@ turntablePlayerEngine.prototype = {
 				armW: 63,
 				armH: 314,
 				armStart: 22,
-				armEnd: 45,
+				armEnd: 43,
 				discX: 125,
 				discY: 125,
 				discR: 115,
 				discFW: 140,
-				discBgR: 117,
+				discStartR: 117,
+				discEndR: 60,
 				discFgR: 55,
 				discAxisR: 3,
 				// colors
@@ -57,7 +61,6 @@ turntablePlayerEngine.prototype = {
 				armNeedleFg: 'transparent'
 			}
 		},
-		useTransitions: true,
 		transitions: {
 			start: {
 				src: {
@@ -77,30 +80,35 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Reserved parameters which will be overriden
 	 */
-	_wrapper: null,
-	_player: null,
-	_playlist: null,
-	_playlistIndex: 0,
-	_buttons: {},
-	_playPause: null,
-	_playerPaused: null,
-	_infos: {},
-	_infosInit: null,
-	_disc: null,
-	_discTitle: null,
 	_arm: null,
 	_armFt: null,
 	_armFtCallback: null,
-	_armInPlace: null,
-	_discRotation: 0,
-	_armRotation: 0,
+	_disc: null,
+	_discTitle: null,
+	_player: null,
+	_playlist: null,
+	_playPause: null,
+	_playlistIndex: 0,
+	_transitionID: null,
+	_wrapper: null,
+	
+	_buttons: {},
+	_infos: {},
+	_playerTransition: {},
+
 	_logMethods: [],
 	_tracks: [],
+
+	_armInPlace: false,
+	_infosInit: false,
+	_inRotation: false,
+	_inTransition: false,
+	_playerPaused: true,
+
+	_armRotation: 0,
+	_discRotation: 0,
 	_rpm: 45,
 	_rpmTransition: 3,
-	_transitionID: null,
-	_inTransition: null,
-	_playerTransition: {},
 
 	/**
 	 * Init the turntable
@@ -433,14 +441,14 @@ turntablePlayerEngine.prototype = {
 	 * @return {[type]} [description]
 	 */
 	initTransitions : function () {
-		if (this.options.useTransitions) {
+		if (this.options.useTransitions && !this._playerTransition.start) {
 			var
 				start = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'),
 				stop = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio')
 			;
 
-			this._playerTransition.start = this.loadTransitionTracks(start, 'start');
-			this._playerTransition.stop = this.loadTransitionTracks(stop, 'stop');
+			this._playerTransition.start = this.loadTransition(start, 'start');
+			this._playerTransition.stop = this.loadTransition(stop, 'stop');
 		}
 	},
 
@@ -493,14 +501,8 @@ turntablePlayerEngine.prototype = {
 			remote.setAttribute('class', 'remote');
 
 			this.toggleClass(button, 'playPauseButton', 'add');
-			if (this.options.autoPlay) {
-				button.innerHTML = this.options.buttonLabels.pause;
-				button.data = true;
-			}
-			else {
-				button.innerHTML = this.options.buttonLabels.play;
-				button.data = false;
-			}
+			button.innerHTML = this.options.buttonLabels.play;
+			button.data = false;
 			button.addEventListener('click', function (event) {
 				self.playPauseButtonClicked(event);
 			}, false);
@@ -569,12 +571,12 @@ turntablePlayerEngine.prototype = {
 					.attr({
 						'stroke': this.options.themes[this.options.theme].discBg,
 						'fill': this.options.themes[this.options.theme].discBg,
-						'opacity': .5 })
-				discBg = paper
+						'opacity': .5 }),
+				discStart = paper
 					.circle(
 						this.options.themes[this.options.theme].discX,
 						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discBgR)
+						this.options.themes[this.options.theme].discStartR)
 					.attr('fill', this.options.themes[this.options.theme].discBg),
 				disc = paper
 					.path(this.getFurrowsPath(
@@ -585,13 +587,19 @@ turntablePlayerEngine.prototype = {
 					.attr({ 
 						'fill': this.options.themes[this.options.theme].discBg, 
 						'stroke': this.options.themes[this.options.theme].discFurrows }),
+				discEnd = paper
+					.circle(
+						this.options.themes[this.options.theme].discX,
+						this.options.themes[this.options.theme].discY,
+						this.options.themes[this.options.theme].discEndR)
+					.attr('fill', this.options.themes[this.options.theme].discBg),
 				discFg = paper
 					.circle(
 						this.options.themes[this.options.theme].discX,
 						this.options.themes[this.options.theme].discY,
 						this.options.themes[this.options.theme].discFgR)
 					.attr('fill', this.options.themes[this.options.theme].discFg),
-					bbox = disc.getBBox(),
+				bbox = disc.getBBox(),
 				discTitle = paper
 					.text(
 						bbox.x + bbox.width / 2,
@@ -619,23 +627,18 @@ turntablePlayerEngine.prototype = {
 					self._armRotation = ft.attrs.rotate;
 					if (events.indexOf('rotate') != -1) {
 						self.pause();
-						self.stopTransitionTracks();
+						self.stopTransition();
 					}
 					else if (
 						events.indexOf('rotate end') != -1
 						&& ft.attrs.rotate > self.options.themes[self.options.theme].armStart
 						&& ft.attrs.rotate < self.options.themes[self.options.theme].armEnd
 					) {
-						var
-							percent = (ft.attrs.rotate - self.options.themes[self.options.theme].armStart) * 100 / (self.options.themes[self.options.theme].armEnd - self.options.themes[self.options.theme].armStart),
-							currentTime = self._player.duration * percent / 100
-						;
-						self._player.currentTime = currentTime;
-						self.start({ force: true });
-						console.info('Player track is at ' + Math.floor(percent, 10) + '%.');
+						self.updatePlayerPosition();
+						self.play({ force: true });
 					}
 					else if (events.indexOf('rotate end') != -1) {
-						self.stop();
+						self.placeTheArmOffTheDisc();
 					}
 				},
 				ft = paper.freeTransform(
@@ -769,134 +772,350 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc arm according to the current position of the track
 	 */
 	updateDiscNeedlePosition : function () {
-		if (this._armInPlace && this._playerPaused == false) {
+		if (this._playerPaused == false) {
 			var
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 				pos = (this._player.currentTime / this._player.duration) * 100,
-				deg = pos * (this.options.themes[this.options.theme].armEnd - this.options.themes[this.options.theme].armStart) / 100
+				deg = pos * (this.options.themes[this.options.theme].armEnd - this.options.themes[this.options.theme].armStart) / 100,
+				rotation = this.options.themes[this.options.theme].armStart + deg
 			;
-			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart + deg;
+			this._armFt.attrs.rotate = rotation;
 			this._armFt.apply();
-			console.info('Arm rotation : ' + deg + 'deg.');
+			console.info('Arm rotation : ' + rotation + 'deg.');
+		}
+	},
+	/**
+	 * Update the track current position according to the current position of the disc arm
+	 */
+	updatePlayerPosition : function () {
+		var
+			percent = (this._armRotation - this.options.themes[this.options.theme].armStart) * 100 / (this.options.themes[this.options.theme].armEnd - this.options.themes[this.options.theme].armStart),
+			currentTime = this._player.duration * percent / 100
+		;
+		
+		if (currentTime < 0) {
+			percent = 0;
+			currentTime = 0;
+		}
+
+		this._player.currentTime = currentTime;
+		
+		console.info('Player track is at ' + Math.floor(percent, 10) + '%.');
+	},
+
+	/**
+	 * Get the name of the area where the arm is placed
+	 * @return {String} The name of the area
+	 */
+	getArmArea : function () {
+		var area;
+
+		if (
+			this._armRotation > this.options.themes[this.options.theme].armStart
+			&& this._armRotation < this.options.themes[this.options.theme].armEnd
+		)
+			area = 'track';
+		else if (this._armRotation == 0)
+			area = 'stop';
+		else if (this._armRotation == this.options.themes[this.options.theme].armStart)
+			area = 'start';
+		else if (this._armRotation == this.options.themes[this.options.theme].armEnd)
+			area = 'end';
+
+		console.info('The arm is at the position : "' + area + '".')
+		return area;
+	},
+
+	/**
+	 * Place the arm on the disc in order to be ready to play
+	 * @param  {Object} options Settings
+	 */
+	placeTheArmOnTheDisc : function (options) {
+		var 
+			self = this,
+			o = options || {}
+		;
+
+		this.disableRemote('start');
+		o.enableRemote = true;
+
+		if (this._armFt) {
+			this._armFt.setOpts({ animate: true }, this._armFtCallback);
+			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart;
+			this._armFt.apply(function (ft) {
+				console.info('Arm rotation : ' + ft.attrs.rotate + 'deg.');
+				ft.setOpts({ animate: false }, self._armFtCallback);
+				self._armInPlace = true;
+				if (o.force) {
+					delete o.force;
+					self.play(o);
+				}
+				else
+					this.enableRemote('start');
+			});
+		}
+		else {
+			this._armInPlace = true;
+			this.play(o);
+		}
+	},
+
+	/**
+	 * Place the arm off the disc in order to be powered off
+	 * @param  {Object} options Settings
+	 */
+	placeTheArmOffTheDisc : function (options) {
+		var 
+			self = this,
+			o = options || {}
+		;
+
+		this.disableRemote('stop');
+		o.enableRemote = true;
+
+		if (this._armFt) {
+			this._armFt.setOpts({ animate: true }, this._armFtCallback);
+			this._armFt.attrs.rotate = 0;
+			this._armFt.apply(function (ft) {
+				console.info('Arm rotation : ' + ft.attrs.rotate + 'deg.');
+				ft.setOpts({ animate: false }, self._armFtCallback);
+				self._armInPlace = false;
+				self._armRotation = ft.attrs.rotate;
+				if (o.force) {
+					delete o.force;
+					self.end(o);
+				}
+				else
+					self.enableRemote('stop');
+			});
+		}
+		else {
+			this._armInPlace = true;
+			if (o.force) {
+				delete o.force;
+				self.end(o);
+			}
+			else
+				self.enableRemote('stop');
 		}
 	},
 
 	/**
 	 * Switch on the turntable
-	 * @param  {Object} options Settings
 	 */
-	start : function (options) {
-		console.info('START');
-		var o = options || {};
+	powerON : function () {
+		console.info('POWER ON');
 
-		if (this._armInPlace != true && this._armRotation == 0) {
-			this.startDiscTransitionRotation({ 
-				easing: this.options.easing.start,
-				transition: 'start'
-			});
-			var self = this;
-			this.disableRemote('start');
-			this._armFt.setOpts({ animate: true }, this._armFtCallback);
-			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart;
-			this._armFt.apply(function (ft) {
-				ft.setOpts({ animate: false }, self._armFtCallback);
-				self.startTrack({ 
-					startDiscTrackRotation: true,
-					enableRemote: true 
-				});
-			});
-			this._armInPlace = true;
-			console.info('Arm rotation : ' + this.options.themes[this.options.theme].armStart + 'deg.');
-		}
-		else if (o.force)
-			this.startTrack({ 
-				force: true,
-				startDiscTrackRotation: true
-			});
-		else if (this._playerPaused == true)
-			this.startTrack();
+		this.switchOnTheButton();
+
+		if (this.options.autoPlay)
+			this.startAuto();
 		else
-			this.startTrack({ startDiscTrackRotation: true });
+			this.startManual();
+	},
 
-		this.updateDiscInfos();
+	/**
+	 * Switch off the turntable
+	 */
+	powerOFF : function () {
+		console.info('POWER OFF');
+
+		this.switchOffTheButton();
+
+		if (this.options.autoPlay)
+			this.stopAuto();
+		else
+			this.stopManual();
+	},
+
+	/**
+	 * Switch on the play/pause button
+	 */
+	switchOnTheButton : function () {
+		this._powerON = true;
 		this._playPause.innerHTML = this.options.buttonLabels.pause;
 		this.toggleClass(this._playPause, 'active', 'add');
 	},
 
 	/**
-	 * Pause the audio player
-	 * @return {[type]} [description]
+	 * Switch off the play/pause button
 	 */
-	pause : function () {
-		console.info('PAUSE');
-		if (this._playerPaused != true) {
-			this._player.pause();
-			this._playerPaused = true;
+	switchOffTheButton : function () {
+		this._powerON = false;
+		this._playPause.innerHTML = this.options.buttonLabels.play;
+		this.toggleClass(this._playPause, 'active', 'remove');
+	},
+
+	/**
+	 * Start the manual turntable
+	 */
+	startManual : function () {
+		console.info('START MANUAL');
+
+		this.startDiscRotation({ 
+			easing: 'linear',
+			transition: 'manualstart'
+		});
+
+		if (this.getArmArea() != 'stop')
+			this.play({ force: true });
+	},
+
+	/**
+	 * Stop the manual turntable
+	 */
+	stopManual : function () {
+		console.info('STOP MANUAL');
+
+		this.startDiscRotation({ 
+			easing: this.options.easing.stop,
+			transition: 'stop',
+			withTransition: false
+		});
+
+		if (this._playerPaused == false)
+			this.pause();
+	},
+
+	/**
+	 * Start the automatic turntable
+	 */
+	startAuto : function () {
+		console.info('START AUTO');
+
+		var self = this;
+
+		this.startDiscRotation({ 
+			easing: this.options.easing.start,
+			transition: 'start'
+		});
+
+		this.placeTheArmOnTheDisc({
+			force: true,
+			transition: 'start'
+		});
+	},
+
+	/**
+	 * Stop the automatic turntable
+	 */
+	stopAuto : function () {
+		console.info('STOP AUTO');
+		
+		var self = this;
+
+		this.end({
+			force: this.getArmArea() != 'end' ? true : false,
+			transition: 'stop'
+		});
+	},
+
+	/**
+	 * Play the audio track or the start transition
+	 * @param  {Object} options Settings
+	 */
+	play : function (options) {
+		var o = options || {};
+
+		o.transition = 'start';
+		this.stopTransition();
+		this.updateTrackInfos();
+		this.updateInfos();
+
+		if (o.force || !this.options.useTransitions) {
+			if (this._powerON || (this.options.autoPlay && !this._powerON)) {
+				this._player.play();
+				this._playerPaused = false;
+				this._armInPlace = true;
+
+				this.switchOnTheButton();
+				this.startDiscRotation({ transition: 'track' });
+
+				if (o.enableRemote && !this.options.useTransitions)
+					this.enableRemote('start');
+			}
+		}
+		else {
+			this.playTransition(o);
 		}
 	},
 
 	/**
-	 * Switch off the turntable
+	 * Stop the audio track and/or play the stop transition
 	 * @param  {Object} options Settings
 	 */
-	stop : function (options) {
-		console.info('STOP');
-		var 
-			self = this,
-			o = options || {};
-		;
-		o.transition = 'stop';
+	end : function (options) {
+		var o = options || {};
 
-		this.stopTransitionTracks();
+		o.transition = 'stop';
+		this.stopTransition();
 
 		if (this._player.currentTime) {
-			this._player.pause();
+			this.pause();
 			this._player.currentTime = 0;
 		}
 
-		if (this._playerPaused != true || this._inTransition) {
-			this.startDiscTransitionRotation({ 
-				easing: this.options.easing.stop,
-				withTransition: o.force ? false : true,
-				transition: 'stop'
-			});
-		}
-
-		if (o.force && this._transitionID != undefined) {
+		if (this._transitionID != undefined) {
 			window.clearTimeout(this._transitionID);
 			this._transitionID = null;
 		}
 
+		this.startDiscRotation({
+			easing: this.options.easing.stop,
+			withTransition: o.force ? !o.force : this.options.useTransitions,
+			transition: o.force || this.options.autoPlay ? 'stop' : 'manualstop'
+		});
+
 		if (o.force || !this.options.useTransitions) {
-			if (this._armFt) {
-				this.disableRemote('stop');
-				this._armFt.setOpts({ animate: true }, this._armFtCallback);
-				this._armFt.attrs.rotate = 0;
-				this._armFt.apply(function (ft) {
-					ft.setOpts({ animate: false }, self._armFtCallback);
-					o.enableRemote = true;
-					self.stopTrackTransition(o);
+			if (this.options.autoPlay)
+				this.placeTheArmOffTheDisc({
+					transition: 'stop'
 				});
+
+			if (o.enableRemote && !this.options.useTransitions)
+				this.enableRemote('stop');
+
+			if (o.withStart && this.options.autoPlay) {
+				var self = this;
+				this._transitionID = window.setTimeout(function () {
+					self.updateTrackInfos();
+					self.updateInfos();
+					self.updateDiscInfos();
+					self.powerON();
+				}, parseInt(this._transitionTimer));
 			}
-			else {
-				this.stopTrackTransition(o);
-			}
+			else
+				this.switchOffTheButton();
 		}
-		else if (this._playerPaused != true) {
-			this.startTransitionTrack(o);
+		else {
+			if (!this.options.autoPlay)
+				o.duration = this.options.autoStop;
+			this.playTransition(o);
 		}
-		
+	},
+
+	/**
+	 * Pause the audio player
+	 */
+	pause : function () {
+		console.info('PAUSE');
+
 		if (this._playerPaused != true) {
+			this._player.pause();
 			this._playerPaused = true;
 		}
 	},
 
 	/**
-	 * Switch OFF an then ON the turntable
+	 * Stop and start the turntable
 	 */
 	restart : function () {
 		console.info('RESTART');
-		this.stop({ withStart: true });
+
+		this.end({ 
+			force: true,
+			withStart: true 
+		});
 	},
 
 	/**
@@ -909,9 +1128,6 @@ turntablePlayerEngine.prototype = {
 				i = i || 0,
 				track = this._tracks[i]
 			;
-
-			if (this._playerPaused == true || this._playerPaused == null)
-				this.stop({ force: true });
 
 			if (this._player.canPlayType('audio/mpeg') && track.src.mp3)
 				this._player.src = track.src.mp3;
@@ -940,60 +1156,12 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Start the audio track or the start transition
-	 * @param  {Object} options Settings
-	 */
-	startTrack: function (options) {
-		var o = options || {};
-
-		o.transition = 'start';
-
-		if (o.force || !this.options.useTransitions) {
-			this._player.play();
-			this._playerPaused = false;
-			this._armInPlace = true;
-
-			if (o.startDiscTrackRotation)
-				this.startDiscTrackRotation();
-
-			if (o.enableRemote && !this.options.useTransitions)
-				this.enableRemote('start');
-		}
-		else {
-			this.startTransitionTrack(o);
-		}
-	},
-
-	/**
-	 * Function called once the playlist is played and the animation finished
-	 * @param  {Object} options Settings
-	 */
-	stopTrackTransition : function (options) {
-		var o = options || {};
-
-		this._armInPlace = false;
-		this._armRotation = 0;
-
-		if (o.enableRemote) {
-			this.enableRemote('stop');
-		}
-
-		if (this._playPause && !o.withStart) {
-			this._playPause.innerHTML = this.options.buttonLabels.play;
-			this.toggleClass(this._playPause, 'active', 'remove');
-		}
-
-		if (o.withStart)
-			this.start();
-	},
-
-	/**
 	 * Load the transition played when the playlist starts and/or stops
 	 * @param  {Object} element    The DOM node element
 	 * @param  {String} transition The transition type
 	 * @return {Object} The DOM node element
 	 */
-	loadTransitionTracks : function (element, transition) {
+	loadTransition : function (element, transition) {
 		if (!element || !transition) {
 			console.error('No transition track to load.')
 			return;
@@ -1017,6 +1185,7 @@ turntablePlayerEngine.prototype = {
 
 		element.id = 'turntable-player-transition-' + transition;
 		element.preload = 'metadata';
+		element.loop = 'loop';
 
 		if (element.canPlayType('audio/mpeg') && option.src.mp3)
 			element.src = option.src.mp3;
@@ -1038,7 +1207,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the duration time of the transitions
 	 * @param  {Object} element    The DOM node element
 	 */
-	updateTransitionTrack : function (element) {
+	updateTransition : function (element) {
 		var transition;
 
 		if (element.id == 'turntable-player-transition-start')
@@ -1056,7 +1225,7 @@ turntablePlayerEngine.prototype = {
 	 * Play the transition according to his name
  	 * @param  {Object} options Settings
 	 */
-	startTransitionTrack: function (options) {
+	playTransition: function (options) {
 		var 
 			self = this,
 			o = options || {},
@@ -1064,34 +1233,37 @@ turntablePlayerEngine.prototype = {
 		;
 		o.force = true;
 
-		this.stopTransitionTracks();
+		this.stopTransition();
 
 		if (o.enableRemote)
 			this.enableRemote(transition);
 
 		if (this.options.useTransitions && this._playerTransition[transition]) {
 			console.info('Playing transition "' + transition + '".');
+
+			var duration = o.duration || this.options.transitions[transition].duration;
+			
 			this._inTransition = true;
 			this._playerTransition[transition].play();
 			this._transitionID = window.setTimeout(function () {
 				if (transition == 'start')
-					self.startTrack(o);
+					self.play(o);
 				else if (transition == 'stop')
-					self.stop(o);
-			}, this.options.transitions[transition].duration);
+					self.end(o);
+			}, parseInt(duration));
 		}
 		else if (this._playerTransition[transition]) {
 			if (transition == 'start')
-				self.startTrack(o);
+				self.play(o);
 			else if (transition == 'stop')
-				self.stop(o);
+				self.end(o);
 		}
 	},
 
 	/**
 	 * Stop all the transitions
 	 */
-	stopTransitionTracks : function () {
+	stopTransition : function () {
 		for (var t in this._playerTransition) {
 			this._playerTransition[t].pause();
 			this._playerTransition[t].currentTime = 0;
@@ -1099,16 +1271,36 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Start the rotation of the disc according to the track
+	 * Start the rotation of the disc according to the settings
 	 */
-	startDiscTrackRotation : function () {
+	startDiscRotation : function (options) {
 		this.stopDiscRotation();
 
 		var
 			self = this,
-			rem = this._player.duration - this._player.currentTime,
-			deg = parseInt(this._rpm * 360 * rem / 60) + this._discRotation,
-			ms = parseInt(rem * 1000)
+			o = options || {},
+			easing = o.easing || 'linear',
+			name = o.transition || 'none',
+			time = o.duration || 0
+		;
+
+		if (o.withTransition == undefined || !this.options.useTransitions)
+		  o.withTransition = this.options.useTransitions;
+
+		if (name == 'track')
+			time = this._player.duration - this._player.currentTime;
+		else if (name == 'manualstart' || name == 'manualstop')
+			time = parseInt(this.options.autoStop) / 1000;
+		else if (o.withTransition)
+			time = parseInt(this.options.animateDelay + this.options.transitions[o.transition].duration) / 1000
+		else
+			time = this.options.animateDelay / 1000;	
+
+		this._transitionTimer = time * 1000;
+
+		var
+			deg = parseInt(this._rpm * 360 * time / 60) + this._discRotation,
+			ms = parseInt(time * 1000)
 		;
 
 		this._disc.animate({ transform: 'r' +	deg}, ms, 'linear', function () {
@@ -1116,45 +1308,9 @@ turntablePlayerEngine.prototype = {
 		});
 		this._discTitle.animate({ transform: 'r' +	deg}, ms, 'linear');
 
-		console.info('Rotation : ' + deg + 'deg for ' + ms + 'ms.');
-	},
+		this._inRotation = true;
 
-	/**
-	 * Start the rotation of the disc according to the transition
- 	 * @param  {Object} options Settings
-	 */
-	startDiscTransitionRotation : function (options) {
-		if (this._disc && (
-			this._inTransition
-			|| (this._armRotation != 0 && this._discRotation != 0)
-			|| (this._armInPlace != true && this._armRotation == 0)
-		)) {		
-			this.stopDiscRotation();
-
-			var
-				self = this,
-				o = options || {},
-				easing = o.easing || 'linear'
-			;
-			if (o.withTransition == undefined || !this.options.useTransitions)
-			  o.withTransition = this.options.useTransitions;
-
-			var
-				delay = o.withTransition 
-					? this.options.animateDelay + this.options.transitions[o.transition].duration
-					: this.options.animateDelay,
-				rem = delay / 1000,
-				deg = parseInt(this._rpm * 360 * rem / 60) + this._discRotation,
-				ms = parseInt(delay)
-			;
-
-			this._disc.animate({ transform: 'r' +	deg}, ms, easing, function () {
-				self.updateDiscRotationIndex(this);
-			});
-			this._discTitle.animate({ transform: 'r' +	deg}, ms, easing);
-
-			console.info('Transition : ' + deg + 'deg for ' + ms + 'ms with easing ' + easing + '.');
-		}
+		console.info('Rotation "' + name + '": ' + deg + 'deg for ' + ms + 'ms.');
 	},
 
 	/**
@@ -1165,6 +1321,8 @@ turntablePlayerEngine.prototype = {
 			this.updateDiscRotationIndex(this._disc.stop());
 		if (this._discTitle)
 			this._discTitle.stop();
+
+		this._inRotation = false;
 	},
 
 	/**
@@ -1194,12 +1352,14 @@ turntablePlayerEngine.prototype = {
 
 		if (event.target.id == 'turntable-player') {
 			this.enableRemote('playerLoaded');
-			this.updateTrackInfos();
-			this.updateInfos();
 
-			if (this._playerPaused && this.options.autoPlay)
-				this.start();
-			else if (!this._playerPaused)
+			if (!this.options.autoPlay) {
+				this.updateTrackInfos();
+				this.updateInfos();
+				this.updatePlayerPosition();
+			}		
+
+			if (this.options.autoPlay && (!this._playerPaused || this._inTransition))
 				this.restart();
 		}
 	},
@@ -1211,8 +1371,11 @@ turntablePlayerEngine.prototype = {
 		console.info('Audio player "' + event.target.id + '" event: loadedMetaData.');
 
 		if (event.target.id == 'turntable-player') {
-			this.updateTrackInfos();
-			this.updateInfos();
+			if (!this.options.autoPlay){
+				this.updateTrackInfos();
+				this.updateInfos();
+			}
+
 			if (this._playerPaused == true)
 				this.updateDiscInfos();
 		}
@@ -1222,7 +1385,7 @@ turntablePlayerEngine.prototype = {
 				s = event.target.id
 			;
 			if (r.test(s))
-				this.updateTransitionTrack(event.target);
+				this.updateTransition(event.target);
 		}
 	},
 
@@ -1232,7 +1395,7 @@ turntablePlayerEngine.prototype = {
 	playerEnded : function (event) {
 		if (event.target.id == 'turntable-player') {
 			console.info('Player event: ended.');
-			this.stop();
+			this.end();
 		}
 		else {
 			var 
@@ -1258,17 +1421,20 @@ turntablePlayerEngine.prototype = {
 	 * Event 'click' called on the play/pause button
 	 */
 	playPauseButtonClicked : function (event) {
-		if (this._playerPaused == true && !this._inTransition)
-			this.start();
+		if (this._powerON)
+			this.powerOFF();
 		else
-			this.stop({ force: true });
+			this.powerON();
 	},
 
 	/**
 	 * Event 'click' called on the playlist tracks
 	 */
 	playlistButtonClicked : function (event) {
-		if (event.target.data)
+		if (event.target.data && 
+			!this._powerON
+			|| (this._powerON && this.options.autoPlay)
+		)
 			this.loadTrack(event.target.data);
 	}
 };

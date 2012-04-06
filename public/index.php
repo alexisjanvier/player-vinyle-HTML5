@@ -58,7 +58,7 @@ foreach ($keys as $key)
 	<article>
 		<h1>Vinyl player</h1>
 		<p>Technologies : HTML, CSS, JavaScript and SVG thanks to <a href="http://raphaeljs.com/">Raphaël</a></p>
-		<p>All the magic is in <a href="js/main.js">js/main.js</a>.</p>
+		<p>All the magic is in <a href="js/turntable-player.js">js/turntable-player.js</a>.</p>
 		<h2>Examples :</h2>
 		<p>You can customize the settings sent to the player through the url, for example :</p>
 		<ul>
@@ -69,39 +69,39 @@ foreach ($keys as $key)
 				<br />animateDelay=5000</li>
 			<li><a href="index.php?infos=duration,current,timer,position">Change the track informations<a>
 				<br />infos=duration,current,timer,position</li>
-			<li><a href="index.php?autoPlay=true">Autoplay on load<a>
+			<li><a href="index.php?autoPlay=true">Automatic turntable<a>
 				<br />autoPlay=true</li>
 		</ul>
 		<h2>All the config settings :</h2>
 		<pre>
 {
-  // Load on init
-  enable: true, 
   // Delay for the animations of the arm and the disc
   animateDelay : 2000, 
-  // Show log infos
-  debugMode : false, 
-  // Play at start
+  // Automatic turntable
   autoPlay : false, 
-  // Dom ID to use to build the player, if not found, the element will be created
-  mainId: 'player', 
-  // Uri of the playlist in json format
-  playlistLocation: '/data/playlist.json', 
   // Customize the labels of the buttons
   buttonLabels: { 
     play: 'POWER ON',
     pause: 'POWER OFF'
   },
+  // Show log infos
+  debugMode : false, 
   // Easing customization
   easing: { 
     start: '<',
     pause: 'cubic-bezier(.81, .79, .57, 1.01)',
     stop: 'cubic-bezier(.81, .79, .57, 1.01)'
   },
+  // Load on init
+  enable: true, 
   // Choices : duration, current, timer, position
   infos: ["duration", "timer"], 
   // Log informations in the console
   logMethodNames: ["log", "debug", "warn", "info"],
+  // Dom ID to use to build the player, if not found, the element will be created
+  mainId: 'player', 
+  // Uri of the playlist in json format
+  playlistLocation: '/data/playlist.json', 
   // Use audio transition at the beginning and the end of the track
   useTransitions: true,
 }
@@ -116,7 +116,7 @@ foreach ($keys as $key)
 
 	<script src="vendor/raphael-min.js" type="text/javascript"></script>
 	<script src="vendor/raphael.free_transform_animate.js" type="text/javascript"></script>
-	<script src="js/main.js" type="text/javascript"></script>
+	<script src="js/turntable-player.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		var turntablePlayer = new turntablePlayerEngine();
 		window.addEventListener('load', function () {
