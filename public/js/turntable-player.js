@@ -31,34 +31,102 @@ turntablePlayerEngine.prototype = {
 		themes : { // The list of the available themes with their settings
 			default: {
 				class: 'default',
-				armSrc: 'img/vinyl-arm-200-314.png',
+				// armSrc: 'img/vinyl-arm-200-314.png',
 				// positions and radius
-				paperX: 2,
-				paperY: 2,
-				armX: 230,
-				armY: -90,
-				armW: 63,
-				armH: 314,
-				armStart: 22,
-				armEnd: 43,
-				discX: 125,
-				discY: 125,
-				discR: 115,
-				discFW: 140,
-				discStartR: 117,
-				discEndR: 60,
-				discFgR: 55,
-				discAxisR: 3,
+				// armX: 230,
+				// armY: -90,
+				// armW: 63,
+				// armH: 314,
+				// armStartFrom: 20,
+				// armStartTo: 22,
+				// armTrackFrom: 22,
+				// armTrackTo: 43,
+				// armEndFrom: 43,
+				// armEndTo: 49,
+				// discX: 125,
+				// discY: 125,
+				// discR: 115,
+				// discFW: 140,
+				// discStartR: 117,
+				// discEndR: 60,
+				// discFgR: 45,
+				// discAxisR: 3,
 				// colors
-				discBg: '#000',
-				discFurrows: '#111',
-				discFg: '#666',
-				discTitle: '#eee',
-				discAxis: '#000',
-				armBg: '#999',
-				armFg: '#000',
-				armNeedleBg: '#999',
-				armNeedleFg: 'transparent'
+				// discBg: '#000',
+				// discFurrows: '#111',
+				// discFg: '#666',
+				// discTitle: '#eee',
+				// discAxis: '#000',
+				// armBg: '#999',
+				// armFg: '#000',
+				// armNeedleBg: '#999',
+				// armNeedleFg: 'transparent',
+				// new config format
+				arm: {
+					src: 'img/vinyl-arm-200-314.png',
+					fill: '#999',
+					stroke: '#000',
+					area: {
+						start: 20,
+						from: 22,
+						to: 43,
+						end: 49
+					},
+					dim: { 
+						w: 63,
+						h: 314
+					},
+					needle : {
+						fill: '#999',
+						stroke: 'transparent'
+					},
+					pos: { 
+						x: 230,
+						y: -90
+					}
+				},
+				disc: {
+					fill: '#000',
+					stroke: '#111',
+					pos: { 
+						x: 125,
+						y: 125
+					},
+					shadow: {
+						r: 125,
+						opacity: .5,
+						fill: '#000',
+						stroke: '#111'
+					},
+					furrows: {
+						r: 115,
+						size: 140,
+						fill: '#000',
+						stroke: '#111'
+					},
+					start: {
+						r: 117,
+					},
+					end: {
+						r: 60,
+					},
+					cover: {
+						r: 45,
+						fill: '#666',
+						stroke: '#fff'
+					},
+					axis: {
+						r: 3,
+						fill: '#000',
+						stroke: '#000'
+					}
+				},
+				paper: {
+					pos: {
+						x: 2,
+						y: 2
+					}
+				}
 			}
 		},
 		transitions: {
@@ -255,6 +323,17 @@ turntablePlayerEngine.prototype = {
 		catch( e ) {
 			console.error('Caught Exception: ' + e.description);
 		}
+	},
+
+	/**
+	 * Get a random number according to the min and max numbers 
+	 * @param  {Number} min Minimum
+	 * @param  {Number} max Maximum
+	 * @return {Number}     Random number result
+	 */
+	getRandomArbitrary : function (min, max)  
+	{  
+	  return Math.random() * (max - min) + min;
 	},
 
 	/**
@@ -558,6 +637,7 @@ turntablePlayerEngine.prototype = {
 			var
 				self = this,
 				turntable = this.getWrapper(),
+				theme = this.options.themes[this.options.theme],
 				paper = Raphael(
 					turntable,
 					turntable.offsetWidth, 
@@ -565,40 +645,40 @@ turntablePlayerEngine.prototype = {
 				defs = document.getElementsByTagName('defs')[0],
 				discShadow = paper
 					.circle(
-						this.options.themes[this.options.theme].discX,
-						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discBgR + 10)
+						theme.disc.pos.x,
+						theme.disc.pos.y,
+						theme.disc.shadow.r)
 					.attr({
-						'stroke': this.options.themes[this.options.theme].discBg,
-						'fill': this.options.themes[this.options.theme].discBg,
-						'opacity': .5 }),
+						'stroke': theme.disc.shadow.stroke,
+						'fill': theme.disc.shadow.fill,
+						'opacity': theme.disc.shadow.opacity }),
 				discStart = paper
 					.circle(
-						this.options.themes[this.options.theme].discX,
-						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discStartR)
-					.attr('fill', this.options.themes[this.options.theme].discBg),
+						theme.disc.pos.x,
+						theme.disc.pos.y,
+						theme.disc.start.r)
+					.attr('fill', theme.disc.fill),
 				disc = paper
 					.path(this.getFurrowsPath(
-						this.options.themes[this.options.theme].discX,
-						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discFW,
-						this.options.themes[this.options.theme].discR))
+						theme.disc.pos.x,
+						theme.disc.pos.y,
+						theme.disc.furrows.size,
+						theme.disc.furrows.r))
 					.attr({ 
-						'fill': this.options.themes[this.options.theme].discBg, 
-						'stroke': this.options.themes[this.options.theme].discFurrows }),
+						'fill': theme.disc.fill, 
+						'stroke': theme.disc.stroke }),
 				discEnd = paper
 					.circle(
-						this.options.themes[this.options.theme].discX,
-						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discEndR)
-					.attr('fill', this.options.themes[this.options.theme].discBg),
+						theme.disc.pos.x,
+						theme.disc.pos.y,
+						theme.disc.end.r)
+					.attr('fill', theme.disc.fill),
 				discFg = paper
 					.circle(
-						this.options.themes[this.options.theme].discX,
-						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discFgR)
-					.attr('fill', this.options.themes[this.options.theme].discFg),
+						theme.disc.pos.x,
+						theme.disc.pos.y,
+						theme.disc.cover.r)
+					.attr('fill', theme.disc.cover.fill),
 				bbox = disc.getBBox(),
 				discTitle = paper
 					.text(
@@ -606,36 +686,36 @@ turntablePlayerEngine.prototype = {
 						bbox.y + bbox.height / 2,
 						this.getTrackTitleLineBreak())
 					.attr({
-						'fill': this.options.themes[this.options.theme].discTitle,
-						'height': this.options.themes[this.options.theme].discFgR * 1.25,
-						'width': this.options.themes[this.options.theme].discFgR * 1.25 }),
+						'fill': theme.disc.cover.stroke,
+						'height': theme.disc.cover.r * 1.25,
+						'width': theme.disc.cover.r * 1.25 }),
 				discAxis = paper
 					.circle(
-						this.options.themes[this.options.theme].discX,
-						this.options.themes[this.options.theme].discY,
-						this.options.themes[this.options.theme].discAxisR)
-					.attr('fill', this.options.themes[this.options.theme].discAxis),
+						theme.disc.pos.x,
+						theme.disc.pos.y,
+						theme.disc.axis.r)
+					.attr('fill', theme.disc.axis.fill),
 				arm = paper
 					.image(
-						this.options.themes[this.options.theme].armSrc,
-						this.options.themes[this.options.theme].armX,
-						this.options.themes[this.options.theme].armY,
-						this.options.themes[this.options.theme].armW,
-						this.options.themes[this.options.theme].armH),
+						theme.arm.src,
+						theme.arm.pos.x,
+						theme.arm.pos.y,
+						theme.arm.dim.w,
+						theme.arm.dim.h),
 				ftCallback = function(ft, events) {
 					console.info('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
 					self._armRotation = ft.attrs.rotate;
 					if (events.indexOf('rotate') != -1) {
 						self.pause();
-						self.stopTransition();
+						self.pauseTransition();
 					}
 					else if (
 						events.indexOf('rotate end') != -1
-						&& ft.attrs.rotate > self.options.themes[self.options.theme].armStart
-						&& ft.attrs.rotate < self.options.themes[self.options.theme].armEnd
+						&& ft.attrs.rotate >= self.options.themes[self.options.theme].arm.area.start
+						&& ft.attrs.rotate <= self.options.themes[self.options.theme].arm.area.end
 					) {
 						self.updatePlayerPosition();
-						self.play({ force: true });
+						self.playDiscArea({ force: true });
 					}
 					else if (events.indexOf('rotate end') != -1) {
 						self.placeTheArmOffTheDisc();
@@ -645,8 +725,8 @@ turntablePlayerEngine.prototype = {
 					arm,
 					{
 						attrs: {
-							fill: this.options.themes[this.options.theme].armNeedleBg,
-							stroke: this.options.themes[this.options.theme].armNeedleFg,
+							fill: theme.arm.needle.fill,
+							stroke: theme.arm.needle.stroke,
 							opacity: 0
 						},
 						animate: false,
@@ -655,7 +735,7 @@ turntablePlayerEngine.prototype = {
 						size: 20,
 						drag: false,
 						scale: false,
-						rotateRange: [0, this.options.themes[this.options.theme].armEnd]
+						rotateRange: [0, theme.arm.area.end]
 					},
 					ftCallback
 				)
@@ -770,18 +850,39 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Update the disc arm according to the current position of the track
+	 * @param {Object} options Settings
 	 */
-	updateDiscNeedlePosition : function () {
-		if (this._playerPaused == false) {
+	updateDiscNeedlePosition : function (options) {
+		var o = options || {};
+		if (o.element && (
+			(o.name == 'track' && !this._playerPaused)
+			|| (o.name == 'start' && this._inTransition)
+			|| (o.name == 'end' && this._inTransition)
+		)) {
+			var from, to;
+			if (o.name == 'track') {
+				from = this.options.themes[this.options.theme].arm.area.from; 
+				to = this.options.themes[this.options.theme].arm.area.to;
+			}
+			else if (o.name == 'start') {
+				from = this.options.themes[this.options.theme].arm.area.start; 
+				to = this.options.themes[this.options.theme].arm.area.from;
+			}
+			else if (o.name == 'end') {
+				from = this.options.themes[this.options.theme].arm.area.to; 
+				to = this.options.themes[this.options.theme].arm.area.end;
+			}
+
 			var
-				rem = parseInt(this._player.duration - this._player.currentTime, 10),
-				pos = (this._player.currentTime / this._player.duration) * 100,
-				deg = pos * (this.options.themes[this.options.theme].armEnd - this.options.themes[this.options.theme].armStart) / 100,
-				rotation = this.options.themes[this.options.theme].armStart + deg
+				rem = parseInt(o.element.duration - o.element.currentTime, 10),
+				pos = (o.element.currentTime / o.element.duration) * 100,
+				deg = pos * (to - from) / 100,
+				rotation = from + deg,
+				random = rotation + this.getRandomArbitrary(-0.1, 0.15)
 			;
-			this._armFt.attrs.rotate = rotation;
+			this._armFt.attrs.rotate = random;
 			this._armFt.apply();
-			console.info('Arm rotation : ' + rotation + 'deg.');
+			console.info('Arm rotation "' + o.name + '" : ' + rotation + ' (' + random + ') deg.');
 		}
 	},
 	/**
@@ -789,7 +890,7 @@ turntablePlayerEngine.prototype = {
 	 */
 	updatePlayerPosition : function () {
 		var
-			percent = (this._armRotation - this.options.themes[this.options.theme].armStart) * 100 / (this.options.themes[this.options.theme].armEnd - this.options.themes[this.options.theme].armStart),
+			percent = (this._armRotation - this.options.themes[this.options.theme].arm.area.from) * 100 / (this.options.themes[this.options.theme].arm.area.to - this.options.themes[this.options.theme].arm.area.from),
 			currentTime = this._player.duration * percent / 100
 		;
 		
@@ -811,16 +912,22 @@ turntablePlayerEngine.prototype = {
 		var area;
 
 		if (
-			this._armRotation > this.options.themes[this.options.theme].armStart
-			&& this._armRotation < this.options.themes[this.options.theme].armEnd
+			this._armRotation >= this.options.themes[this.options.theme].arm.area.from
+			&& this._armRotation <= this.options.themes[this.options.theme].arm.area.to
 		)
 			area = 'track';
+		else if (
+			this._armRotation >= this.options.themes[this.options.theme].arm.area.start
+			&& this._armRotation <= this.options.themes[this.options.theme].arm.area.from
+		)
+			area = 'start';
+		else if (
+			this._armRotation >= this.options.themes[this.options.theme].arm.area.to
+			&& this._armRotation <= this.options.themes[this.options.theme].arm.area.end
+		)
+			area = 'end';
 		else if (this._armRotation == 0)
 			area = 'stop';
-		else if (this._armRotation == this.options.themes[this.options.theme].armStart)
-			area = 'start';
-		else if (this._armRotation == this.options.themes[this.options.theme].armEnd)
-			area = 'end';
 
 		console.info('The arm is at the position : "' + area + '".')
 		return area;
@@ -841,7 +948,7 @@ turntablePlayerEngine.prototype = {
 
 		if (this._armFt) {
 			this._armFt.setOpts({ animate: true }, this._armFtCallback);
-			this._armFt.attrs.rotate = this.options.themes[this.options.theme].armStart;
+			this._armFt.attrs.rotate = this.options.themes[this.options.theme].arm.area.from;
 			this._armFt.apply(function (ft) {
 				console.info('Arm rotation : ' + ft.attrs.rotate + 'deg.');
 				ft.setOpts({ animate: false }, self._armFtCallback);
@@ -957,8 +1064,9 @@ turntablePlayerEngine.prototype = {
 			transition: 'manualstart'
 		});
 
-		if (this.getArmArea() != 'stop')
-			this.play({ force: true });
+		this.playDiscArea({ force: true });
+		// if (this.getArmArea() != 'stop')
+		// 	this.play({ force: true });
 	},
 
 	/**
@@ -1011,6 +1119,31 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Play the audio track or transition according to the arm position
+	 * @param  {Object} options Settings
+	 */
+	playDiscArea : function (options) {
+		console.info("DRAGGED'N'DROPPED");
+		var area = this.getArmArea();
+
+		if (this._powerON || (this.options.autoPlay && !this._powerON)) {
+			this.switchOnTheButton();
+
+			if (area == 'track') {
+				this.play(options);
+			}
+			else if (area == 'start') {
+				delete options.force;
+				this.play(options);
+			}
+			else if (area == 'end') {
+				delete options.force;
+				this.end(options);
+			}
+		}
+	},
+
+	/**
 	 * Play the audio track or the start transition
 	 * @param  {Object} options Settings
 	 */
@@ -1018,7 +1151,7 @@ turntablePlayerEngine.prototype = {
 		var o = options || {};
 
 		o.transition = 'start';
-		this.stopTransition();
+		this.pauseTransition();
 		this.updateTrackInfos();
 		this.updateInfos();
 
@@ -1048,7 +1181,7 @@ turntablePlayerEngine.prototype = {
 		var o = options || {};
 
 		o.transition = 'stop';
-		this.stopTransition();
+		this.pauseTransition();
 
 		if (this._player.currentTime) {
 			this.pause();
@@ -1179,6 +1312,9 @@ turntablePlayerEngine.prototype = {
 			}, false);
 		}
 
+		element.addEventListener('timeupdate', function (event) {
+			self.playerTimeUpdated(event);
+		}, false);
 		element.addEventListener('ended', function (event) {
 			self.playerEnded(event);
 		}, false);
@@ -1233,7 +1369,7 @@ turntablePlayerEngine.prototype = {
 		;
 		o.force = true;
 
-		this.stopTransition();
+		this.pauseTransition();
 
 		if (o.enableRemote)
 			this.enableRemote(transition);
@@ -1244,6 +1380,7 @@ turntablePlayerEngine.prototype = {
 			var duration = o.duration || this.options.transitions[transition].duration;
 			
 			this._inTransition = true;
+			this._playerTransition[transition].currentTime = 0;
 			this._playerTransition[transition].play();
 			this._transitionID = window.setTimeout(function () {
 				if (transition == 'start')
@@ -1257,6 +1394,15 @@ turntablePlayerEngine.prototype = {
 				self.play(o);
 			else if (transition == 'stop')
 				self.end(o);
+		}
+	},
+
+	/**
+	 * Pause all the transitions
+	 */
+	pauseTransition : function () {
+		for (var t in this._playerTransition) {
+			this._playerTransition[t].pause();
 		}
 	},
 
@@ -1393,7 +1539,7 @@ turntablePlayerEngine.prototype = {
 	 * Event 'ended' called on media elements
 	 */
 	playerEnded : function (event) {
-		if (event.target.id == 'turntable-player') {
+		if (event.target.id == 'turntable-player' && !this._playerPaused) {
 			console.info('Player event: ended.');
 			this.end();
 		}
@@ -1412,8 +1558,25 @@ turntablePlayerEngine.prototype = {
 	 */
 	playerTimeUpdated : function (event) {
 		if (event.target.id == 'turntable-player') {
-			this.updateDiscNeedlePosition();
+			this.updateDiscNeedlePosition({ 
+				name: 'track', 
+				element: this._player 
+			});
 			this.updateInfos();
+		}
+		else if (this._playerPaused && this._inTransition) {
+			if (event.target.id == 'turntable-player-transition-start') {
+				this.updateDiscNeedlePosition({ 
+					name: 'start', 
+					element: this._playerTransition.start
+				});
+			}
+			else if (event.target.id == 'turntable-player-transition-stop') {
+				this.updateDiscNeedlePosition({ 
+					name: 'end', 
+					element: this._playerTransition.stop
+				});
+			}
 		}
 	},
 
