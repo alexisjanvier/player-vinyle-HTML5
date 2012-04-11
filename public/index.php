@@ -63,14 +63,16 @@ foreach ($keys as $key)
 		<p>You can customize the settings sent to the player through the url, for example :</p>
 		<ul>
 			<li><a href="index.php">Default options<a></li>
+			<li><a href="index.php?autoPlay=true">Automatic turntable<a>
+				<br />autoPlay=true</li>
+			<li><a href="index.php?theme=alu">ALU theme<a>
+				<br />theme=alu</li>
 			<li><a href="index.php?buttonLabels=play|on,pause|off">Change the power button labels to "on" and "off"<a>
 				<br />buttonLabels=play|on,pause|off</li>
 			<li><a href="index.php?animateDelay=5000">Change the animation delay to 5 seconds<a>
 				<br />animateDelay=5000</li>
 			<li><a href="index.php?infos=duration,current,timer,position">Change the track informations<a>
 				<br />infos=duration,current,timer,position</li>
-			<li><a href="index.php?autoPlay=true">Automatic turntable<a>
-				<br />autoPlay=true</li>
 		</ul>
 		<h2>All the config settings :</h2>
 		<pre>

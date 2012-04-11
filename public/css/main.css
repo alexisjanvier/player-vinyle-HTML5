@@ -2,7 +2,12 @@
 button::-moz-focus-inner { border: none; }
 article, aside, figure, footer, header, hgroup, menu, nav, section { display: block; }
 body {
-	background-color: #999;
+	background-color: #333;
+	background-image: -webkit-linear-gradient(bottom, #aaa, #666);
+	background-image: -moz-linear-gradient(bottom, #aaa, #666);
+	background-image: -ms-linear-gradient(bottom, #aaa, #666);
+	background-image: -o-linear-gradient(bottom, #aaa, #666);
+	background-image: linear-gradient(bottom, #aaa, #666);
 }
 article {
 	font: 14px Courier, "Lucida Console", monospace;
@@ -37,19 +42,14 @@ article footer {
 	font-family: Impact;
 }
 
+/* THEMES */
 #player.default {
-	background-color: #333;
-	background-image: -webkit-linear-gradient(bottom left 45deg, #333, #111);
-	background-image: -moz-linear-gradient(bottom left 45deg, #333, #111);
-	background-image: -ms-linear-gradient(bottom left 45deg, #333, #111);
-	background-image: -o-linear-gradient(bottom left 45deg, #333, #111);
-	background-image: linear-gradient(bottom left 45deg, #333, #111);
-	border: 2px solid #000;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	-ms-border-radius: 3px;
-	-o-border-radius: 3px;
-	border-radius: 3px;
+	border: 2px solid;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
 	box-shadow: 0 0 30px 10px #000;
 	height: 320px;
 	margin: 50px auto 0;
@@ -99,11 +99,6 @@ article footer {
 	background-color: #111;
 	border: 2px solid #000;
 	border-radius: 3px;
-	-webkit-box-shadow: 0 0 5px #222 inset;
-	-moz-box-shadow: 0 0 5px #222 inset;
-	-ms-box-shadow: 0 0 5px #222 inset;
-	-o-box-shadow: 0 0 5px #222 inset;
-	box-shadow: 0 0 5px #222 inset;
 	color: #444;
 	padding: 10px;
 	position: absolute;
@@ -167,4 +162,30 @@ article footer {
 	left: 0;
 	position: absolute;
 	top: 0;
+}
+
+/** THEMES / WOOD **/
+#player.default.wood {
+	background: #230700 url(../img/default/bg-wood.png) top right;
+	border-color: #230700;
+}
+#player.default.wood .infos {
+	-webkit-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
+	-moz-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
+	-ms-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
+	-o-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
+	box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;	
+}
+
+/** THEMES / ALU **/
+#player.default.alu {
+	background: #727272 url(../img/default/bg-alu.png) top right;
+	border-color: #727272;
+}
+#player.default.alu .infos {
+	-webkit-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
+	-moz-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
+	-ms-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
+	-o-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
+	box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;	
 }
