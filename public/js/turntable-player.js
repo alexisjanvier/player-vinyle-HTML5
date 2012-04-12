@@ -26,7 +26,8 @@ turntablePlayerEngine.prototype = {
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
-		useInfos: false, // Use the informations panel
+		useInfos: true, // Display the informations panel
+		usePlaylist: true, // Display the playlist panel
 		useTransitions: true, // Use the audio transitions
 
 		themes : { // The list of the available themes with their settings
@@ -671,7 +672,7 @@ turntablePlayerEngine.prototype = {
 	 * Init the playlist
 	 */
 	initPlaylist : function () {
-		if (!this._playlist) {
+		if (this.options.usePlaylist && !this._playlist) {
 			var
 				self = this,
 				playlist = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
@@ -1141,7 +1142,9 @@ turntablePlayerEngine.prototype = {
 	switchOnTheButton : function () {
 		this._powerON = true;
 
-		this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'add');
+		if (this.options.usePlaylist)
+			this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'add');
+
 		this.toggleClass(document.getElementById('power'), 'active', 'add');
 		document.getElementById('power-on').checked = true;
 	},
@@ -1152,7 +1155,9 @@ turntablePlayerEngine.prototype = {
 	switchOffTheButton : function () {
 		this._powerON = false;
 
-		this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'remove');
+		if (this.options.usePlaylist)
+			this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'remove');
+
 		this.toggleClass(document.getElementById('power'), 'active', 'remove');
 		document.getElementById('power-off').checked = true;
 	},

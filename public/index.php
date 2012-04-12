@@ -15,7 +15,7 @@ $keys_string = array(
 	'mainId', 'playlistLocation', 'theme'
 );
 $keys_boolean = array(
-	'enable', 'debugMode', 'autoPlay', 'useTransitions', 'useInfos'
+	'enable', 'debugMode', 'autoPlay', 'useTransitions', 'useInfos', 'usePlaylist'
 );
 $keys_int = array(
 	'animateDelay'
@@ -71,6 +71,8 @@ foreach ($keys as $key)
 				<br />animateDelay=5000</li>
 			<li><a href="index.php?useInfos=true&infos=duration,current,timer,position">Display the informations panel and choose the track informations<a>
 				<br />useInfos=true&infos=duration,current,timer,position</li>
+			<li><a href="index.php?usePlaylist=false&useInfos=false">Clean turntable with no distraction<a>
+				<br />usePlaylist=false&useInfos=false</li>
 		</ul>
 		<h2>All the config settings :</h2>
 		<pre>
@@ -102,8 +104,12 @@ foreach ($keys as $key)
   mainId: 'player', 
   // Uri of the playlist in json format
   playlistLocation: '/data/playlist.json', 
+	// Display the informations panel
+	useInfos: true, 
+	// Display the playlist panel
+	usePlaylist: true, 
   // Use audio transition at the beginning and the end of the track
-  useTransitions: true,
+	useTransitions: true, 
 }
 		</pre>
 		<footer>
