@@ -11,8 +11,8 @@ turntablePlayerEngine.prototype = {
 		autoPlay : false, // Automatic turntable
 		autoStop: 60000, // Time in ms when the turntable auto-shutdowns when it turns with no track in manual mode
 		buttonLabels: { // Customize the labels of the buttons
-			play: 'POWER',
-			pause: 'POWER'
+			powerON: 'I',
+			powerOFF: 'O'
 		},
 		easing: { // Easing customization
 			start: '<',
@@ -26,8 +26,7 @@ turntablePlayerEngine.prototype = {
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
-		useInfos: true, // Use the informations panel
-		usePowerButtonLabel: false, // Use the label for the power button
+		useInfos: false, // Use the informations panel
 		useTransitions: true, // Use the audio transitions
 
 		themes : { // The list of the available themes with their settings
@@ -204,12 +203,12 @@ turntablePlayerEngine.prototype = {
 	_discTitle: null,
 	_player: null,
 	_playlist: null,
-	_playPause: null,
 	_playlistIndex: 0,
 	_transitionID: null,
 	_wrapper: null,
 	
-	_buttons: {},
+	_powerButtons: {},
+	_playlistButtons: {},
 	_infos: {},
 	_playerTransition: {},
 
@@ -584,9 +583,7 @@ turntablePlayerEngine.prototype = {
 	 * Init the track informations
 	 */
 	initInfos : function () {
-		if (this.options.themes[this.options.theme].useInfos 
-			&& this.options.infos.length && !this._infosInit
-		) {
+		if (this.options.useInfos && this.options.infos.length && !this._infosInit) {
 			var 
 				infos = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
 				a = {
@@ -621,27 +618,52 @@ turntablePlayerEngine.prototype = {
 	 * Init the remote control
 	 */
 	initRemote : function () {
-		if (!this._playPause) {
+		if (!this._powerButtons.inputON) {
 			var
 				self = this,
 				remote = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
-				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
+				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
+				inputON = document.createElementNS('http://www.w3.org/1999/xhtml', 'input'),
+				labelON = document.createElementNS('http://www.w3.org/1999/xhtml', 'label'),
+				inputOFF = document.createElementNS('http://www.w3.org/1999/xhtml', 'input'),
+				labelOFF = document.createElementNS('http://www.w3.org/1999/xhtml', 'label')
 			;
 
 			remote.setAttribute('class', 'remote');
+			button.id = 'power';
+			this.toggleClass(button, 'powerButton', 'add');
 
-			this.toggleClass(button, 'playPauseButton', 'add');
-			if (this.options.themes[self.options.theme].usePowerButtonLabel)
-				button.innerHTML = this.options.buttonLabels.play;
-			button.data = false;
-			button.addEventListener('click', function (event) {
-				self.playPauseButtonClicked(event);
+			inputON.id = 'power-on';
+			inputON.name = 'power';
+			inputON.type = 'radio';
+			inputOFF.id = 'power-off';
+			inputOFF.name = 'power';
+			inputOFF.type = 'radio';
+			inputOFF.checked = true;
+
+			labelON.htmlFor = inputON.id;
+			labelON.innerHTML = this.options.buttonLabels.powerON;
+			labelOFF.htmlFor = inputOFF.id;
+			labelOFF.innerHTML = this.options.buttonLabels.powerOFF;
+
+			inputON.addEventListener('click', function (event) {
+				self.powerButtonClicked(event);
+			}, false);
+			inputOFF.addEventListener('click', function (event) {
+				self.powerButtonClicked(event);
 			}, false);
 
+			button.appendChild(inputOFF);
+			button.appendChild(labelOFF);
+			button.appendChild(inputON);
+			button.appendChild(labelON);
 			remote.appendChild(button);
 			this._wrapper.appendChild(remote);
 
-			this._playPause = button;
+			this._powerButtons.inputON = inputON;
+			this._powerButtons.labelON = labelON;
+			this._powerButtons.inputOFF = inputOFF;
+			this._powerButtons.labelOFF = labelOFF;
 		}
 	},
 
@@ -672,7 +694,7 @@ turntablePlayerEngine.prototype = {
 					self.playlistButtonClicked(event);
 				}, false);
 
-				this._buttons[i] = button;
+				this._playlistButtons[i] = button;
 			}
 
 			this._playlist = playlist;
@@ -837,11 +859,13 @@ turntablePlayerEngine.prototype = {
 	 */
 	enableRemote : function (s) {
 		var s = s || '-';
-		if (this._playPause)
-			this._playPause.disabled = false;
-		for (var button in this._buttons) {
-			this._buttons[button].disabled = false;
-		}
+
+		for (var button in this._powerButtons)
+			this._powerButtons[button].disabled = false;
+
+		for (var button in this._playlistButtons)
+			this._playlistButtons[button].disabled = false;
+
 		console.info('Remote enabled (' + s + ').');
 	},
 
@@ -851,11 +875,13 @@ turntablePlayerEngine.prototype = {
 	 */
 	disableRemote : function (s) {
 		var s = s || '-';
-		if (this._playPause)
-			this._playPause.disabled = true;
-		for (var button in this._buttons) {
-			this._buttons[button].disabled = true;
-		}
+
+		for (var button in this._powerButtons)
+			this._powerButtons[button].disabled = true;
+
+		for (var button in this._playlistButtons)
+			this._playlistButtons[button].disabled = true;
+
 		console.info('Remote disabled (' + s + ').');
 	},
 
@@ -863,8 +889,8 @@ turntablePlayerEngine.prototype = {
 	 * Reset the remote control by removing the buttons, mostly called on re-init
 	 */
 	resetRemote : function () {
-		for (var button in this._buttons)
-			delete this._buttons[button];
+		for (var button in this._playlistButtons)
+			delete this._playlistButtons[button];
 
 		console.info('Remote reset.');
 	},
@@ -883,9 +909,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc informations such as the duration of the track
 	 */
 	updateTrackInfos : function () {
-		if (this.options.themes[this.options.theme].useInfos 
-			&& this.options.infos.indexOf('duration') != -1
-		) {
+		if (this.options.useInfos && this.options.infos.indexOf('duration') != -1) {
 			this._infos['duration'].innerHTML = this.formatTime({
 				mins: Math.floor(this._player.duration / 60, 10),
 				secs: Math.floor(this._player.duration % 60 , 10)
@@ -899,7 +923,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc informations such as the position of the track
 	 */
 	updateInfos : function () {
-		if (this.options.themes[this.options.theme].useInfos) {
+		if (this.options.useInfos) {
 			var
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 				pos = (this._player.currentTime / this._player.duration) * 100,
@@ -1117,11 +1141,9 @@ turntablePlayerEngine.prototype = {
 	switchOnTheButton : function () {
 		this._powerON = true;
 
-		if (this.options.themes[this.options.theme].usePowerButtonLabel)
-			this._playPause.innerHTML = this.options.buttonLabels.pause;
-
-		this.toggleClass(this._playPause, 'active', 'add');
-		this.toggleClass(this._buttons[this._playlistIndex], 'active', 'add');
+		this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'add');
+		this.toggleClass(document.getElementById('power'), 'active', 'add');
+		document.getElementById('power-on').checked = true;
 	},
 
 	/**
@@ -1130,11 +1152,9 @@ turntablePlayerEngine.prototype = {
 	switchOffTheButton : function () {
 		this._powerON = false;
 
-		if (this.options.themes[this.options.theme].usePowerButtonLabel)
-			this._playPause.innerHTML = this.options.buttonLabels.play;
-
-		this.toggleClass(this._playPause, 'active', 'remove');
-		this.toggleClass(this._buttons[this._playlistIndex], 'active', 'remove');
+		this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'remove');
+		this.toggleClass(document.getElementById('power'), 'active', 'remove');
+		document.getElementById('power-off').checked = true;
 	},
 
 	/**
@@ -1359,11 +1379,11 @@ turntablePlayerEngine.prototype = {
 
 			this.disableRemote('loadTrack');
 
-			for (var button in this._buttons) {
+			for (var button in this._playlistButtons) {
 				if (button == i && this._powerON)
-					this.toggleClass(this._buttons[button], 'active', 'add');
+					this.toggleClass(this._playlistButtons[button], 'active', 'add');
 				else if (button != i)
-					this.toggleClass(this._buttons[button], 'active', 'remove');
+					this.toggleClass(this._playlistButtons[button], 'active', 'remove');
 			}
 
 			console.info('Track #' + i + ' ok.');
@@ -1672,12 +1692,12 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Event 'click' called on the play/pause button
+	 * Event 'click' called on the power button
 	 */
-	playPauseButtonClicked : function (event) {
-		if (this._powerON)
+	powerButtonClicked : function (event) {
+		if (this._powerON && event.target.id == 'power-off')
 			this.powerOFF();
-		else
+		else if (!this._powerON && event.target.id == 'power-on')
 			this.powerON();
 	},
 

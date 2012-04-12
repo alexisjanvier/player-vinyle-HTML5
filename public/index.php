@@ -15,7 +15,7 @@ $keys_string = array(
 	'mainId', 'playlistLocation', 'theme'
 );
 $keys_boolean = array(
-	'enable', 'debugMode', 'autoPlay', 'useTransitions'
+	'enable', 'debugMode', 'autoPlay', 'useTransitions', 'useInfos'
 );
 $keys_int = array(
 	'animateDelay'
@@ -67,12 +67,10 @@ foreach ($keys as $key)
 				<br />autoPlay=true</li>
 			<li><a href="index.php?theme=alu">ALU theme<a>
 				<br />theme=alu</li>
-			<li><a href="index.php?buttonLabels=play|on,pause|off">Change the power button labels to "on" and "off"<a>
-				<br />buttonLabels=play|on,pause|off</li>
 			<li><a href="index.php?animateDelay=5000">Change the animation delay to 5 seconds<a>
 				<br />animateDelay=5000</li>
-			<li><a href="index.php?infos=duration,current,timer,position">Change the track informations<a>
-				<br />infos=duration,current,timer,position</li>
+			<li><a href="index.php?useInfos=true&infos=duration,current,timer,position">Display the informations panel and choose the track informations<a>
+				<br />useInfos=true&infos=duration,current,timer,position</li>
 		</ul>
 		<h2>All the config settings :</h2>
 		<pre>
