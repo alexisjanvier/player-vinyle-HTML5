@@ -69,32 +69,12 @@ article footer {
 #player.default button {
 	position: relative;
 }
-/*#player.default button:active {
-	top: -1px;
-}*/
 #player.default button:active,
 #player.default button:focus,
 #player.default button:hover {
 	cursor: pointer;
 	outline: 0;
 }
-/*#player.default button.active {
-	color: green;
-	-webkit-text-shadow: 0 0 5px green;
-	-moz-text-shadow: 0 0 5px green;
-	-ms-text-shadow: 0 0 5px green;
-	-o-text-shadow: 0 0 5px green;
-	text-shadow: 0 0 5px green;
-}
-#player.default button[disabled],
-#player.default button[disabled].active {
-	color: #666;
-	-webkit-text-shadow: 0 0 5px #666;
-	-moz-text-shadow: 0 0 5px #666;
-	-ms-text-shadow: 0 0 5px #666;
-	-o-text-shadow: 0 0 5px #666;
-	text-shadow: 0 0 5px #666;
-}*/
 #player.default .remote {
 	bottom: 10px;
 	left: 10px;
@@ -103,11 +83,6 @@ article footer {
 }
 #player.default .remote button {
 	background-color: #000;
-	/*background-image: -webkit-radial-gradient(#111 30%, #000);
-	background-image: -moz-radial-gradient(#111 30%, #000);
-	background-image: -ms-radial-gradient(#111 30%, #000);
-	background-image: -o-radial-gradient(#111 30%, #000);
-	background-image: radial-gradient(#111 30%, #000);*/
 	background-image: -webkit-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
 	background-image: -moz-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
 	background-image: -ms-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
@@ -128,11 +103,6 @@ article footer {
 	display: block;	
 	height: 50px;
 	text-align: center;
-	/*-webkit-text-shadow: 0 0 5px #000;
-	-moz-text-shadow: 0 0 5px #000;
-	-ms-text-shadow: 0 0 5px #000;
-	-o-text-shadow: 0 0 5px #000;
-	text-shadow: 0 0 5px #000;*/
 	width: 25px;
 }
 #player.default .remote button.active {
@@ -141,12 +111,6 @@ article footer {
 	background-image: -ms-linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
 	background-image: -o-linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
 	background-image: linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
-	/*color: green;*/
-	/*-webkit-box-shadow: 0 0 20px green;
-	-moz-box-shadow: 0 0 20px green;
-	-ms-box-shadow: 0 0 20px green;
-	-o-box-shadow: 0 0 20px green;
-	box-shadow: 0 0 20px green;*/
 }
 #player.default .remote button:before {
 	background: -webkit-radial-gradient(#347235, #254117 51%, #ccc);
