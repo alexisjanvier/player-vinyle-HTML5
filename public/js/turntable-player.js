@@ -26,6 +26,7 @@ turntablePlayerEngine.prototype = {
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
+		useInfos: true, // Use the informations panel
 		usePowerButtonLabel: false, // Use the label for the power button
 		useTransitions: true, // Use the audio transitions
 
@@ -583,7 +584,9 @@ turntablePlayerEngine.prototype = {
 	 * Init the track informations
 	 */
 	initInfos : function () {
-		if (this.options.infos.length && !this._infosInit) {
+		if (this.options.themes[this.options.theme].useInfos 
+			&& this.options.infos.length && !this._infosInit
+		) {
 			var 
 				infos = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
 				a = {
@@ -880,40 +883,45 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc informations such as the duration of the track
 	 */
 	updateTrackInfos : function () {
-		if (this.options.infos.indexOf('duration') != -1)
+		if (this.options.themes[this.options.theme].useInfos 
+			&& this.options.infos.indexOf('duration') != -1
+		) {
 			this._infos['duration'].innerHTML = this.formatTime({
 				mins: Math.floor(this._player.duration / 60, 10),
 				secs: Math.floor(this._player.duration % 60 , 10)
 			});
 
-		console.info('Track infos updated.');
+			console.info('Track infos updated.');
+		}
 	},
 
 	/**
 	 * Update the disc informations such as the position of the track
 	 */
 	updateInfos : function () {
-		var
-			rem = parseInt(this._player.duration - this._player.currentTime, 10),
-			pos = (this._player.currentTime / this._player.duration) * 100,
-			mins = Math.floor(rem / 60, 10),
-			secs = rem - mins * 60
-		;
+		if (this.options.themes[this.options.theme].useInfos) {
+			var
+				rem = parseInt(this._player.duration - this._player.currentTime, 10),
+				pos = (this._player.currentTime / this._player.duration) * 100,
+				mins = Math.floor(rem / 60, 10),
+				secs = rem - mins * 60
+			;
 
-		if (this.options.infos.indexOf('position') != -1)
-			this._infos['position'].innerHTML = Math.floor(pos, 10) + '%';
+			if (this.options.infos.indexOf('position') != -1)
+				this._infos['position'].innerHTML = Math.floor(pos, 10) + '%';
 
-		if (this.options.infos.indexOf('current') != -1)
-			this._infos['current'].innerHTML = this.formatTime({
-				mins: Math.floor(this._player.currentTime / 60, 10),
-				secs: Math.floor(this._player.currentTime % 60 , 10)
-			});
+			if (this.options.infos.indexOf('current') != -1)
+				this._infos['current'].innerHTML = this.formatTime({
+					mins: Math.floor(this._player.currentTime / 60, 10),
+					secs: Math.floor(this._player.currentTime % 60 , 10)
+				});
 
-		if (this.options.infos.indexOf('timer') != -1)
-			this._infos['timer'].innerHTML = '-' + this.formatTime({
-				mins: mins,
-				secs: secs
-			});
+			if (this.options.infos.indexOf('timer') != -1)
+				this._infos['timer'].innerHTML = '-' + this.formatTime({
+					mins: mins,
+					secs: secs
+				});
+		}
 	},
 
 	/**
