@@ -26,7 +26,8 @@ turntablePlayerEngine.prototype = {
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
-		useTransitions: true,
+		usePowerButtonLabel: false, // Use the label for the power button
+		useTransitions: true, // Use the audio transitions
 
 		themes : { // The list of the available themes with their settings
 			wood: {
@@ -627,7 +628,8 @@ turntablePlayerEngine.prototype = {
 			remote.setAttribute('class', 'remote');
 
 			this.toggleClass(button, 'playPauseButton', 'add');
-			button.innerHTML = this.options.buttonLabels.play;
+			if (this.options.themes[self.options.theme].usePowerButtonLabel)
+				button.innerHTML = this.options.buttonLabels.play;
 			button.data = false;
 			button.addEventListener('click', function (event) {
 				self.playPauseButtonClicked(event);
@@ -658,7 +660,7 @@ turntablePlayerEngine.prototype = {
 					button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
 				;
 				this.toggleClass(button, 'playlistButton', 'add');
-				if (i == this._playlistIndex)
+				if (i == this._playlistIndex && this._powerON)
 					this.toggleClass(button, 'active', 'add');
 				button.innerHTML = this.getTrackTitle(i);
 				button.data = i;
@@ -1106,8 +1108,12 @@ turntablePlayerEngine.prototype = {
 	 */
 	switchOnTheButton : function () {
 		this._powerON = true;
-		this._playPause.innerHTML = this.options.buttonLabels.pause;
+
+		if (this.options.themes[this.options.theme].usePowerButtonLabel)
+			this._playPause.innerHTML = this.options.buttonLabels.pause;
+
 		this.toggleClass(this._playPause, 'active', 'add');
+		this.toggleClass(this._buttons[this._playlistIndex], 'active', 'add');
 	},
 
 	/**
@@ -1115,8 +1121,12 @@ turntablePlayerEngine.prototype = {
 	 */
 	switchOffTheButton : function () {
 		this._powerON = false;
-		this._playPause.innerHTML = this.options.buttonLabels.play;
+
+		if (this.options.themes[this.options.theme].usePowerButtonLabel)
+			this._playPause.innerHTML = this.options.buttonLabels.play;
+
 		this.toggleClass(this._playPause, 'active', 'remove');
+		this.toggleClass(this._buttons[this._playlistIndex], 'active', 'remove');
 	},
 
 	/**
@@ -1342,9 +1352,9 @@ turntablePlayerEngine.prototype = {
 			this.disableRemote('loadTrack');
 
 			for (var button in this._buttons) {
-				if (button == i)
+				if (button == i && this._powerON)
 					this.toggleClass(this._buttons[button], 'active', 'add');
-				else
+				else if (button != i)
 					this.toggleClass(this._buttons[button], 'active', 'remove');
 			}
 
@@ -1667,9 +1677,9 @@ turntablePlayerEngine.prototype = {
 	 * Event 'click' called on the playlist tracks
 	 */
 	playlistButtonClicked : function (event) {
-		if (event.target.data != undefined && (
-			!this._powerON
-			|| (this._powerON && this.options.autoPlay)
+		if (event.target.data != undefined && this._powerON && (
+			this.options.autoPlay
+			|| (this._playerPaused && !this._inTransition)
 		))
 			this.loadTrack(event.target.data);
 	}

@@ -69,16 +69,16 @@ article footer {
 #player.default button {
 	position: relative;
 }
-#player.default button:active {
+/*#player.default button:active {
 	top: -1px;
-}
+}*/
 #player.default button:active,
 #player.default button:focus,
 #player.default button:hover {
 	cursor: pointer;
 	outline: 0;
 }
-#player.default button.active {
+/*#player.default button.active {
 	color: green;
 	-webkit-text-shadow: 0 0 5px green;
 	-moz-text-shadow: 0 0 5px green;
@@ -94,9 +94,94 @@ article footer {
 	-ms-text-shadow: 0 0 5px #666;
 	-o-text-shadow: 0 0 5px #666;
 	text-shadow: 0 0 5px #666;
+}*/
+#player.default .remote {
+	bottom: 10px;
+	left: 10px;
+	padding-left: 20px;
+	position: absolute;
 }
-#player.default .infos {
+#player.default .remote button {
+	background-color: #000;
+	/*background-image: -webkit-radial-gradient(#111 30%, #000);
+	background-image: -moz-radial-gradient(#111 30%, #000);
+	background-image: -ms-radial-gradient(#111 30%, #000);
+	background-image: -o-radial-gradient(#111 30%, #000);
+	background-image: radial-gradient(#111 30%, #000);*/
+	background-image: -webkit-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: -moz-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: -ms-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: -o-linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: linear-gradient(top, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	border: 2px solid #000;
+	color: #666;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	-ms-border-radius: 4px;
+	-o-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 0 20px #000;
+	-moz-box-shadow: 0 0 20px #000;
+	-ms-box-shadow: 0 0 20px #000;
+	-o-box-shadow: 0 0 20px #000;
+	box-shadow: 0 0 20px #000;
+	display: block;	
+	height: 50px;
+	text-align: center;
+	/*-webkit-text-shadow: 0 0 5px #000;
+	-moz-text-shadow: 0 0 5px #000;
+	-ms-text-shadow: 0 0 5px #000;
+	-o-text-shadow: 0 0 5px #000;
+	text-shadow: 0 0 5px #000;*/
+	width: 25px;
+}
+#player.default .remote button.active {
+	background-image: -webkit-linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: -moz-linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: -ms-linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: -o-linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	background-image: linear-gradient(bottom, #101010, #111 10%, #000 75%, #000 85%, #222 90%, #101010);
+	/*color: green;*/
+	/*-webkit-box-shadow: 0 0 20px green;
+	-moz-box-shadow: 0 0 20px green;
+	-ms-box-shadow: 0 0 20px green;
+	-o-box-shadow: 0 0 20px green;
+	box-shadow: 0 0 20px green;*/
+}
+#player.default .remote button:before {
+	background: -webkit-radial-gradient(#347235, #254117 51%, #ccc);
+	background: -moz-radial-gradient(#347235, #254117 51%, #ccc);
+	background: -ms-radial-gradient(#347235, #254117 51%, #ccc);
+	background: -o-radial-gradient(#347235, #254117 51%, #ccc);
+	background: radial-gradient(#347235, #254117 51%, #ccc);
+	border-radius: 5px;
+	content: " ";
+	height: 10px;
+	left: -20px;
+	position: absolute;
+	bottom: 8px;
+	width: 10px;
+}
+#player.default .remote button.active:before {
+	background: -webkit-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: -moz-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: -ms-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: -o-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: radial-gradient(green, #4AA02C 51%, #ccc);
+	-webkit-box-shadow: 0 0 5px green;
+	-moz-box-shadow: 0 0 5px green;
+	-ms-box-shadow: 0 0 5px green;
+	-o-box-shadow: 0 0 5px green;
+	box-shadow: 0 0 5px green;
+}
+#player.default .infos,
+#player.default .playlist {
 	background-color: #111;
+	background: -webkit-linear-gradient(top left, #111, #1A1A1A);
+	background: -moz-linear-gradient(top left, #111, #1A1A1A);
+	background: -ms-linear-gradient(top left, #111, #1A1A1A);
+	background: -o-linear-gradient(top left, #111, #1A1A1A);
+	background: linear-gradient(top left, #111, #1A1A1A);
 	border: 2px solid #000;
 	border-radius: 3px;
 	color: #444;
@@ -111,52 +196,48 @@ article footer {
 	display: inline-block;
 	min-width: 35px;
 }
-#player.default .remote {
-	bottom: 10px;
-	left: 10px;
-	position: absolute;
-}
-#player.default .remote button {
-	background-color: #000;
-	background-image: -webkit-radial-gradient(#111 30%, #000);
-	background-image: -moz-radial-gradient(#111 30%, #000);
-	background-image: -ms-radial-gradient(#111 30%, #000);
-	background-image: -o-radial-gradient(#111 30%, #000);
-	background-image: radial-gradient(#111 30%, #000);
-	border: 2px solid #000;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	-ms-border-radius: 4px;
-	-o-border-radius: 4px;
-	border-radius: 4px;
-	-webkit-box-shadow: 0 0 20px #000;
-	-moz-box-shadow: 0 0 20px #000;
-	-ms-box-shadow: 0 0 20px #000;
-	-o-box-shadow: 0 0 20px #000;
-	box-shadow: 0 0 20px #000;
-	display: block;	
-	height: 60px;
-	text-align: center;
-	width: 60px;
-}
-#player.default .remote button.active {
-	border-color: green;
-	-webkit-box-shadow: 0 0 20px green;
-	-moz-box-shadow: 0 0 20px green;
-	-ms-box-shadow: 0 0 20px green;
-	-o-box-shadow: 0 0 20px green;
-	box-shadow: 0 0 20px green;
-}
 #player.default .playlist {
 	bottom: 10px;
 	position: absolute;
 	right: 10px;
+	top: auto;
 }
 #player.default .playlist button {
 	background: transparent;
 	border: none;
+	color: #444;
 	display: block;	
 	font-size: 11px;
+	padding-left: 15px;
+}
+#player.default .playlist button:before {
+	background: -webkit-radial-gradient(#347235, #254117 51%, #ccc);
+	background: -moz-radial-gradient(#347235, #254117 51%, #ccc);
+	background: -ms-radial-gradient(#347235, #254117 51%, #ccc);
+	background: -o-radial-gradient(#347235, #254117 51%, #ccc);
+	background: radial-gradient(#347235, #254117 51%, #ccc);
+	border-radius: 5px;
+	content: " ";
+	height: 10px;
+	left: 0;
+	position: absolute;
+	top: 4px;
+	width: 10px;
+}
+#player.default .playlist button.active {
+	color: #999;
+}
+#player.default .playlist button.active:before {
+	background: -webkit-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: -moz-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: -ms-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: -o-radial-gradient(green, #4AA02C 51%, #ccc);
+	background: radial-gradient(green, #4AA02C 51%, #ccc);
+	-webkit-box-shadow: 0 0 5px green;
+	-moz-box-shadow: 0 0 5px green;
+	-ms-box-shadow: 0 0 5px green;
+	-o-box-shadow: 0 0 5px green;
+	box-shadow: 0 0 5px green;
 }
 #player.default audio[controls] {
 	left: 0;
@@ -169,6 +250,7 @@ article footer {
 	background: #230700 url(../img/default/bg-wood.png) top right;
 	border-color: #230700;
 }
+#player.default.wood .playlist,
 #player.default.wood .infos {
 	-webkit-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
 	-moz-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
@@ -182,6 +264,7 @@ article footer {
 	background: #727272 url(../img/default/bg-alu.png) top right;
 	border-color: #727272;
 }
+#player.default.alu .playlist,
 #player.default.alu .infos {
 	-webkit-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
 	-moz-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
