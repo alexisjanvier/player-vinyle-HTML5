@@ -9,7 +9,8 @@ turntablePlayerEngine.prototype = {
 	options: {
 		animateDelay : 2000, // Delay for the animations of the arm and the disc
 		autoPlay : false, // Automatic turntable
-		autoStop: 60000, // Time in ms when the turntable auto-shutdowns when it turns with no track in manual mode
+		autoStop: 60000, // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
+		endTransitionDuration: 0, // Duration in ms of the repetition of the end transition in manual mode
 		buttonLabels: { // Customize the labels of the buttons
 			powerON: 'I',
 			powerOFF: 'O',
@@ -191,8 +192,8 @@ turntablePlayerEngine.prototype = {
 			},
 			stop: {
 				src: {
-					mp3: '/audio/stop.mp3',
-					ogg: '/audio/stop.ogg'
+					mp3: '/audio/stop2.mp3',
+					ogg: '/audio/stop2.ogg'
 				}
 			}
 		}
@@ -1533,8 +1534,8 @@ turntablePlayerEngine.prototype = {
 				this.switchOffTheButton();
 		}
 		else {
-			if (!this.options.autoPlay)
-				o.duration = this.options.autoStop;
+			if (!this.options.autoPlay && this.options.endTransitionDuration)
+				o.duration = this.options.endTransitionDuration;
 			this.playTransition(o);
 		}
 	},

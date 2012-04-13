@@ -84,8 +84,8 @@ foreach ($keys as $key)
   animateDelay : 2000, 
   // Automatic turntable
   autoPlay : false, 
-  // Time in ms when the turntable auto-shutdowns when it turns with no track in manual mode
-  autoStop: 60000, 
+  // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
+  autoStop : 60000,
   // Customize the labels of the buttons
   buttonLabels: { 
     play: 'POWER ON',
@@ -101,6 +101,8 @@ foreach ($keys as $key)
   },
   // Load on init
   enable: true, 
+  // Duration of the repetition of the end transition in manual mode (false or in ms)
+  endTransitionDuration: false, 
   // Force the request to retrieve an updated playlist
   forceDateInUri : true, 
   // Choices : duration, current, timer, position
@@ -127,7 +129,7 @@ foreach ($keys as $key)
 			<p>Developed by <a href="http://www.amanca.fr/">Aurélien MANCA</a> for <a href="http://www.le-vinyle.com">Le-vinyle.com</a></p>
 			<p>Music is courtesy of <a href="http://www.kahvi.org/">Kahvi Collective</a></p>
 			<p>Favicon from <a href="http://www.iconfinder.com/icondetails/23864/16/">Oliver Scholtz (and others)</a></p>
-			<p>Audio transitions from <a href="http://www.freesound.org/people/schluppipuppie/sounds/13279/">schluppipuppie</a> and <a href="http://www.freesound.org/people/gadzooks/sounds/59985/">gadzooks</a></p>
+			<p>Audio transitions from <a href="http://www.freesound.org/people/gadzooks/sounds/59985/">gadzooks</a> and <a href="http://www.freesound.org/people/FreqMan/sounds/42820/">FreqMan</a></p>
 		</footer>
 	</article>
 
