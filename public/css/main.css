@@ -222,7 +222,11 @@ article footer {
 	position: absolute;
 	right: -230px;
 	width: 250px;
+	-webkit-transition: right 1s;
 	-moz-transition: right 1s;
+	-ms-transition: right 1s;
+	-o-transition: right 1s;
+	transition: right 1s;
 }
 #player.default .cover:hover {
 	right: 0;
