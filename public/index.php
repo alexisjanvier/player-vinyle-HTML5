@@ -73,8 +73,8 @@ foreach ($keys as $key)
 				<br />animateDelay=5000</li>
 			<li><a href="index.php?useInfos=true&infos=duration,current,timer,position">Display the informations panel and choose the track informations</a>
 				<br />useInfos=true&infos=duration,current,timer,position</li>
-			<li><a href="index.php?usePlaylist=false&useInfos=false">Clean turntable with no distraction</a>
-				<br />usePlaylist=false&useInfos=false</li>
+			<li><a href="index.php?usePlaylist=true&useInfos=true">All panels displayed</a>
+				<br />usePlaylist=true&useInfos=true</li>
 		</ul>
 		<h2>All the config settings :</h2>
 		<pre>

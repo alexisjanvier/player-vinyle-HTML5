@@ -28,8 +28,8 @@ turntablePlayerEngine.prototype = {
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
-		useInfos: true, // Display the informations panel
-		usePlaylist: true, // Display the playlist panel
+		useInfos: false, // Display the informations panel
+		usePlaylist: false, // Display the playlist panel
 		useTransitions: true, // Use the audio transitions
 
 		themes : { // The list of the available themes with their settings
@@ -163,7 +163,7 @@ turntablePlayerEngine.prototype = {
 					cover: {
 						r: 45,
 						fill: '#666',
-						stroke: '#fff',
+						stroke: 'transparent',
 						turnable: false
 					},
 					title: {
@@ -527,6 +527,8 @@ turntablePlayerEngine.prototype = {
 			}
 			this._wrapper = wrapper;
 			this.toggleClass(this._wrapper, this.options.themes[this.options.theme].cssClass, 'add');
+			if (this.options.useInfos || this.options.usePlaylist)
+				this.toggleClass(this._wrapper, 'with-infos', 'add');
 		}
 
 		return this._wrapper;
@@ -649,7 +651,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Add the power button to the player
+	 * Add the power button in the remote panel
 	 */
 	initPowerButton : function () {
 		if (!this._powerButtons.inputON) {
@@ -699,6 +701,9 @@ turntablePlayerEngine.prototype = {
 		}
 	},
 
+	/**
+	 * Add the next button in the remote panel
+	 */
 	initNextButton : function () {
 		if (!this._nextButton) {
 			var
@@ -719,8 +724,6 @@ turntablePlayerEngine.prototype = {
 			this._nextButton = button;
 		}
 	},
-
-
 
 	/**
 	 * Init the playlist

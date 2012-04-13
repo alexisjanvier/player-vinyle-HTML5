@@ -51,9 +51,12 @@ article footer {
 	-o-border-radius: 5px;
 	border-radius: 5px;
 	box-shadow: 0 0 30px 10px #000;
-	height: 320px;
+	height: 250px;
 	margin: 50px auto 0;
-	width: 500px;
+	width: 450px;
+}
+#player.default.with-infos {
+	height: 320px;
 }
 #player.default,
 #player.default button,
@@ -82,16 +85,16 @@ article footer {
 
 /* REMOTE PANEL */
 #player.default .remote {
-	bottom: 10px;
-	left: 10px;
 	padding-right: 20px;
 	position: absolute;
+	right: 10px;
+	top: 10px;
 }
 #player.default .remote .button {
 	border: 2px solid;
-	display: inline-block;	
+	display: block;	
 	height: 25px;
-	margin-right: 50px;
+	margin-bottom: 20px;
 	padding: 0;
 	vertical-align: middle;
 }
@@ -187,7 +190,7 @@ article footer {
 	-ms-border-radius: 15px;
 	-o-border-radius: 15px;
 	border-radius: 15px;
-	border-width: 3px;
+	border-width: 2px;
 	-webkit-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
 	-moz-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
 	-ms-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
@@ -221,23 +224,25 @@ article footer {
 	background: linear-gradient(top left, #111, #1A1A1A);
 	border: 2px solid #000;
 	border-radius: 3px;
+	bottom: 10px;
 	color: #444;
 	padding: 10px;
 	position: absolute;
-	right: 10px;
 	text-align: right;
-	top: 10px;
+}
+
+/** OTHER PANELS / INFOS **/
+#player.default .infos {
+	right: 10px
 }
 #player.default .infos p span {
 	color: #999;
 	display: inline-block;
 	min-width: 35px;
 }
+/** OTHER PANELS / PLAYLIST **/
 #player.default .playlist {
-	bottom: 10px;
-	position: absolute;
-	right: 10px;
-	top: auto;
+	left: 10px;
 }
 #player.default .playlist button {
 	background: transparent;
