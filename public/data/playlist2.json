@@ -1,0 +1,18 @@
+[
+	{
+		artist: "Epoq",
+		title: "Lepidoptera",
+		src: {
+			mp3: "/music/Epoq-Lepidoptera.mp3",
+			ogg: "/music/Epoq-Lepidoptera.ogg"
+		}
+	},
+	{
+		artist: "Kenny Beltrey",
+		title: "Hydrate",
+		src: {
+			mp3: "/music/Hydrate-Kenny_Beltrey.mp3",
+			ogg: "/music/Hydrate-Kenny_Beltrey.ogg"
+		}
+	}
+]

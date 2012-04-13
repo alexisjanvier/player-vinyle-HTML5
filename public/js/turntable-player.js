@@ -12,7 +12,8 @@ turntablePlayerEngine.prototype = {
 		autoStop: 60000, // Time in ms when the turntable auto-shutdowns when it turns with no track in manual mode
 		buttonLabels: { // Customize the labels of the buttons
 			powerON: 'I',
-			powerOFF: 'O'
+			powerOFF: 'O',
+			next: '&#x27F3;'
 		},
 		easing: { // Easing customization
 			start: '<',
@@ -21,7 +22,8 @@ turntablePlayerEngine.prototype = {
 		},
 		enable: true, // Load on init
 		debugMode : false, // Show log infos
-		mainId: 'player', // Dom ID to use to build the player
+		playerId: 'player', // Dom ID to use to build the player
+		remoteId: 'remote', // Dom ID to use to build the remote
 		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
@@ -211,7 +213,7 @@ turntablePlayerEngine.prototype = {
 	_powerButtons: {},
 	_playlistButtons: {},
 	_infos: {},
-	_playerTransition: {},
+	_playerTransitions: {},
 
 	_logMethods: [],
 	_tracks: [],
@@ -515,11 +517,12 @@ turntablePlayerEngine.prototype = {
 	getWrapper : function () {
 		if (!this._wrapper) {
 			var 
-				id = this.options.mainId,
+				id = this.options.playerId,
 				wrapper = document.getElementById(id)
 			;
 			if (!wrapper) {
 				wrapper = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+				wrapper.id = id;
 				document.body.appendChild(wrapper);
 			}
 			this._wrapper = wrapper;
@@ -527,6 +530,28 @@ turntablePlayerEngine.prototype = {
 		}
 
 		return this._wrapper;
+	},
+
+	/**
+	 * Get the remote node
+	 * @return {Object} The DOM node element
+	 */
+	getRemote : function () {
+		if (!this._remote) {
+			var 
+				id = this.options.remoteId,
+				remote = document.getElementById(id)
+			;
+			if (!remote) {
+				remote = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+				remote.id = id;
+				this.getWrapper().appendChild(remote);
+			}
+			this._remote = remote;
+			this.toggleClass(this._remote, 'remote', 'add');
+		}
+
+		return this._remote;
 	},
 
 	/**
@@ -569,14 +594,14 @@ turntablePlayerEngine.prototype = {
 	 * @return {[type]} [description]
 	 */
 	initTransitions : function () {
-		if (this.options.useTransitions && !this._playerTransition.start) {
+		if (this.options.useTransitions && !this._playerTransitions.start) {
 			var
 				start = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'),
 				stop = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio')
 			;
 
-			this._playerTransition.start = this.loadTransition(start, 'start');
-			this._playerTransition.stop = this.loadTransition(stop, 'stop');
+			this._playerTransitions.start = this.loadTransition(start, 'start');
+			this._playerTransitions.stop = this.loadTransition(stop, 'stop');
 		}
 	},
 
@@ -619,10 +644,17 @@ turntablePlayerEngine.prototype = {
 	 * Init the remote control
 	 */
 	initRemote : function () {
+		this.initPowerButton();
+		this.initNextButton();
+	},
+
+	/**
+	 * Add the power button to the player
+	 */
+	initPowerButton : function () {
 		if (!this._powerButtons.inputON) {
 			var
 				self = this,
-				remote = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
 				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
 				inputON = document.createElementNS('http://www.w3.org/1999/xhtml', 'input'),
 				labelON = document.createElementNS('http://www.w3.org/1999/xhtml', 'label'),
@@ -630,9 +662,9 @@ turntablePlayerEngine.prototype = {
 				labelOFF = document.createElementNS('http://www.w3.org/1999/xhtml', 'label')
 			;
 
-			remote.setAttribute('class', 'remote');
+			button.id = 'remote';
 			button.id = 'power';
-			this.toggleClass(button, 'powerButton', 'add');
+			this.toggleClass(button, 'power button', 'add');
 
 			inputON.id = 'power-on';
 			inputON.name = 'power';
@@ -658,8 +690,7 @@ turntablePlayerEngine.prototype = {
 			button.appendChild(labelOFF);
 			button.appendChild(inputON);
 			button.appendChild(labelON);
-			remote.appendChild(button);
-			this._wrapper.appendChild(remote);
+			this.getRemote().appendChild(button);
 
 			this._powerButtons.inputON = inputON;
 			this._powerButtons.labelON = labelON;
@@ -667,6 +698,29 @@ turntablePlayerEngine.prototype = {
 			this._powerButtons.labelOFF = labelOFF;
 		}
 	},
+
+	initNextButton : function () {
+		if (!this._nextButton) {
+			var
+				self = this,
+				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
+			;
+
+			button.id = 'next';
+			this.toggleClass(button, 'next button', 'add');
+			button.innerHTML = this.options.buttonLabels.next;
+
+			button.addEventListener('click', function (event) {
+				self.nextButtonClicked(event);
+			}, false);
+
+			this.getRemote().appendChild(button);
+
+			this._nextButton = button;
+		}
+	},
+
+
 
 	/**
 	 * Init the playlist
@@ -800,7 +854,7 @@ turntablePlayerEngine.prototype = {
 					self._armRotation = ft.attrs.rotate;
 					if (events.indexOf('rotate') != -1) {
 						self.pause();
-						self.pauseTransition();
+						self.pauseTransitions();
 					}
 					else if (
 						events.indexOf('rotate end') != -1
@@ -1233,6 +1287,7 @@ turntablePlayerEngine.prototype = {
 	 */
 	playDiscArea : function (options) {
 		console.info("DRAGGED'N'DROPPED");
+
 		var area = this.getArmArea();
 
 		if (this._powerON || (this.options.autoPlay && !this._powerON)) {
@@ -1257,10 +1312,12 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Object} options Settings
 	 */
 	play : function (options) {
+		console.info('PLAY');
+
 		var o = options || {};
 
 		o.transition = 'start';
-		this.pauseTransition();
+		this.pauseTransitions();
 		this.updateTrackInfos();
 		this.updateInfos();
 
@@ -1283,14 +1340,30 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Switch to the next track
+	 */
+	next: function () {
+		console.info('NEXT');
+
+		var next = this._tracks[this._playlistIndex + 1] != undefined 
+			? this._playlistIndex + 1
+			: 0;
+
+
+		this.loadTrack(next);
+	},
+
+	/**
 	 * Stop the audio track and/or play the stop transition
 	 * @param  {Object} options Settings
 	 */
 	end : function (options) {
+		console.info('END');
+
 		var o = options || {};
 
 		o.transition = 'stop';
-		this.pauseTransition();
+		this.pauseTransitions();
 
 		if (this._player.currentTime) {
 			this.pause();
@@ -1478,19 +1551,19 @@ turntablePlayerEngine.prototype = {
 		;
 		o.force = true;
 
-		this.pauseTransition();
+		this.pauseTransitions();
 
 		if (o.enableRemote)
 			this.enableRemote(transition);
 
-		if (this.options.useTransitions && this._playerTransition[transition]) {
+		if (this.options.useTransitions && this._playerTransitions[transition]) {
 			console.info('Playing transition "' + transition + '".');
 
 			var duration = o.duration || this.options.transitions[transition].duration;
 			
 			this._inTransition = true;
-			this._playerTransition[transition].currentTime = 0;
-			this._playerTransition[transition].play();
+			this._playerTransitions[transition].currentTime = 0;
+			this._playerTransitions[transition].play();
 			this._transitionID = window.setTimeout(function () {
 				if (transition == 'start')
 					self.play(o);
@@ -1498,7 +1571,7 @@ turntablePlayerEngine.prototype = {
 					self.end(o);
 			}, parseInt(duration));
 		}
-		else if (this._playerTransition[transition]) {
+		else if (this._playerTransitions[transition]) {
 			if (transition == 'start')
 				self.play(o);
 			else if (transition == 'stop')
@@ -1509,9 +1582,9 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Pause all the transitions
 	 */
-	pauseTransition : function () {
-		for (var t in this._playerTransition) {
-			this._playerTransition[t].pause();
+	pauseTransitions : function () {
+		for (var t in this._playerTransitions) {
+			this._playerTransitions[t].pause();
 		}
 		this._inTransition = false;
 	},
@@ -1519,10 +1592,10 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop all the transitions
 	 */
-	stopTransition : function () {
-		for (var t in this._playerTransition) {
-			this._playerTransition[t].pause();
-			this._playerTransition[t].currentTime = 0;
+	stopTransitions : function () {
+		for (var t in this._playerTransitions) {
+			this._playerTransitions[t].pause();
+			this._playerTransitions[t].currentTime = 0;
 		}
 	},
 
@@ -1684,13 +1757,13 @@ turntablePlayerEngine.prototype = {
 			if (event.target.id == 'turntable-player-transition-start') {
 				this.updateDiscNeedlePosition({ 
 					name: 'start', 
-					element: this._playerTransition.start
+					element: this._playerTransitions.start
 				});
 			}
 			else if (event.target.id == 'turntable-player-transition-stop') {
 				this.updateDiscNeedlePosition({ 
 					name: 'end', 
-					element: this._playerTransition.stop
+					element: this._playerTransitions.stop
 				});
 			}
 		}
@@ -1704,6 +1777,14 @@ turntablePlayerEngine.prototype = {
 			this.powerOFF();
 		else if (!this._powerON && event.target.id == 'power-on')
 			this.powerON();
+	},
+
+	/**
+	 * Event 'click' called on the next button
+	 */
+	nextButtonClicked : function (event) {
+		if (!this._powerON)
+			this.next();
 	},
 
 	/**

@@ -62,16 +62,18 @@ foreach ($keys as $key)
 		<h2>Examples :</h2>
 		<p>You can customize the settings sent to the player through the url, for example :</p>
 		<ul>
-			<li><a href="index.php">Default options<a></li>
-			<li><a href="index.php?autoPlay=true">Automatic turntable<a>
+			<li><a href="index.php">Default options</a></li>
+			<li><a href="index.php?autoPlay=true">Automatic turntable</a>
 				<br />autoPlay=true</li>
-			<li><a href="index.php?theme=alu">ALU theme<a>
+			<li><a href="index.php?theme=alu">ALU theme</a>
 				<br />theme=alu</li>
-			<li><a href="index.php?animateDelay=5000">Change the animation delay to 5 seconds<a>
+			<li><a href="index.php?playlistLocation=data/playlist2.json">Another playlist</a>
+				<br />playlistLocation=data/playlist2.json</li>
+			<li><a href="index.php?animateDelay=5000">Change the animation delay to 5 seconds</a>
 				<br />animateDelay=5000</li>
-			<li><a href="index.php?useInfos=true&infos=duration,current,timer,position">Display the informations panel and choose the track informations<a>
+			<li><a href="index.php?useInfos=true&infos=duration,current,timer,position">Display the informations panel and choose the track informations</a>
 				<br />useInfos=true&infos=duration,current,timer,position</li>
-			<li><a href="index.php?usePlaylist=false&useInfos=false">Clean turntable with no distraction<a>
+			<li><a href="index.php?usePlaylist=false&useInfos=false">Clean turntable with no distraction</a>
 				<br />usePlaylist=false&useInfos=false</li>
 		</ul>
 		<h2>All the config settings :</h2>

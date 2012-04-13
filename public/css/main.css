@@ -56,7 +56,9 @@ article footer {
 	width: 500px;
 }
 #player.default,
-#player.default button {
+#player.default button,
+#player.default input,
+#player.default label {
 	color: #aaa;
 	font: 11px "Arial Black";
 	-webkit-text-shadow: 0 0 2px #000;
@@ -66,7 +68,9 @@ article footer {
 	text-shadow: 0 0 2px #000;
 	text-transform: uppercase;
 }
-#player.default button {
+#player.default button,
+#player.default input,
+#player.default label {
 	position: relative;
 }
 #player.default button:active,
@@ -83,36 +87,45 @@ article footer {
 	padding-right: 20px;
 	position: absolute;
 }
-/** REMOTE PANEL / POWER BUTTON **/
-#player.default .remote .powerButton {
-	background-color: #000;
-	background-image: -webkit-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: -moz-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: -ms-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: -o-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+#player.default .remote .button {
 	border: 2px solid;
+	display: inline-block;	
+	height: 25px;
+	margin-right: 50px;
+	padding: 0;
+	vertical-align: middle;
+}
+#player.default .remote .button,
+#player.default .remote .button label {
 	color: #666;
+	line-height: 25px;
+}
+
+/** REMOTE PANEL / POWER BUTTON **/
+#player.default .remote .power {
+	background-color: #000;
+	background: -webkit-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: -moz-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: -ms-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: -o-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	-ms-border-radius: 4px;
 	-o-border-radius: 4px;
 	border-radius: 4px;
-	display: block;	
-	height: 25px;
-	line-height: 25px;
 	position: relative;
 	text-align: center;
 	width: 50px;
 }
-#player.default .remote .powerButton.active {
-	background-image: -webkit-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: -moz-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: -ms-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: -o-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
-	background-image: linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010s);
+#player.default .remote .power.active {
+	background: -webkit-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: -moz-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: -ms-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: -o-linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
+	background: linear-gradient(right, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010s);
 }
-#player.default .remote .powerButton:before {
+#player.default .remote .power:before {
 	background: -webkit-radial-gradient(#347235, #254117 51%, #ccc);
 	background: -moz-radial-gradient(#347235, #254117 51%, #ccc);
 	background: -ms-radial-gradient(#347235, #254117 51%, #ccc);
@@ -126,7 +139,7 @@ article footer {
 	top: 8px;
 	width: 10px;
 }
-#player.default .remote .powerButton.active:before {
+#player.default .remote .power.active:before {
 	background: -webkit-radial-gradient(green, #4AA02C 51%, #ccc);
 	background: -moz-radial-gradient(green, #4AA02C 51%, #ccc);
 	background: -ms-radial-gradient(green, #4AA02C 51%, #ccc);
@@ -138,32 +151,63 @@ article footer {
 	-o-box-shadow: 0 0 5px green;
 	box-shadow: 0 0 5px green;
 }
-#player.default .remote .powerButton input[type=radio] {
+#player.default .remote .power input[type=radio] {
 	display: none;
 }
-#player.default .remote .powerButton label {
+#player.default .remote .power label {
 	bottom: 0;
 	position: absolute;
 	top: 0;
 }
-#player.default .remote .powerButton label[for=power-off] {
+#player.default .remote .power label[for=power-off] {
 	left: 0;
 	padding-left: 8px;
 	padding-right: 10px;
 }
-#player.default .remote .powerButton label[for=power-on] {
+#player.default .remote .power label[for=power-on] {
 	cursor: pointer;
 	right: 0;
 	padding-left: 10px;
 	padding-right: 12px;
 }
-#player.default .remote .powerButton.active label[for=power-off] {
+#player.default .remote .power.active label[for=power-off] {
 	cursor: pointer;
 	padding-left: 10px;
 }
-#player.default .remote .powerButton.active label[for=power-on] {
+#player.default .remote .power.active label[for=power-on] {
 	cursor: default;
 	padding-right: 10px;
+}
+
+/** REMOTE PANEL / NEXT BUTTON **/
+#player.default .remote .next {
+	background-color: #151515;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	-ms-border-radius: 15px;
+	-o-border-radius: 15px;
+	border-radius: 15px;
+	border-width: 3px;
+	-webkit-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
+	-moz-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
+	-ms-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
+	-o-box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
+	box-shadow: 0 1px 2px #666 inset, 0 -1px 2px #000 inset;
+	font-size: 18px;
+	font-weight: bold;
+	height: 30px;
+	line-height: 13px;
+	text-align: center;
+	text-indent: 2px;
+	width: 30px;
+}
+#player.default .remote .next:active {
+	background-color: #333;
+	-webkit-box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
+	-moz-box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
+	-ms-box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
+	-o-box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
+	box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
 }
 
 /* OTHER PANELS */
@@ -243,7 +287,7 @@ article footer {
 	background: #230700 url(../img/default/bg-wood.png) top right;
 	border-color: #230700;
 }
-#player.default.wood .remote .powerButton {
+#player.default.wood .remote .button {
 	border-color: #230700;
 }
 #player.default.wood .playlist,
@@ -260,7 +304,7 @@ article footer {
 	background: #727272 url(../img/default/bg-alu.png) top right;
 	border-color: #727272;
 }
-#player.default.alu .remote .powerButton {
+#player.default.alu .remote .button {
 	border-color: #727272;
 }
 #player.default.alu .playlist,
