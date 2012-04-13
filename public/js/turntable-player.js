@@ -22,12 +22,14 @@ turntablePlayerEngine.prototype = {
 		},
 		enable: true, // Load on init
 		debugMode : false, // Show log infos
-		playerId: 'player', // Dom ID to use to build the player
-		remoteId: 'remote', // Dom ID to use to build the remote
+		forceDateInUri : true, // Force the request to retrieve an updated playlist
+		playerId: 'player', // Dom ID to use to build the player, if not found, the element will be created
+		remoteId: 'remote', // Dom ID to use to build the remote, if not found, the element will be created
 		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
+		useCover: true, // Display the cover panel
 		useInfos: false, // Display the informations panel
 		usePlaylist: false, // Display the playlist panel
 		useTransitions: true, // Use the audio transitions
@@ -202,16 +204,18 @@ turntablePlayerEngine.prototype = {
 	_arm: null,
 	_armFt: null,
 	_armFtCallback: null,
+	_cover: null,
 	_disc: null,
 	_discTitle: null,
+	_nextButton: null,
 	_player: null,
 	_playlist: null,
-	_playlistIndex: 0,
 	_transitionID: null,
 	_wrapper: null,
 	
 	_powerButtons: {},
 	_playlistButtons: {},
+	_playlistInfos: {},
 	_infos: {},
 	_playerTransitions: {},
 
@@ -226,6 +230,7 @@ turntablePlayerEngine.prototype = {
 
 	_armRotation: 0,
 	_discRotation: 0,
+	_playlistIndex: 0,
 	_rpm: 45,
 	_rpmTransition: 3,
 
@@ -252,6 +257,7 @@ turntablePlayerEngine.prototype = {
 			this.initPlaylist();
 			this.initInfos();
 			this.initTurntable();
+			this.initCover();
 		}
 	},
 
@@ -477,13 +483,46 @@ turntablePlayerEngine.prototype = {
 			uri = uri || this.options.playlistLocation,
 			req = this.createXHR()
 		;
+
+		if (this.options.forceDateInUri) {
+			var
+				r = /\?/i,
+				now = new Date(),
+				y = now.getFullYear(),
+				m = now.getMonth(),
+				d = now.getDate(),
+				h = now.getHours(),
+				i = now.getMinutes(),
+				ymd = y + '-' + m + '-' + d + '-' + h + '-' + i
+			;
+
+			if (r.test(uri))
+				uri += ('&' + ymd); 
+			else
+				uri += ('?' + ymd);
+		}
+
 		req.open("GET", uri, false);
 		req.onreadystatechange = function () {
-			var tracks = eval(self.getResponseXHR(req));
-			if (typeof(tracks) == 'object' && tracks.length) {
-				self._tracks = tracks;
-				self.options.enable = true;
-				self.load();
+			var 
+				response = eval(self.getResponseXHR(req))
+			;
+			if (typeof(response) == 'object' && response.length) {
+				var
+					playlist = response[0]
+				;
+				if (typeof(playlist) == 'object'  
+					&& typeof(playlist.tracks) == 'object' && playlist.tracks.length
+				) {
+					self._playlistInfos.title = playlist.title;
+					self._playlistInfos.artist = playlist.artist;
+					self._tracks = playlist.tracks;
+					self.options.enable = true;
+					self.load();
+				}
+				else {
+					console.error('No well formatted playlist.');
+				}
 			}
 		};
 		req.send(null);
@@ -761,6 +800,20 @@ turntablePlayerEngine.prototype = {
 		}
 	},
 
+	initCover : function () {
+		if (this.options.useCover && !this._cover) {
+			var 
+				cover = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
+			;
+			this.toggleClass(cover, 'cover', 'add');
+			this.getWrapper().appendChild(cover);
+
+			this._cover = cover;
+
+			this.updateCoverInfos();
+		}
+	},
+
 	/**
 	 * Init the turntable disc
 	 */
@@ -961,6 +1014,80 @@ turntablePlayerEngine.prototype = {
 			this._discTitle.attr('text', this.getTrackTitleLineBreak());
 		
 		console.info('Disc infos updated.');
+	},
+
+	/**
+	 * Update the cover with title, artist and tracks names
+	 */
+	updateCoverInfos : function () {
+		if (this._playlistInfos.artist) {
+			this.loadCoverLegend({
+				label: this._playlistInfos.artist,
+				cssClass: 'artist'
+			});
+		}
+
+		if (this._playlistInfos.title) {
+			this.loadCoverLegend({
+				label: this._playlistInfos.title,
+				cssClass: 'title'
+			});
+		}
+
+		var parentNode = document.createElementNS('http://www.w3.org/1999/xhtml', 'ul');
+
+		for (var i = 0; i < this._tracks.length; i++) {
+			var track = document.createElementNS('http://www.w3.org/1999/xhtml', 'li');
+
+			if (this._tracks[i].artist)
+				this.loadCoverLegend({
+					label: this._tracks[i].artist,
+					cssClass: 'track-artist',
+					parentNode: track,
+					tag: 'strong'
+				});
+			if (this._tracks[i].title)
+				this.loadCoverLegend({
+					label: this._tracks[i].title,
+					cssClass: 'track-title',
+					parentNode: track,
+					tag: 'span'
+				});
+			if (this._tracks[i].duration)
+				this.loadCoverLegend({
+					label: this._tracks[i].duration,
+					cssClass: 'track-duration',
+					parentNode: track,
+					tag: 'span'
+				});
+
+			this.toggleClass(track, 'track', 'add');
+			parentNode.appendChild(track);
+		}
+
+		this.toggleClass(parentNode, 'legend tracks', 'add');
+		this._cover.appendChild(parentNode);
+
+		console.info('Cover infos updated.');
+	},
+
+	/**
+	 * Add the legend to the cover
+	 * @param  {Object} options Settings
+	 */
+	loadCoverLegend : function (options) {
+		var 
+			o = options || {},
+			tag = o.tag || 'div'
+			element = document.createElementNS('http://www.w3.org/1999/xhtml', tag)
+		;
+
+		element.innerHTML = o.label;
+		this.toggleClass(element, 'legend ' + o.cssClass, 'add');
+		if (o.parentNode)
+			o.parentNode.appendChild(element);
+		else
+			this._cover.appendChild(element);
 	},
 
 	/**

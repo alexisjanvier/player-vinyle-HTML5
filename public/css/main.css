@@ -56,7 +56,7 @@ article footer {
 	width: 450px;
 }
 #player.default.with-infos {
-	height: 320px;
+	height: 350px;
 }
 #player.default,
 #player.default button,
@@ -211,6 +211,60 @@ article footer {
 	-ms-box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
 	-o-box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
 	box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
+}
+
+/* COVER PANEL */
+#player.default .cover {
+	background: url(../img/default/paper-cover.png) no-repeat 0 0;
+	bottom: 0;
+	cursor: pointer;
+	height: 242px;
+	position: absolute;
+	right: -230px;
+	width: 250px;
+	-moz-transition: right 1s;
+}
+#player.default .cover:hover {
+	right: 0;
+}
+#player.default .cover .legend {
+	color: #000;
+	font: 10px "Courier New", Courier, monospace;
+	left: 55px;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+}
+#player.default .cover .artist {
+	top: 30px;
+}
+#player.default .cover .title {
+	top: 46px;
+}
+#player.default .cover .tracks {
+	left: 15px;
+	top: 100px;
+	width: 225px;
+}
+#player.default .cover .tracks .track {
+	float: left;
+	padding-left: 5%;
+	text-align: left;
+	width: 42%;
+}
+#player.default .cover .tracks .track:nth-child(even) {
+	float: right;
+	padding-right: 5%;
+	text-align: right;
+}
+#player.default .cover .tracks .legend {
+	display: block;
+	left: 0;
+	position: static;
+}
+#player.default .cover .tracks .track-title {
+	text-transform: capitalize;
 }
 
 /* OTHER PANELS */

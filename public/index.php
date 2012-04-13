@@ -15,7 +15,7 @@ $keys_string = array(
 	'mainId', 'playlistLocation', 'theme'
 );
 $keys_boolean = array(
-	'enable', 'debugMode', 'autoPlay', 'useTransitions', 'useInfos', 'usePlaylist'
+	'enable', 'debugMode', 'autoPlay', 'useTransitions', 'useInfos', 'usePlaylist', 'useCover'
 );
 $keys_int = array(
 	'animateDelay'
@@ -83,6 +83,8 @@ foreach ($keys as $key)
   animateDelay : 2000, 
   // Automatic turntable
   autoPlay : false, 
+  // Time in ms when the turntable auto-shutdowns when it turns with no track in manual mode
+  autoStop: 60000, 
   // Customize the labels of the buttons
   buttonLabels: { 
     play: 'POWER ON',
@@ -98,18 +100,24 @@ foreach ($keys as $key)
   },
   // Load on init
   enable: true, 
+  // Force the request to retrieve an updated playlist
+  forceDateInUri : true, 
   // Choices : duration, current, timer, position
   infos: ["duration", "timer"], 
   // Log informations in the console
   logMethodNames: ["log", "debug", "warn", "info"],
   // Dom ID to use to build the player, if not found, the element will be created
-  mainId: 'player', 
+  playedId: 'player', 
+  // Dom ID to use to build the remote, if not found, the element will be created
+  remoteId: 'player', 
   // Uri of the playlist in json format
   playlistLocation: '/data/playlist.json', 
-	// Display the informations panel
-	useInfos: true, 
-	// Display the playlist panel
-	usePlaylist: true, 
+  // Display the paper panel
+  useCover: true, 
+  // Display the informations panel
+  useInfos: true, 
+  // Display the playlist panel
+  usePlaylist: true, 
   // Use audio transition at the beginning and the end of the track
 	useTransitions: true, 
 }

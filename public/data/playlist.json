@@ -1,18 +1,22 @@
-[
-	{
-		artist: "Badloop",
-		title: "Lumme",
-		src: {
-			mp3: "/music/Lumme-Badloop.mp3",
-			ogg: "/music/Lumme-Badloop.ogg"
+[{
+	artist: "Various artists",
+	title: "Sample #1",
+	tracks: [
+		{
+			artist: "Badloop",
+			title: "Lumme",
+			src: {
+				mp3: "/music/Lumme-Badloop.mp3",
+				ogg: "/music/Lumme-Badloop.ogg"
+			}
+		},
+		{
+			artist: "4T Thieves",
+			title: "Mists of Time",
+			src: {
+				mp3: "/music/Mists_of_Time-4T.mp3",
+				ogg: "/music/Mists_of_Time-4T.ogg"
+			}
 		}
-	},
-	{
-		artist: "4T Thieves",
-		title: "Mists of Time",
-		src: {
-			mp3: "/music/Mists_of_Time-4T.mp3",
-			ogg: "/music/Mists_of_Time-4T.ogg"
-		}
-	}
-]
+	]
+}]
