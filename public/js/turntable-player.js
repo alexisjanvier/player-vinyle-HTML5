@@ -1359,8 +1359,6 @@ turntablePlayerEngine.prototype = {
 		});
 
 		this.playDiscArea({ force: true });
-		// if (this.getArmArea() != 'stop')
-		// 	this.play({ force: true });
 	},
 
 	/**
@@ -1377,6 +1375,8 @@ turntablePlayerEngine.prototype = {
 
 		if (this._playerPaused == false)
 			this.pause();
+		else if (this._inTransition)
+			this.pauseTransitions();
 	},
 
 	/**
