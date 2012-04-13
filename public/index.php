@@ -59,6 +59,7 @@ foreach ($keys as $key)
 		<h1>Vinyl player</h1>
 		<p>Technologies : HTML, CSS, JavaScript and SVG thanks to <a href="http://raphaeljs.com/">Raphaël</a></p>
 		<p>All the magic is in <a href="js/turntable-player.js">js/turntable-player.js</a>.</p>
+		<p>You can fork this demo at <a href="https://github.com/Le-Vinyle/player-vinyle-HTML5">https://github.com/Le-Vinyle/player-vinyle-HTML5</a>.</p>
 		<h2>Examples :</h2>
 		<p>You can customize the settings sent to the player through the url, for example :</p>
 		<ul>
