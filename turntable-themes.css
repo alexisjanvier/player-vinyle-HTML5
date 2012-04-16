@@ -1,38 +1,3 @@
-* { margin: 0; padding: 0; }
-button::-moz-focus-inner { border: none; }
-article, aside, figure, footer, header, hgroup, menu, nav, section { display: block; }
-body {
-	background-color: #333;
-	background-image: -webkit-linear-gradient(bottom, #aaa, #666);
-	background-image: -moz-linear-gradient(bottom, #aaa, #666);
-	background-image: -ms-linear-gradient(bottom, #aaa, #666);
-	background-image: -o-linear-gradient(bottom, #aaa, #666);
-	background-image: linear-gradient(bottom, #aaa, #666);
-}
-article {
-	font: 14px Courier, "Lucida Console", monospace;
-	margin: 20px auto;
-	text-align: justify;
-	width: 500px;
-}
-article h1,
-article h2 {
-	margin: 15px 0 10px;
-}
-article ul {
-	margin-left: 2em;
-}
-article pre {
-	background-color: #aaa;
-	border: 1px solid #666;
-	padding: 5px;
-	overflow-x: scroll;
-}
-article footer {
-	margin-top: 40px;
-	text-align: center;
-}
-
 #player {
 	overflow: hidden;
 	position: relative;
@@ -43,6 +8,7 @@ article footer {
 }
 
 /* THEMES */
+/** THEMES / DEFAULT **/
 #player.default {
 	border: 2px solid;
 	-webkit-border-radius: 5px;
@@ -52,7 +18,7 @@ article footer {
 	border-radius: 5px;
 	box-shadow: 0 0 30px 10px #000;
 	height: 250px;
-	margin: 50px auto 0;
+	margin: 20px auto;
 	width: 450px;
 }
 #player.default.with-infos {
@@ -83,7 +49,7 @@ article footer {
 	outline: 0;
 }
 
-/* REMOTE PANEL */
+/** REMOTE PANEL **/
 #player.default .remote {
 	padding-right: 20px;
 	position: absolute;
@@ -104,7 +70,7 @@ article footer {
 	line-height: 25px;
 }
 
-/** REMOTE PANEL / POWER BUTTON **/
+/*** REMOTE PANEL / POWER BUTTON ***/
 #player.default .remote .power {
 	background-color: #000;
 	background: -webkit-linear-gradient(left, #111, #333 5%, #000 60%, #000 85%, #222 90%, #101010);
@@ -182,7 +148,7 @@ article footer {
 	padding-right: 10px;
 }
 
-/** REMOTE PANEL / NEXT BUTTON **/
+/*** REMOTE PANEL / NEXT BUTTON ***/
 #player.default .remote .next {
 	background-color: #151515;
 	-webkit-border-radius: 15px;
@@ -213,9 +179,9 @@ article footer {
 	box-shadow: 0 0 5px 3px #000 inset, 0 0 1px #000;
 }
 
-/* COVER PANEL */
+/** COVER PANEL **/
 #player.default .cover {
-	background: url(../img/default/paper-cover.png) no-repeat 0 0;
+	background: url(default/paper-cover.png) no-repeat 0 0;
 	bottom: 0;
 	cursor: pointer;
 	height: 242px;
@@ -232,10 +198,12 @@ article footer {
 	right: 0;
 }
 #player.default .cover .legend {
+	background: none;
+	background: none;
 	color: #000;
 	font: 10px "Courier New", Courier, monospace;
 	left: 55px;
-	list-style-type: none;
+	list-style: none;
 	margin: 0;
 	padding: 0;
 	position: absolute;
@@ -271,7 +239,7 @@ article footer {
 	text-transform: capitalize;
 }
 
-/* OTHER PANELS */
+/** OTHER PANELS **/
 #player.default .infos,
 #player.default .playlist {
 	background-color: #111;
@@ -289,16 +257,19 @@ article footer {
 	text-align: right;
 }
 
-/** OTHER PANELS / INFOS **/
+/*** OTHER PANELS / INFOS ***/
 #player.default .infos {
 	right: 10px
+}
+#player.default .infos p {
+	margin: 0;
 }
 #player.default .infos p span {
 	color: #999;
 	display: inline-block;
 	min-width: 35px;
 }
-/** OTHER PANELS / PLAYLIST **/
+/*** OTHER PANELS / PLAYLIST ***/
 #player.default .playlist {
 	left: 10px;
 }
@@ -347,7 +318,7 @@ article footer {
 
 /** THEMES / WOOD **/
 #player.default.wood {
-	background: #230700 url(../img/default/bg-wood.png) top right;
+	background: #230700 url(default/bg-wood.png) top right;
 	border-color: #230700;
 }
 #player.default.wood .remote .button {
@@ -364,7 +335,7 @@ article footer {
 
 /** THEMES / ALU **/
 #player.default.alu {
-	background: #727272 url(../img/default/bg-alu.png) top right;
+	background: #727272 url(default/bg-alu.png) top right;
 	border-color: #727272;
 }
 #player.default.alu .remote .button {

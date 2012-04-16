@@ -6,32 +6,32 @@
 			artist: "24-7 Spys",
 			title: "Jungle Boogie",
 			src: {
-				ogg: "/music/JungleBoogie.ogg",
-				mp3: "/music/JungleBoogie.mp3"
+				ogg: "JungleBoogie.ogg",
+				mp3: "JungleBoogie.mp3"
 			}
 		},
 		{
 			artist: "LampChop",
 			title: "Gone Tomorrow",
 			src: {
-				ogg: "/music/GoneTomorrow.ogg",
-				mp3: "/music/GoneTomorrow.mp3"
+				ogg: "GoneTomorrow.ogg",
+				mp3: "GoneTomorrow.mp3"
 			}
 		},
 		{
 			artist: "Baxter Dury",
 			title: "Claire",
 			src: {
-				ogg: "/music/Claire.ogg",
-				mp3: "/music/Claire.mp3"
+				ogg: "Claire.ogg",
+				mp3: "Claire.mp3"
 			}
 		},
 		{
 			artist: "Gotcha",
 			title: "Bonesong",
 			src: {
-				ogg: "/music/Bonesong.ogg",
-				mp3: "/music/Bonesong.mp3"
+				ogg: "Bonesong.ogg",
+				mp3: "Bonesong.mp3"
 			}
 		}
 	]

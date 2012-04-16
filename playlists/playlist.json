@@ -6,16 +6,16 @@
 			artist: "Badloop",
 			title: "Lumme",
 			src: {
-				mp3: "/music/Lumme-Badloop.mp3",
-				ogg: "/music/Lumme-Badloop.ogg"
+				mp3: "Lumme-Badloop.mp3",
+				ogg: "Lumme-Badloop.ogg"
 			}
 		},
 		{
 			artist: "4T Thieves",
 			title: "Mists of Time",
 			src: {
-				mp3: "/music/Mists_of_Time-4T.mp3",
-				ogg: "/music/Mists_of_Time-4T.ogg"
+				mp3: "Mists_of_Time-4T.mp3",
+				ogg: "Mists_of_Time-4T.ogg"
 			}
 		}
 	]

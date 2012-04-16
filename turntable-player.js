@@ -7,6 +7,13 @@ turntablePlayerEngine.prototype = {
 	 * @type {Object}
 	 */
 	options: {
+		paths: { // The path to needed folders
+			audio: 'audio/',
+			music: 'music/',
+			playlists: 'playlists/',
+			themes: ''
+		},
+
 		animateDelay : 2000, // Delay for the animations of the arm and the disc
 		autoPlay : false, // Automatic turntable
 		autoStop: 60000, // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
@@ -26,7 +33,7 @@ turntablePlayerEngine.prototype = {
 		forceDateInUri : true, // Force the request to retrieve an updated playlist
 		playerId: 'player', // Dom ID to use to build the player, if not found, the element will be created
 		remoteId: 'remote', // Dom ID to use to build the remote, if not found, the element will be created
-		playlistLocation: '/data/playlist.json', // Uri of the playlist in json format
+		playlistLocation: 'playlist.json', // Uri of the playlist in json format
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 		theme: 'wood', // The name of the theme
@@ -39,7 +46,7 @@ turntablePlayerEngine.prototype = {
 			wood: {
 				cssClass: 'default wood',
 				arm: {
-					src: 'img/default/arm-200-314.png',
+					src: 'default/arm-200-314.png',
 					turnable: true,
 					area: {
 						start: 19,
@@ -116,7 +123,7 @@ turntablePlayerEngine.prototype = {
 			alu: {
 				cssClass: 'default alu',
 				arm: {
-					src: 'img/default/arm-200-314.png',
+					src: 'default/arm-200-314.png',
 					turnable: true,
 					area: {
 						start: 19,
@@ -186,14 +193,14 @@ turntablePlayerEngine.prototype = {
 		transitions: {
 			start: {
 				src: {
-					mp3: '/audio/start.mp3',
-					ogg: '/audio/start.ogg'
+					mp3: 'start.mp3',
+					ogg: 'start.ogg'
 				}
 			},
 			stop: {
 				src: {
-					mp3: '/audio/stop2.mp3',
-					ogg: '/audio/stop2.ogg'
+					mp3: 'stop2.mp3',
+					ogg: 'stop2.ogg'
 				}
 			}
 		}
@@ -481,7 +488,7 @@ turntablePlayerEngine.prototype = {
 	getPlaylist : function (uri) {
 		var
 			self = this,
-			uri = uri || this.options.playlistLocation,
+			uri = uri || (this.options.paths.playlists + this.options.playlistLocation),
 			req = this.createXHR()
 		;
 
@@ -861,7 +868,7 @@ turntablePlayerEngine.prototype = {
 					.attr('fill', theme.disc.fill),
 				discCover = theme.disc.cover.src 
 					? paper.image(
-						theme.disc.cover.src,
+						this.options.paths.themes + theme.disc.cover.src,
 						theme.disc.cover.pos.x,
 						theme.disc.cover.pos.y,
 						theme.disc.cover.dim.w,
@@ -892,7 +899,7 @@ turntablePlayerEngine.prototype = {
 					.attr('fill', theme.disc.axis.fill),
 				arm = theme.arm.src 
 					? paper.image(
-						theme.arm.src,
+						this.options.paths.themes + theme.arm.src,
 						theme.arm.pos.x,
 						theme.arm.pos.y,
 						theme.arm.dim.w,
@@ -1565,6 +1572,40 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Add the source to the audio element
+	 * @param {Object} element The audio element
+	 * @param {Mixed} src     The source(s) as string or object
+	 */
+	addSrcToAudio : function (element, src, type) {
+		while (element.firstChild) {
+		  element.removeChild(element.firstChild);
+		}
+
+		var 
+			path = this.options.paths[type],
+			r = /http/i
+		;
+
+		if (typeof(src) == 'string') {
+			source.src = r.test(src) ? src : path + src;
+		}
+		else {
+			var source = document.createElementNS('http://www.w3.org/1999/xhtml', 'source');
+
+			if (element.canPlayType('audio/mpeg') && src.mp3) {
+				source.src = r.test(src.mp3) ? src.mp3 : path + src.mp3;
+				source.type = 'audio/mpeg';	
+			}
+			else if (element.canPlayType('audio/ogg') && src.ogg) {
+				source.src = r.test(src.ogg) ? src.ogg : path + src.ogg;
+				source.type = 'audio/ogg';	
+			}
+			
+			element.appendChild(source);
+		}
+	},
+
+	/**
 	 * Load the track according to his index in the playlist
 	 * @param  {Number} i The index of the track in the playlist
 	 */
@@ -1575,14 +1616,8 @@ turntablePlayerEngine.prototype = {
 				track = this._tracks[i]
 			;
 
-			if (this._player.canPlayType('audio/mpeg') && track.src.mp3)
-				this._player.src = track.src.mp3;
-			else if (this._player.canPlayType('audio/ogg') && track.src.ogg)
-				this._player.src = track.src.ogg;
-			else if (typeof(option.src) == 'string')
-				this._player.src = track.src;
-			else
-				console.error('Cannot load the track source.')
+			this.addSrcToAudio(this._player, track.src, 'music');
+
 			this._player.load();
 			this._playlistIndex = i;
 
@@ -1636,14 +1671,7 @@ turntablePlayerEngine.prototype = {
 		element.preload = 'metadata';
 		element.loop = 'loop';
 
-		if (element.canPlayType('audio/mpeg') && option.src.mp3)
-			element.src = option.src.mp3;
-		else if (element.canPlayType('audio/ogg') && option.src.ogg)
-			element.src = option.src.ogg;
-		else if (typeof(option.src) == 'string')
-			element.src = option.src;
-		else
-			console.error('Cannot load the track transition source of "' + transition + '".');
+		this.addSrcToAudio(element, option.src, 'audio');
 
 		element.load();
 

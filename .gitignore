@@ -1,12 +1,1 @@
-onfig/deploy.rb
-/web/bundles/
-/app/bootstrap*
-/app/cache/*
-/app/logs/*
-/vendor/
-/build
-/app/config/parameters.ini
-*.DS_Store
-.buildpath
-.project
-.settings
+_site
