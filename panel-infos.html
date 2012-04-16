@@ -1,5 +1,5 @@
 ---
-title: demos [default]
+title: demos [infos panel]
 layout: master
 player: true
 ---
@@ -7,13 +7,19 @@ player: true
 <script type="text/javascript">
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
-    turntablePlayer.init();
+    turntablePlayer.init({
+      useInfos: true,
+      infos: ['duration', 'current', 'timer', 'position']
+    });
   }, false);
 </script>
 
 <pre>
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
-    turntablePlayer.init();
+    turntablePlayer.init({
+      useInfos: true,
+      infos: ['duration', 'current', 'timer', 'position']
+    });
   }, false);
 </pre>

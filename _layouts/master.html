@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Turntable player by Le-Vinyle {% if page.title %} - {{ page.title }} {% endif %}</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="turntable-player/turntable-themes.css" type="text/css" />
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <div id="header">
+        <nav>
+          <li class="documentation"><a href="index.html">Demos</a></li>
+          <li class="documentation"><a href="documentation.html">Documentation</a></li>
+          <li class="fork"><a href="https://github.com/Le-Vinyle/player-vinyle-HTML5">Fork On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Le-Vinyle/player-vinyle-HTML5/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Le-Vinyle/player-vinyle-HTML5/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Player-vinyle-html5</h1>
+          <p>player vinyle HTML5</p>
+        </div>
+
+        {% if page.player %}
+        <div id="player"></div>
+        {% endif %}
+
+        <script src="turntable-player/lib/raphael-min.js" type="text/javascript"></script>
+        <script src="turntable-player/lib/raphael.free_transform_animate.js" type="text/javascript"></script>
+        <script src="turntable-player/turntable-player.js" type="text/javascript"></script>
+
+        {{ content }}
+
+        {% if page.player %}
+        <p>Technologies : HTML, CSS, JavaScript and SVG thanks to <a href="http://raphaeljs.com/">Raphaël</a>.</p>
+        <p>All the magic is in <a href="https://github.com/Le-Vinyle/player-vinyle-HTML5/turntable-player.js">turntable-player.js</a>.</p>
+
+        <h2>Examples :</h2>
+        <p>You can customize the settings sent to the player through the url, for example :</p>
+        <ul>
+          <li><a href="/">Default options</a></li>
+          <li><a href="autoplay.html">Automatic turntable</a></li>
+          <li><a href="theme.html">Change the theme</a></li>
+          <li><a href="playlist.html">Another playlist</a></li>
+          <li><a href="duration.html">Change the animation delay to 5 seconds</a></li>
+          <li><a href="panel-infos.html">Display the informations panel and choose the track informations</a></li>
+          <li><a href="panels.html">All panels displayed</a></li>          
+        </ul>
+        {% endif %}
+
+        <hr />
+        <p>Developed by <a href="http://www.amanca.fr/">Aurélien MANCA</a> for <a href="http://www.le-vinyle.com">Le-vinyle.com</a></p>
+        <p>Music is courtesy of <a href="http://www.kahvi.org/">Kahvi Collective</a></p>
+        <p>Favicon from <a href="http://www.iconfinder.com/icondetails/23864/16/">Oliver Scholtz (and others)</a></p>
+        <p>Audio transitions from <a href="http://www.freesound.org/people/gadzooks/sounds/59985/">gadzooks</a> and <a href="http://www.freesound.org/people/FreqMan/sounds/42820/">FreqMan</a></p>
+
+        <hr />
+        <span class="credits left">Project maintained by <a href="https://github.com/Le-Vinyle">Le-Vinyle</a></span>
+        <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    <script type="text/javascript">
+      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+      try {
+        var pageTracker = _gat._getTracker("UA-17311686-7");
+      pageTracker._trackPageview();
+      } catch(err) {}
+    </script>
+
+  </body>
+</html>

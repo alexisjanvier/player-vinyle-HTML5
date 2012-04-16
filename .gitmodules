@@ -1,0 +1,3 @@
+[submodule "turntable-player"]
+	path = turntable-player
+	url = git://github.com/Le-Vinyle/player-vinyle-HTML5.git

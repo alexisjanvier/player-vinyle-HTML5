@@ -712,7 +712,7 @@ dt {
   max-width: 650px;
   margin: 0 auto;
   padding: 0 10px;
-  background: blue;
+  /*background: blue;*/
   margin: 6px auto;
 }
 #header nav li {
@@ -770,6 +770,10 @@ dt {
   float: left;
   margin-left: 0px;
 }
+#header nav li.documentation {
+  float: left;
+  margin-right: 6px;
+}
 #header nav li.downloads {
   float: right;
   margin-left: 6px;
@@ -789,7 +793,7 @@ section {
 section #title {
   border: 0;
   outline: none;
-  margin: 0 0 50px 0;
+  margin: 0 0 10px 0;
   padding: 0 0 5px 0;
 }
 section #title h1 {
