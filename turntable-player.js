@@ -378,7 +378,7 @@ turntablePlayerEngine.prototype = {
 		var self = this;
 		try {
 			if (httpRequest.readyState === 4) {
-				if (httpRequest.status === 200) {
+				if (httpRequest.status === 200 || httpRequest.status === 0) {
 					return(httpRequest.responseText);
 				} else {
 					console.error('There was a problem with the request.');
