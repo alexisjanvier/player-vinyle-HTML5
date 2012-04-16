@@ -8,7 +8,13 @@ player: true
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
     turntablePlayer.init({
-      playlistLocation: '/turntable-player/playlists/playlist2.json'
+      playlistLocation: 'playlist2.json',
+      paths: {
+        audio: 'turntable-player/audio/',
+        music: 'turntable-player/music/',
+        playlists: 'turntable-player/playlists/',
+        themes: 'turntable-player/'
+      }
     });
   }, false);
 </script>
@@ -17,7 +23,13 @@ player: true
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
     turntablePlayer.init({
-      playlistLocation: '/turntable-player/playlists/playlist2.json'
+      playlistLocation: 'playlist2.json',
+      paths: {
+        audio: 'turntable-player/audio/',
+        music: 'turntable-player/music/',
+        playlists: 'turntable-player/playlists/',
+        themes: 'turntable-player/'
+      }
     });
   }, false);
 </pre>

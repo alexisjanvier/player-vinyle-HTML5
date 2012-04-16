@@ -7,13 +7,27 @@ player: true
 <script type="text/javascript">
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
-    turntablePlayer.init();
+    turntablePlayer.init({
+      paths: {
+        audio: 'turntable-player/audio/',
+        music: 'turntable-player/music/',
+        playlists: 'turntable-player/playlists/',
+        themes: 'turntable-player/'
+      }
+    });
   }, false);
 </script>
 
 <pre>
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
-    turntablePlayer.init();
+    turntablePlayer.init({
+      paths: {
+        audio: 'turntable-player/audio/',
+        music: 'turntable-player/music/',
+        playlists: 'turntable-player/playlists/',
+        themes: 'turntable-player/'
+      }
+    });
   }, false);
 </pre>
