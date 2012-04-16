@@ -202,6 +202,13 @@ turntablePlayerEngine.prototype = {
 					mp3: 'stop2.mp3',
 					ogg: 'stop2.ogg'
 				}
+			},
+			drag: {
+				loop: false,
+				src: {
+					mp3: 'drag.mp3',
+					ogg: 'drag.ogg'
+				}
 			}
 		}
 	},
@@ -644,13 +651,19 @@ turntablePlayerEngine.prototype = {
 	 */
 	initTransitions : function () {
 		if (this.options.useTransitions && !this._playerTransitions.start) {
-			var
-				start = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'),
-				stop = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio')
-			;
 
-			this._playerTransitions.start = this.loadTransition(start, 'start');
-			this._playerTransitions.stop = this.loadTransition(stop, 'stop');
+			this._playerTransitions.start = this.loadTransition(
+				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'), 
+				'start'
+			);
+			this._playerTransitions.stop = this.loadTransition(
+				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'), 
+				'stop'
+			);
+			this._playerTransitions.drag = this.loadTransition(
+				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'), 
+				'drag'
+			);
 		}
 	},
 
@@ -916,9 +929,13 @@ turntablePlayerEngine.prototype = {
 				ftCallback = function(ft, events) {
 					console.info('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
 					self._armRotation = ft.attrs.rotate;
-					if (events.indexOf('rotate') != -1) {
+					if (events.indexOf('rotate start') != -1) {
 						self.pause();
 						self.pauseTransitions();
+						self.playTransition({
+							transition: 'drag',
+							useTransitions: false
+						});
 					}
 					else if (
 						events.indexOf('rotate end') != -1
@@ -1669,7 +1686,8 @@ turntablePlayerEngine.prototype = {
 
 		element.id = 'turntable-player-transition-' + transition;
 		element.preload = 'metadata';
-		element.loop = 'loop';
+		if (option.loop != false)
+			element.loop = 'loop';
 
 		this.addSrcToAudio(element, option.src, 'audio');
 
@@ -1693,6 +1711,8 @@ turntablePlayerEngine.prototype = {
 			transition = 'stop';
 		else if (element.id == 'turntable-player-transition-between')
 			transition = 'between';
+		else if (element.id == 'turntable-player-transition-drag')
+			transition = 'drag';
 
 		this.options.transitions[transition].duration = element.duration * 1000;
 		console.info('Transition "' + transition + '" event: loadedMetaData.');
@@ -1707,6 +1727,9 @@ turntablePlayerEngine.prototype = {
 			self = this,
 			o = options || {},
 			transition = o.transition || 'transition'
+			useTransitions = o.useTransitions != undefined 
+				? o.useTransitions 
+				: this.options.useTransitions
 		;
 		o.force = true;
 
@@ -1715,7 +1738,7 @@ turntablePlayerEngine.prototype = {
 		if (o.enableRemote)
 			this.enableRemote(transition);
 
-		if (this.options.useTransitions && this._playerTransitions[transition]) {
+		if (useTransitions == true && this._playerTransitions[transition]) {
 			console.info('Playing transition "' + transition + '".');
 
 			var duration = o.duration || this.options.transitions[transition].duration;
@@ -1735,6 +1758,11 @@ turntablePlayerEngine.prototype = {
 				self.play(o);
 			else if (transition == 'stop')
 				self.end(o);
+			else {
+				var pos = this.getArmArea();
+				if (pos != 'stop' && pos != undefined)
+					self._playerTransitions[transition].play();
+			}
 		}
 	},
 
