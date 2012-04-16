@@ -1760,8 +1760,10 @@ turntablePlayerEngine.prototype = {
 				self.end(o);
 			else {
 				var pos = this.getArmArea();
-				if (pos != 'stop' && pos != undefined)
-					self._playerTransitions[transition].play();
+				if (pos != 'stop' && pos != undefined){
+					this._playerTransitions[transition].currentTime = 0;
+					this._playerTransitions[transition].play();
+				}
 			}
 		}
 	},
