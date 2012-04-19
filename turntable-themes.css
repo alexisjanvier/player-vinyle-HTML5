@@ -6,6 +6,9 @@
 #player tspan {
 	font-family: Impact;
 }
+#player svg {
+	z-index: 1;
+}
 
 /* THEMES */
 /** THEMES / DEFAULT **/
@@ -49,12 +52,31 @@
 	outline: 0;
 }
 
+/** DISC **/
+#player.default .disc,
+#player.default .discEnd,
+#player.default .discCover,
+#player.default .discTitle {
+	left: 0;
+	position: absolute;
+	top: 0;
+}
+#player.default .discTitle {
+	font: 10px Impact;
+	height: 40px;
+	padding: 25px 0;
+	text-transform: capitalize;
+	white-space: pre;
+	width: 90px;
+}
+
 /** REMOTE PANEL **/
 #player.default .remote {
 	padding-right: 20px;
 	position: absolute;
 	right: 10px;
 	top: 10px;
+	z-index: 1;
 }
 #player.default .remote .button {
 	border: 2px solid;
@@ -193,6 +215,7 @@
 	-ms-transition: right 1s;
 	-o-transition: right 1s;
 	transition: right 1s;
+	z-index: 1;
 }
 #player.default .cover:hover {
 	right: 0;
