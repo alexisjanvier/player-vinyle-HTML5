@@ -13,19 +13,49 @@
 /* THEMES */
 /** THEMES / DEFAULT **/
 #player.default {
-	border: 2px solid;
+	height: 255px;
+	margin: 5px auto;
+	width: 455px;
+}
+#player.default.with-cover {
+	width: 700px;
+}
+#player.default.with-shadow {
+	width: 555px;
+}
+#player.default.with-infos,
+#player.default.with-shadow {
+	height: 355px;
+}
+#player.default.with-shadow.with-cover {
+	width: 780px;
+}
+#player.default.with-shadow.with-infos {
+	height: 555px;
+}
+#player.default .bg {
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	-ms-border-radius: 5px;
 	-o-border-radius: 5px;
 	border-radius: 5px;
-	box-shadow: 0 0 30px 10px #000;
-	height: 250px;
-	margin: 20px auto;
+	border: 2px solid;
+	bottom: 0;
+	left: 0;
+	top: 0;
+	position: absolute;
 	width: 450px;
+	z-index: 1;
 }
-#player.default.with-infos {
-	height: 350px;
+#player.default.with-shadow .bg {
+	-webkit-box-shadow: 0 0 30px 10px #000;
+	-moz-box-shadow: 0 0 30px 10px #000;
+	-ms-box-shadow: 0 0 30px 10px #000;
+	-o-box-shadow: 0 0 30px 10px #000;
+	box-shadow: 0 0 30px 10px #000;
+	bottom: 50px;
+	left: 50px;
+	top: 50px;
 }
 #player.default,
 #player.default button,
@@ -205,24 +235,34 @@
 /** COVER PANEL **/
 #player.default .cover {
 	background: url(default/paper-cover.png) no-repeat 0 0;
-	bottom: 0;
+	top: 55px;
 	cursor: pointer;
 	height: 242px;
 	position: absolute;
-	right: -230px;
+	left: 300px;
 	width: 250px;
-	-webkit-transition: right 1s;
-	-moz-transition: right 1s;
-	-ms-transition: right 1s;
-	-o-transition: right 1s;
-	transition: right 1s;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	-o-transition: all 1s;
+	transition: all 1s;
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	transform: rotate(90deg);
+	z-index: 0;
+}
+#player.default .cover.active {
+	left: 525px;
+	-webkit-transform: rotate(0deg);
+	-moz-transform: rotate(0deg);
+	-ms-transform: rotate(0deg);
+	-o-transform: rotate(0deg);
+	transform: rotate(0deg);
 	z-index: 1;
 }
-#player.default .cover:hover {
-	right: 0;
-}
 #player.default .cover .legend {
-	background: none;
 	background: none;
 	color: #000;
 	font: 10px "Courier New", Courier, monospace;
@@ -341,7 +381,7 @@
 }
 
 /** THEMES / WOOD **/
-#player.default.wood {
+#player.default.wood .bg {
 	background: #230700 url(default/bg-wood.png) top right;
 	border-color: #230700;
 }
@@ -358,7 +398,7 @@
 }
 
 /** THEMES / ALU **/
-#player.default.alu {
+#player.default.alu .bg {
 	background: #727272 url(default/bg-alu.png) top right;
 	border-color: #727272;
 }

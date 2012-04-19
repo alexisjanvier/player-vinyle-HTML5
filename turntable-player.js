@@ -47,6 +47,7 @@ turntablePlayerEngine.prototype = {
 		usePlaylist: false, // Display the playlist panel
 		useTransitions: true, // Use the audio transitions
 		useCssAnimations: false, // Use CSS animations (beta)
+		useShadow: true, // Use shadow around the player
 
 		themes : { // The list of the available themes with their settings
 			wood: {
@@ -237,6 +238,7 @@ turntablePlayerEngine.prototype = {
 	_cover: null,
 	_disc: null,
 	_discTitle: null,
+	_mainWrapper: null,
 	_nextButton: null,
 	_player: null,
 	_playlist: null,
@@ -263,7 +265,6 @@ turntablePlayerEngine.prototype = {
 	_discRotation: 0,
 	_playlistIndex: 0,
 	_rpm: 45,
-	_rpmTransition: 3,
 
 	/**
 	 * Init the turntable
@@ -605,6 +606,7 @@ turntablePlayerEngine.prototype = {
 	 * @return {Boolean} The status of the check
 	 */
 	check : function () {
+		this.getWrapper();
 		if (!this._tracks.length && this.options.enable) {
 			this.options.enable = false;
 			this.getPlaylist();
@@ -621,17 +623,27 @@ turntablePlayerEngine.prototype = {
 		if (!this._wrapper) {
 			var 
 				id = this.options.playerId,
-				wrapper = document.getElementById(id)
+				wrapper = document.getElementById(id),
+				bg = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 			;
 			if (!wrapper) {
 				wrapper = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 				wrapper.id = id;
 				document.body.appendChild(wrapper);
 			}
-			this._wrapper = wrapper;
-			this.toggleClass(this._wrapper, this.options.themes[this.options.theme].cssClass, 'add');
+			this.toggleClass(bg, 'bg', 'add');
+			wrapper.appendChild(bg);
+
+			this.toggleClass(wrapper, this.options.themes[this.options.theme].cssClass, 'add');
 			if (this.options.useInfos || this.options.usePlaylist)
-				this.toggleClass(this._wrapper, 'with-infos', 'add');
+				this.toggleClass(wrapper, 'with-infos', 'add');
+			if (this.options.useCover)
+				this.toggleClass(wrapper, 'with-cover', 'add');
+			if (this.options.useShadow)
+				this.toggleClass(wrapper, 'with-shadow', 'add');
+
+			this._wrapper = bg;
+			this._mainWrapper = wrapper;
 		}
 
 		return this._wrapper;
@@ -668,7 +680,6 @@ turntablePlayerEngine.prototype = {
 				self = this,
 				audio = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio')
 			;
-			this._wrapper = this.getWrapper();
 
 			if (this.options.debugMode) {
 				this._wrapper.appendChild(audio);
@@ -873,14 +884,20 @@ turntablePlayerEngine.prototype = {
 	initCover : function () {
 		if (this.options.useCover && !this._cover) {
 			var 
+				self = this,
 				cover = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
 			;
 			this.toggleClass(cover, 'cover', 'add');
-			this.getWrapper().appendChild(cover);
+			this._mainWrapper.appendChild(cover);
 
 			this._cover = cover;
 
 			this.updateCoverInfos();
+
+			cover.addEventListener('click', function (event) {
+				var r = /active/i;
+				self.toggleClass(self._cover, 'active', r.test(self._cover.className) ? 'remove' : 'add');
+			}, false);
 		}
 	},
 
