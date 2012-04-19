@@ -46,7 +46,7 @@ turntablePlayerEngine.prototype = {
 		useInfos: false, // Display the informations panel
 		usePlaylist: false, // Display the playlist panel
 		useTransitions: true, // Use the audio transitions
-		useCssAnimations: false, // Use CSS animations (beta)
+		useCssAnimations: true, // Use CSS animations (beta)
 		useShadow: true, // Use shadow around the player
 
 		themes : { // The list of the available themes with their settings
@@ -491,6 +491,15 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Format the title of the track with dashes
+	 * @see getTrackTitle()
+	 * @return {String} The title of the track
+	 */
+	getTrackTitleDashed : function () {
+		return this.getTrackTitle() + ' - ';
+	},
+
+	/**
 	 * Format the title of the track with linebreaks instead of dashes
 	 * @see getTrackTitle()
 	 * @return {String} The title of the track
@@ -881,6 +890,9 @@ turntablePlayerEngine.prototype = {
 		}
 	},
 
+	/**
+	 * Init the cover panel
+	 */
 	initCover : function () {
 		if (this.options.useCover && !this._cover) {
 			var 
@@ -894,7 +906,7 @@ turntablePlayerEngine.prototype = {
 
 			this.updateCoverInfos();
 
-			cover.addEventListener('click', function (event) {
+			cover.addEventListener('mouseup', function (event) {
 				var r = /active/i;
 				self.toggleClass(self._cover, 'active', r.test(self._cover.className) ? 'remove' : 'add');
 			}, false);
@@ -927,9 +939,8 @@ turntablePlayerEngine.prototype = {
 			self = this,
 			turntable = this.getWrapper(),
 			theme = this.options.themes[this.options.theme],
-			discStart = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas'),
 			disc = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas'),
-			discTitle = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
+			discTitle = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas')
 		;
 
 	  // DISC
@@ -1011,19 +1022,58 @@ turntablePlayerEngine.prototype = {
 		);
 		discCtx.fill();
 
+		// axis
+    discCtx.fillStyle = theme.disc.axis.fill;
+		discCtx.beginPath();
+		discCtx.arc(
+			theme.disc.pos.x, 
+			theme.disc.pos.y, 
+			theme.disc.axis.r, 
+			0, 
+			2 * Math.PI, 
+			false
+		);
+		discCtx.fill();
+
 		turntable.appendChild(disc);
+		this._disc = disc;
 
 		// TITLE
-		this.toggleClass(discTitle, 'discTitle', 'add');
-		discTitle.style.left = theme.disc.cover.pos.x + 'px';
-		discTitle.style.top = theme.disc.cover.pos.y + 'px';
-		// discTitle.style.width = theme.disc.cover.dim.w + 'px'	;
-		// discTitle.style.height = theme.disc.cover.dim.h + 'px';
-		discTitle.innerHTML = this.getTrackTitleLineBreak();
 		turntable.appendChild(discTitle);
-		
-		this._disc = disc;
 		this._discTitle = discTitle;
+		this.toggleClass(discTitle, 'discTitle', 'add');
+		discTitle.width = theme.disc.pos.x * 2;
+		discTitle.height = theme.disc.pos.x * 2;
+		
+	},
+
+	/**
+	 * Draw the title of the current track on the disc
+	 */
+	drawTitleAlongDisc : function () {
+		var 
+			theme = this.options.themes[this.options.theme],
+			discTitleCtx = this._discTitle.getContext('2d'),
+    	text = this.getTrackTitleDashed(),
+    	angle = Math.PI * 2,
+    	radius = 35
+		;
+		discTitleCtx.font = "bold 8px sans-serif";
+		discTitleCtx.fillStyle = "#eee";
+    discTitleCtx.clearRect(0, 0, this._discTitle.width, this._discTitle.height);
+    discTitleCtx.save();
+    discTitleCtx.translate(theme.disc.pos.x, theme.disc.pos.y);
+    discTitleCtx.rotate(-1 * angle / 2);
+    discTitleCtx.rotate(-1 * (angle / text.length) / 2);
+    for (var n = 0; n < text.length; n++) {
+        discTitleCtx.rotate(angle / text.length);
+        discTitleCtx.save();
+        discTitleCtx.translate(0, -1 * radius);
+        var char = text[n];
+        discTitleCtx.fillText(char, 0, 0);
+        discTitleCtx.restore();
+    }
+    discTitleCtx.restore();
 	},
 
 	/**
@@ -1245,7 +1295,7 @@ turntablePlayerEngine.prototype = {
 	updateDiscInfos : function () {
 		if (this._discTitle) {
 			if (this.options.useCssAnimations)
-				this._discTitle.innerHTML = this.getTrackTitleLineBreak();
+				this.drawTitleAlongDisc();
 			else
 				this._discTitle.attr('text', this.getTrackTitleLineBreak());
 		}

@@ -91,15 +91,6 @@
 	position: absolute;
 	top: 0;
 }
-#player.default .discTitle {
-	font: 10px Impact;
-	height: 40px;
-	padding: 25px 0;
-	text-align: center;
-	text-transform: capitalize;
-	white-space: pre;
-	width: 90px;
-}
 
 /** REMOTE PANEL **/
 #player.default .remote {
@@ -260,7 +251,6 @@
 	-ms-transform: rotate(0deg);
 	-o-transform: rotate(0deg);
 	transform: rotate(0deg);
-	z-index: 1;
 }
 #player.default .cover .legend {
 	background: none;
