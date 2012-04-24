@@ -1,0 +1,32 @@
+body {
+	background-color: #eee;
+	color: #333;
+	text-align: center;
+}
+
+#demo-remote {
+	background-color: #ddd;
+	border-right: 1px solid #999;
+	bottom: 0;
+	font-size: 11px;
+	left: 0;
+	overflow-y: auto;
+	padding: 10px;
+	position: absolute;
+	text-align: right;
+	top: 0;
+	width: 179px;
+}
+#demo-remote input[type=checkbox] {
+	vertical-align: middle;
+}
+
+#demo-player {
+	left: 200px;
+	min-width: 800px;
+	position: absolute;
+	right: 0;
+}	
+#demo-player .mentions {
+	font-size: 11px;
+}

@@ -12,6 +12,12 @@ turntablePlayerEngine.prototype = {
 	 * @type {Object}
 	 */
 	options: {
+		enable: true, // Load on init
+		mode: 'automatic', // The turntable type, choose between : automatic, manual and semi-automatic
+		
+		debugMode : true, // Show log infos
+		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
+
 		paths: { // The path to needed folders
 			audio: 'audio/',
 			music: 'music/',
@@ -19,8 +25,15 @@ turntablePlayerEngine.prototype = {
 			themes: ''
 		},
 
-		animateDelay : 2000, // Delay for the animations of the arm and the disc
-		autoPlay : false, // Automatic turntable
+		ids: { // Dom ID to use to build the player, if not found, the element will be created
+			player: 'player',
+			remote: 'remote',
+			infos: 'infos',
+			cover: 'cover'
+		},
+
+		rpm: 45, // Round per minute
+		animateDelay: 2000, // Delay for the animations of the arm and the disc
 		autoStop: 60000, // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
 		endTransitionDuration: 0, // Duration in ms of the repetition of the end transition in manual mode
 		buttonLabels: { // Customize the labels of the buttons
@@ -33,25 +46,24 @@ turntablePlayerEngine.prototype = {
 			pause: 'cubic-bezier(.81, .79, .57, 1.01)',
 			stop: 'cubic-bezier(.81, .79, .57, 1.01)'
 		},
-		enable: true, // Load on init
-		debugMode : false, // Show log infos
 		forceDateInUri : true, // Force the request to retrieve an updated playlist
-		playerId: 'player', // Dom ID to use to build the player, if not found, the element will be created
-		remoteId: 'remote', // Dom ID to use to build the remote, if not found, the element will be created
 		playlistLocation: 'playlist.json', // Uri of the playlist in json format
 		infos: ["duration", "timer"], // Choices : duration, current, timer, position
-		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
-		theme: 'wood', // The name of the theme
-		useCover: true, // Display the cover panel
-		useInfos: false, // Display the informations panel
-		usePlaylist: false, // Display the playlist panel
+		panels: { // The panels to display
+			'cover': true, 
+			'infos': false, 
+			'playlist': false
+		},
+
 		useTransitions: true, // Use the audio transitions
 		useCssAnimations: true, // Use CSS animations (beta)
 		useShadow: true, // Use shadow around the player
 
+		theme: 'wood', // The name of the chosen theme
 		themes : { // The list of the available themes with their settings
 			wood: {
 				cssClass: 'default wood',
+				dim: { w: 454, h: 255 },
 				arm: {
 					src: 'default/arm-200-314.png',
 					turnable: true,
@@ -133,6 +145,7 @@ turntablePlayerEngine.prototype = {
 			},
 			alu: {
 				cssClass: 'default alu',
+				dim: { w: 454, h: 255 },
 				arm: {
 					src: 'default/arm-200-314.png',
 					turnable: true,
@@ -207,12 +220,14 @@ turntablePlayerEngine.prototype = {
 		},
 		transitions: {
 			start: {
+				loop: false,
 				src: {
 					mp3: 'start.mp3',
 					ogg: 'start.ogg'
 				}
 			},
 			stop: {
+				loop: false,
 				src: {
 					mp3: 'stop2.mp3',
 					ogg: 'stop2.ogg'
@@ -242,7 +257,6 @@ turntablePlayerEngine.prototype = {
 	_nextButton: null,
 	_player: null,
 	_playlist: null,
-	_transitionID: null,
 	_wrapper: null,
 
 	_cssAnimation: {},
@@ -259,12 +273,12 @@ turntablePlayerEngine.prototype = {
 	_infosInit: false,
 	_inRotation: false,
 	_inTransition: false,
+	_needRestart: false,
 	_playerPaused: true,
 
 	_armRotation: 0,
 	_discRotation: 0,
 	_playlistIndex: 0,
-	_rpm: 45,
 
 	/**
 	 * Init the turntable
@@ -298,8 +312,15 @@ turntablePlayerEngine.prototype = {
 	 */
 	setOptions : function (options) {
 		if (options != {}) {
-			for ( var i in options )
-				this.options[i] = options[i];
+			for ( var i in options ) {
+				if (typeof options[i] == 'object' && options[i].length == undefined)
+					for ( var j in options[i] )
+						this.options[i][j] = options[i][j];
+				else
+					this.options[i] = options[i];
+			}
+
+			this.updateInterface();
 		}
 	},
 
@@ -481,9 +502,9 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Number} i The index of the track in the playlist
 	 * @see formatTrackTitle()
 	 */
-	getTrackTitle : function (i) {
+	getTrackTitle : function (index) {
 		var
-			i = i || this._playlistIndex,
+			i = typeof index == 'number' ? index : this._playlistIndex,
 			track = this._tracks[i]
 		;
 
@@ -615,7 +636,7 @@ turntablePlayerEngine.prototype = {
 	 * @return {Boolean} The status of the check
 	 */
 	check : function () {
-		this.getWrapper();
+		this._wrapper;
 		if (!this._tracks.length && this.options.enable) {
 			this.options.enable = false;
 			this.getPlaylist();
@@ -625,13 +646,45 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Get the turntable wrapper
+	 * Update the interface with the selected panels
+	 * @return {[type]} [description]
+	 */
+	updateInterface: function () {
+		if (!this._mainWrapper)
+			this.loadWrapper();
+		var wrapper = this._mainWrapper;
+
+		this.toggleClass(wrapper, 'with-infos', 
+			this.options.panels.infos ? 'add' : 'remove'
+		);
+		if (this.options.panels.infos)
+			this.initInfos();
+
+		this.toggleClass(wrapper, 'with-playlist', 
+			this.options.panels.playlist ? 'add' : 'remove'
+		);
+		if (this.options.panels.playlist)
+			this.initPlaylist();
+
+		this.toggleClass(wrapper, 'with-cover', 
+			this.options.panels.cover ? 'add' : 'remove'
+		);
+		if (this.options.panels.cover && this._tracks.length)
+			this.initCover();
+
+		this.toggleClass(wrapper, 'with-shadow',
+			this.options.useShadow ? 'add' : 'remove'
+		);
+	},
+
+	/**
+	 * Load the turntable wrapper
 	 * @return {Object} The DOM node element
 	 */
-	getWrapper : function () {
+	loadWrapper : function () {
 		if (!this._wrapper) {
 			var 
-				id = this.options.playerId,
+				id = this.options.ids.player,
 				wrapper = document.getElementById(id),
 				bg = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 			;
@@ -644,12 +697,6 @@ turntablePlayerEngine.prototype = {
 			wrapper.appendChild(bg);
 
 			this.toggleClass(wrapper, this.options.themes[this.options.theme].cssClass, 'add');
-			if (this.options.useInfos || this.options.usePlaylist)
-				this.toggleClass(wrapper, 'with-infos', 'add');
-			if (this.options.useCover)
-				this.toggleClass(wrapper, 'with-cover', 'add');
-			if (this.options.useShadow)
-				this.toggleClass(wrapper, 'with-shadow', 'add');
 
 			this._wrapper = bg;
 			this._mainWrapper = wrapper;
@@ -665,13 +712,13 @@ turntablePlayerEngine.prototype = {
 	getRemote : function () {
 		if (!this._remote) {
 			var 
-				id = this.options.remoteId,
+				id = this.options.ids.remote,
 				remote = document.getElementById(id)
 			;
 			if (!remote) {
 				remote = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 				remote.id = id;
-				this.getWrapper().appendChild(remote);
+				this._wrapper.appendChild(remote);
 			}
 			this._remote = remote;
 			this.toggleClass(this._remote, 'remote', 'add');
@@ -740,9 +787,9 @@ turntablePlayerEngine.prototype = {
 	 * Init the track informations
 	 */
 	initInfos : function () {
-		if (this.options.useInfos && this.options.infos.length && !this._infosInit) {
+		if (this.options.panels.infos && this.options.infos.length) {
 			var 
-				infos = document.createElementNS('http://www.w3.org/1999/xhtml', 'div'),
+				infos,
 				a = {
 					duration: 'Duration:', 
 					current: 'Past time:', 
@@ -750,6 +797,16 @@ turntablePlayerEngine.prototype = {
 					position: 'Position:'
 				}
 			;
+
+			infos = document.getElementById(this.options.ids.infos);
+			if (!infos) {
+				infos = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+				infos.id = this.options.ids.infos;
+				this.toggleClass(infos, 'infos', 'add');
+				this._wrapper.appendChild(infos);
+			}
+
+			infos.innerHTML = '';
 
 			for (var i in a) {
 				if (this.options.infos.indexOf(i) != -1) {
@@ -765,9 +822,9 @@ turntablePlayerEngine.prototype = {
 				}
 			}
 
-			this.toggleClass(infos, 'infos', 'add');
-			this._wrapper.appendChild(infos);
 			this._infosInit = true;
+			this.updateTrackInfos();
+			this.updateInfos();
 		}
 	},
 
@@ -858,34 +915,40 @@ turntablePlayerEngine.prototype = {
 	 * Init the playlist
 	 */
 	initPlaylist : function () {
-		if (this.options.usePlaylist && !this._playlist) {
+		if (this.options.panels.playlist) {
 			var
-				self = this,
-				playlist = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
+				self = this
 			;
-
+			if (!this._playlist) {
+				var playlist = document.getElementById(this.options.ids.playlist);
+				if (!playlist) {
+					playlist = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+					this.toggleClass(playlist, 'playlist', 'add');					
+				}
+				this._playlist = playlist;
+				this._wrapper.appendChild(this._playlist);
+			}
 			this.resetRemote();
-			playlist.setAttribute('class', 'playlist');
 
 			for (var i = 0; i < this._tracks.length; i++) {
-				var
-					button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
-				;
-				this.toggleClass(button, 'playlistButton', 'add');
-				if (i == this._playlistIndex && this._powerON)
-					this.toggleClass(button, 'active', 'add');
-				button.innerHTML = this.getTrackTitle(i);
-				button.data = i;
-				playlist.appendChild(button);
-				button.addEventListener('mouseup', function (event) {
-					self.playlistButtonClicked(event);
-				}, false);
+				if (!this._playlistButtons[i]) {
+					var
+						button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
+					;
+					this.toggleClass(button, 'playlistButton', 'add');
+					if (i == this._playlistIndex && this._powerON)
+						this.toggleClass(button, 'active', 'add');
+					button.innerHTML = this.getTrackTitle(i);
+					button.data = i;
+					this._playlist.appendChild(button);
+					button.addEventListener('mouseup', function (event) {
+						self.playlistButtonClicked(event);
+					}, false);
 
-				this._playlistButtons[i] = button;
+					this._playlistButtons[i] = button;
+				}
 			}
 
-			this._playlist = playlist;
-			this._wrapper.appendChild(playlist);
 			console.info('Playlist ok.');
 		}
 	},
@@ -894,22 +957,27 @@ turntablePlayerEngine.prototype = {
 	 * Init the cover panel
 	 */
 	initCover : function () {
-		if (this.options.useCover && !this._cover) {
-			var 
-				self = this,
-				cover = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
-			;
-			this.toggleClass(cover, 'cover', 'add');
-			this._mainWrapper.appendChild(cover);
+		if (this.options.panels.cover) {
 
-			this._cover = cover;
+		 if (!this._cover) {
+				var 
+					self = this,
+					cover = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
+				;
+				this.toggleClass(cover, 'cover', 'add');
+				this._mainWrapper.appendChild(cover);
+
+				this._cover = cover;
+
+				this._cover.addEventListener('mouseup', function (event) {
+					var r = /active/i;
+					self.toggleClass(self._cover, 'active', r.test(self._cover.className) ? 'remove' : 'add');
+				}, false);
+			}
+			else
+				this.toggleClass(this._cover, 'active', 'remove');
 
 			this.updateCoverInfos();
-
-			cover.addEventListener('mouseup', function (event) {
-				var r = /active/i;
-				self.toggleClass(self._cover, 'active', r.test(self._cover.className) ? 'remove' : 'add');
-			}, false);
 		}
 	},
 
@@ -937,7 +1005,7 @@ turntablePlayerEngine.prototype = {
 	initTurntableDisc : function () {
 		var
 			self = this,
-			turntable = this.getWrapper(),
+			turntable = this._wrapper,
 			theme = this.options.themes[this.options.theme],
 			disc = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas'),
 			discTitle = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas')
@@ -1082,12 +1150,11 @@ turntablePlayerEngine.prototype = {
 	initTurntableDiscUsingSVG : function () {
 		var
 			self = this,
-			turntable = this.getWrapper(),
 			theme = this.options.themes[this.options.theme],
 			paper = Raphael(
-				turntable,
-				turntable.offsetWidth, 
-				turntable.offsetHeight),
+				this._wrapper,
+				theme.dim.w, 
+				theme.dim.h),
 			defs = document.getElementsByTagName('defs')[0],
 			discShadow = paper
 				.circle(
@@ -1177,12 +1244,11 @@ turntablePlayerEngine.prototype = {
 	initTurntableArm : function () {
 		var
 			self = this,
-			turntable = this.getWrapper(),
 			theme = this.options.themes[this.options.theme],
 			paper = this._paper || Raphael(
-				turntable,
-				turntable.offsetWidth, 
-				turntable.offsetHeight),
+				this._wrapper,
+				theme.dim.w, 
+				theme.dim.h),
 			arm = theme.arm.src 
 				? paper.image(
 					this.options.paths.themes + theme.arm.src,
@@ -1200,7 +1266,7 @@ turntablePlayerEngine.prototype = {
 						'stroke': theme.arm.stroke
 					}),
 			ftCallback = function(ft, events) {
-				console.info('FT events : ' + events + ' & arm rotation : ' + ft.attrs.rotate + 'deg.');
+				// console.info('FT events : ', events);
 				self._armRotation = ft.attrs.rotate;
 				if (events.indexOf('rotate start') != -1) {
 					self.pause();
@@ -1216,16 +1282,39 @@ turntablePlayerEngine.prototype = {
 					&& ft.attrs.rotate <= self.options.themes[self.options.theme].arm.area.end
 				) {
 					self.updatePlayerPosition();
-					self.playDiscArea({ force: true });
+					self.playDiscArea(true);
 				}
-				else if (events.indexOf('rotate end') != -1) {
+				else if (events.indexOf('rotate end') != -1 && ft.attrs.rotate != 0) {
 					self.placeTheArmOffTheDisc();
+				}
+				else if (events.indexOf('animate end') != -1 && ft.attrs.rotate == 0) {
+					ft.setOpts({ animate: false }, self._armFtCallback);
+					self._armInPlace = false;
+					self.end(true);
+
+					if (self._needRestart) {
+						self.updateTrackInfos();
+						self.updateInfos();
+						self.updateDiscInfos();
+						self.powerON();
+						self._needRestart = false;
+					}
+				}
+				else if (events.indexOf('animate end') != -1) {
+					ft.setOpts({ animate: false }, self._armFtCallback);
+					self._armInPlace = true;
+					if (self.getArmArea() != 'undefined') {
+						self.play();
+					}
+					else
+						self.enableRemote('start');
 				}
 			},
 			ft = paper.freeTransform(
 				arm,
 				{
 					attrs: {
+						cursor: 'pointer',
 						fill: theme.arm.needle.fill,
 						stroke: theme.arm.needle.stroke,
 						opacity: 0
@@ -1283,8 +1372,10 @@ turntablePlayerEngine.prototype = {
 	 * Reset the remote control by removing the buttons, mostly called on re-init
 	 */
 	resetRemote : function () {
-		for (var button in this._playlistButtons)
+		for (var button in this._playlistButtons) {
+			this._playlist.removeChild(this._playlistButtons[button]);
 			delete this._playlistButtons[button];
+		}
 
 		console.info('Remote reset.');
 	},
@@ -1307,6 +1398,8 @@ turntablePlayerEngine.prototype = {
 	 * Update the cover with title, artist and tracks names
 	 */
 	updateCoverInfos : function () {
+		this._cover.innerHTML = '';
+
 		if (this._playlistInfos.artist) {
 			this.loadCoverLegend({
 				label: this._playlistInfos.artist,
@@ -1381,7 +1474,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc informations such as the duration of the track
 	 */
 	updateTrackInfos : function () {
-		if (this.options.useInfos && this.options.infos.indexOf('duration') != -1) {
+		if (this._player && this.options.panels.infos && this.options.infos.indexOf('duration') != -1) {
 			this._infos['duration'].innerHTML = this.formatTime({
 				mins: Math.floor(this._player.duration / 60, 10),
 				secs: Math.floor(this._player.duration % 60 , 10)
@@ -1395,7 +1488,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc informations such as the position of the track
 	 */
 	updateInfos : function () {
-		if (this.options.useInfos) {
+		if (this._player && this.options.panels.infos) {
 			var
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 				pos = (this._player.currentTime / this._player.duration) * 100,
@@ -1507,75 +1600,38 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Place the arm on the disc in order to be ready to play
-	 * @param  {Object} options Settings
 	 */
-	placeTheArmOnTheDisc : function (options) {
-		var 
-			self = this,
-			o = options || {}
-		;
-
+	placeTheArmOnTheDisc : function () {
 		this.disableRemote('start');
-		o.enableRemote = true;
 
 		if (this._armFt) {
 			this._armFt.setOpts({ animate: true }, this._armFtCallback);
 			this._armFt.attrs.rotate = this.options.themes[this.options.theme].arm.area.start;
-			this._armFt.apply(function (ft) {
-				console.info('Arm rotation : ' + ft.attrs.rotate + 'deg.');
-				ft.setOpts({ animate: false }, self._armFtCallback);
-				self._armInPlace = true;
-				if (o.force) {
-					delete o.force;
-					self.play(o);
-				}
-				else
-					this.enableRemote('start');
-			});
+			this._armFt.apply();
 		}
 		else {
 			this._armInPlace = true;
-			this.play(o);
+			this.play();
+			this.enableRemote('start');
 		}
 	},
 
 	/**
 	 * Place the arm off the disc in order to be powered off
-	 * @param  {Object} options Settings
 	 */
-	placeTheArmOffTheDisc : function (options) {
-		var 
-			self = this,
-			o = options || {}
-		;
+	placeTheArmOffTheDisc : function () {
+		if (this._armRotation != 0) {
+			this.disableRemote('stop');
 
-		this.disableRemote('stop');
-		o.enableRemote = true;
-
-		if (this._armFt) {
-			this._armFt.setOpts({ animate: true }, this._armFtCallback);
-			this._armFt.attrs.rotate = 0;
-			this._armFt.apply(function (ft) {
-				console.info('Arm rotation : ' + ft.attrs.rotate + 'deg.');
-				ft.setOpts({ animate: false }, self._armFtCallback);
-				self._armInPlace = false;
-				self._armRotation = ft.attrs.rotate;
-				if (o.force) {
-					delete o.force;
-					self.end(o);
-				}
-				else
-					self.enableRemote('stop');
-			});
-		}
-		else {
-			this._armInPlace = true;
-			if (o.force) {
-				delete o.force;
-				self.end(o);
+			if (this._armFt) {
+				this._armFt.setOpts({ animate: true }, this._armFtCallback);
+				this._armFt.attrs.rotate = 0;
+				this._armFt.apply();
 			}
-			else
-				self.enableRemote('stop');
+			else {
+				this._armInPlace = false;
+				this.end(true);
+			}
 		}
 	},
 
@@ -1587,7 +1643,7 @@ turntablePlayerEngine.prototype = {
 
 		this.switchOnTheButton();
 
-		if (this.options.autoPlay)
+		if (this.options.mode == 'automatic')
 			this.startAuto();
 		else
 			this.startManual();
@@ -1601,7 +1657,7 @@ turntablePlayerEngine.prototype = {
 
 		this.switchOffTheButton();
 
-		if (this.options.autoPlay)
+		if (this.options.mode == 'automatic')
 			this.stopAuto();
 		else
 			this.stopManual();
@@ -1613,7 +1669,7 @@ turntablePlayerEngine.prototype = {
 	switchOnTheButton : function () {
 		this._powerON = true;
 
-		if (this.options.usePlaylist)
+		if (this.options.panels.playlist)
 			this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'add');
 
 		this.toggleClass(document.getElementById('power'), 'active', 'add');
@@ -1626,7 +1682,7 @@ turntablePlayerEngine.prototype = {
 	switchOffTheButton : function () {
 		this._powerON = false;
 
-		if (this.options.usePlaylist)
+		if (this.options.panels.playlist)
 			this.toggleClass(this._playlistButtons[this._playlistIndex], 'active', 'remove');
 
 		this.toggleClass(document.getElementById('power'), 'active', 'remove');
@@ -1639,12 +1695,13 @@ turntablePlayerEngine.prototype = {
 	startManual : function () {
 		console.info('START MANUAL');
 
+		this.playDiscArea(true);
+
 		this.startDiscRotation({ 
 			easing: 'linear',
 			transition: 'manualstart'
 		});
 
-		this.playDiscArea({ force: true });
 	},
 
 	/**
@@ -1671,17 +1728,13 @@ turntablePlayerEngine.prototype = {
 	startAuto : function () {
 		console.info('START AUTO');
 
-		var self = this;
+		this.placeTheArmOnTheDisc();
 
 		this.startDiscRotation({ 
 			easing: this.options.easing.start,
 			transition: 'start'
 		});
 
-		this.placeTheArmOnTheDisc({
-			force: true,
-			transition: 'start'
-		});
 	},
 
 	/**
@@ -1690,69 +1743,69 @@ turntablePlayerEngine.prototype = {
 	stopAuto : function () {
 		console.info('STOP AUTO');
 
-		var self = this;
-
-		this.end({
-			force: this.getArmArea() != 'end' ? true : false,
-			transition: 'stop'
-		});
+		this.end(true);
 	},
 
 	/**
 	 * Play the audio track or transition according to the arm position
-	 * @param  {Object} options Settings
+	 * @param  {Boolean} avoidTransition Avoid use of transition or not
 	 */
-	playDiscArea : function (options) {
+	playDiscArea : function (avoidTransition) {
 		console.info("DRAGGED'N'DROPPED");
 
 		var area = this.getArmArea();
 
-		if (this._powerON || (this.options.autoPlay && !this._powerON)) {
+		if (this._powerON || (this.options.mode == 'automatic' && !this._powerON)) {
 			this.switchOnTheButton();
 
 			if (area == 'track') {
-				this.play(options);
+				this.play(avoidTransition);
 			}
 			else if (area == 'start') {
-				delete options.force;
-				this.play(options);
+				this.play(); //avoidTransition);
 			}
 			else if (area == 'end') {
-				delete options.force;
-				this.end(options);
+				this.end(); //avoidTransition);
 			}
 		}
 	},
 
 	/**
 	 * Play the audio track or the start transition
-	 * @param  {Object} options Settings
+	 * @param  {Boolean} avoidTransition Avoid use of transitions or not
 	 */
-	play : function (options) {
+	play : function (avoidTransition) {
 		console.info('PLAY');
 
-		var o = options || {};
+		if (!avoidTransition)
+			avoidTransition = false;
 
-		o.transition = 'start';
 		this.pauseTransitions();
 		this.updateTrackInfos();
 		this.updateInfos();
 
-		if (o.force || !this.options.useTransitions) {
-			if (this._powerON || (this.options.autoPlay && !this._powerON)) {
-				this._player.play();
-				this._playerPaused = false;
-				this._armInPlace = true;
-
-				this.switchOnTheButton();
-				this.startDiscRotation({ transition: 'track' });
-
-				if (o.enableRemote && !this.options.useTransitions)
-					this.enableRemote('start');
-			}
+		if (avoidTransition || !this.options.useTransitions) {
+			this.playTrack();
 		}
 		else {
-			this.playTransition(o);
+			this.playTransition({ transition: 'start'});
+		}
+	},
+
+	/**
+	 * Play the track
+	 */
+	playTrack : function () {
+		if (this._powerON || (this.options.mode == 'automatic' && !this._powerON)) {
+			this._player.play();
+			this._playerPaused = false;
+			this._armInPlace = true;
+
+			this.switchOnTheButton();
+			this.startDiscRotation({ transition: 'track' });
+
+			if (!this.options.useTransitions)
+				this.enableRemote('start');
 		}
 	},
 
@@ -1766,19 +1819,20 @@ turntablePlayerEngine.prototype = {
 			? this._playlistIndex + 1
 			: 0;
 
-
 		this.loadTrack(next);
 	},
 
 	/**
 	 * Stop the audio track and/or play the stop transition
-	 * @param  {Object} options Settings
+	 * @param  {Boolean} avoidTransition Avoid use of transition or not
 	 */
-	end : function (options) {
+	end : function (avoidTransition) {
 		console.info('END');
 
-		var o = options || {};
+		if (!avoidTransition)
+			avoidTransition = false
 
+		var o = {};
 		o.transition = 'stop';
 		this.pauseTransitions();
 
@@ -1787,40 +1841,25 @@ turntablePlayerEngine.prototype = {
 			this._player.currentTime = 0;
 		}
 
-		if (this._transitionID != undefined) {
-			window.clearTimeout(this._transitionID);
-			this._transitionID = null;
-		}
+		if (this._armRotation != 0)
+			this.startDiscRotation({
+				easing: this.options.easing.stop,
+				withTransition: avoidTransition ? false : this.options.useTransitions,
+				transition: avoidTransition || this.options.mode == 'automatic' ? 'stop' : 'manualstop'
+			});
 
-		this.startDiscRotation({
-			easing: this.options.easing.stop,
-			withTransition: o.force ? !o.force : this.options.useTransitions,
-			transition: o.force || this.options.autoPlay ? 'stop' : 'manualstop'
-		});
+		if (avoidTransition || !this.options.useTransitions) {
+			if (this.options.mode == 'automatic' && this._armRotation != 0)
+				this.placeTheArmOffTheDisc();
 
-		if (o.force || !this.options.useTransitions) {
-			if (this.options.autoPlay)
-				this.placeTheArmOffTheDisc({
-					transition: 'stop'
-				});
-
-			if (o.enableRemote && !this.options.useTransitions)
+			if (!this.options.useTransitions)
 				this.enableRemote('stop');
 
-			if (o.withStart && this.options.autoPlay) {
-				var self = this;
-				this._transitionID = window.setTimeout(function () {
-					self.updateTrackInfos();
-					self.updateInfos();
-					self.updateDiscInfos();
-					self.powerON();
-				}, parseInt(this._transitionTimer));
-			}
-			else
+			if (!this._needRestart)
 				this.switchOffTheButton();
 		}
 		else {
-			if (!this.options.autoPlay && this.options.endTransitionDuration)
+			if (!this.options.mode == 'automatic' && this.options.endTransitionDuration)
 				o.duration = this.options.endTransitionDuration;
 			this.playTransition(o);
 		}
@@ -1844,10 +1883,8 @@ turntablePlayerEngine.prototype = {
 	restart : function () {
 		console.info('RESTART');
 
-		this.end({ 
-			force: true,
-			withStart: true 
-		});
+		this._needRestart = true;
+		this.end(true);
 	},
 
 	/**
@@ -1888,10 +1925,10 @@ turntablePlayerEngine.prototype = {
 	 * Load the track according to his index in the playlist
 	 * @param  {Number} i The index of the track in the playlist
 	 */
-	loadTrack : function (i) {
+	loadTrack : function (index) {
 		if (this._tracks.length) {
 			var
-				i = i || 0,
+				i = typeof index == 'number' ? index : 0,
 				track = this._tracks[i]
 			;
 
@@ -1977,7 +2014,6 @@ turntablePlayerEngine.prototype = {
 			transition = 'drag';
 
 		this.options.transitions[transition].duration = element.duration * 1000;
-		console.info('Transition "' + transition + '" event: loadedMetaData.');
 	},
 
 	/**
@@ -1993,33 +2029,25 @@ turntablePlayerEngine.prototype = {
 				? o.useTransitions 
 				: this.options.useTransitions
 		;
-		o.force = true;
 
 		this.pauseTransitions();
 
-		if (o.enableRemote)
-			this.enableRemote(transition);
+		this.enableRemote(transition);
 
 		if (useTransitions == true && this._playerTransitions[transition]) {
 			console.info('Playing transition "' + transition + '".');
 
-			var duration = o.duration || this.options.transitions[transition].duration;
+			var duration = o.duration != undefined ? o.duration : this.options.transitions[transition].duration;
 
 			this._inTransition = true;
 			this._playerTransitions[transition].currentTime = 0;
 			this._playerTransitions[transition].play();
-			this._transitionID = window.setTimeout(function () {
-				if (transition == 'start')
-					self.play(o);
-				else if (transition == 'stop')
-					self.end(o);
-			}, parseInt(duration));
 		}
 		else if (this._playerTransitions[transition]) {
 			if (transition == 'start')
-				self.play(o);
+				self.play(true);
 			else if (transition == 'stop')
-				self.end(o);
+				self.end(true);
 			else if (this._powerON) {
 				var pos = this.getArmArea();
 				if (pos != 'stop' && pos != undefined){
@@ -2067,7 +2095,7 @@ turntablePlayerEngine.prototype = {
 				domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),  
 				keyframeprefix = '',  
 				pfx  = '',
-				turntable = this.getWrapper()
+				turntable = this._wrapper
 			;  
 
 			this._cssAnimation.animationstring = animationstring;
@@ -2107,8 +2135,6 @@ turntablePlayerEngine.prototype = {
 	 * Start the rotation of the disc according to the settings
 	 */
 	startDiscRotation : function (options) {
-		this.stopDiscRotation();
-
 		var
 			self = this,
 			o = options || {},
@@ -2125,14 +2151,14 @@ turntablePlayerEngine.prototype = {
 		else if (name == 'manualstart' || name == 'manualstop')
 			time = parseInt(this.options.autoStop) / 1000;
 		else if (o.withTransition)
-			time = parseInt(this.options.animateDelay + this.options.transitions[o.transition].duration) / 1000
+			time = parseInt(this.options.animateDelay + this.options.transitions[name].duration) / 1000
 		else
 			time = this.options.animateDelay / 1000;
 
-		this._transitionTimer = time * 1000;
+		this.stopDiscRotation();
 
 		var
-			deg = parseInt(this._rpm * 360 * time / 60) + this._discRotation,
+			deg = parseInt(this.options.rpm * 360 * time / 60) + this._discRotation,
 			s = parseInt(time),
 			ms = s * 1000
 		;
@@ -2238,13 +2264,13 @@ turntablePlayerEngine.prototype = {
 		if (event.target.id == 'turntable-player') {
 			this.enableRemote('playerLoaded');
 
-			if (!this.options.autoPlay) {
+			if (!this.options.mode == 'automatic') {
 				this.updateTrackInfos();
 				this.updateInfos();
 				this.updatePlayerPosition();
 			}
 
-			if (this.options.autoPlay && (!this._playerPaused || this._inTransition))
+			if (this.options.mode == 'automatic' && (!this._playerPaused || this._inTransition))
 				this.restart();
 		}
 	},
@@ -2256,7 +2282,7 @@ turntablePlayerEngine.prototype = {
 		console.info('Audio player "' + event.target.id + '" event: loadedMetaData.');
 
 		if (event.target.id == 'turntable-player') {
-			if (!this.options.autoPlay){
+			if (!this.options.mode == 'automatic'){
 				this.updateTrackInfos();
 				this.updateInfos();
 			}
@@ -2287,8 +2313,13 @@ turntablePlayerEngine.prototype = {
 				r = /turntable-player-transition/i,
 				s = event.target.id
 			;
-			if (r.test(s))
+			if (r.test(s)) {
 				this._inTransition = false;
+				if (event.target.id == 'turntable-player-transition-start')
+					this.play(true);
+				else if (event.target.id == 'turntable-player-transition-stop')
+					this.end(true);
+			}
 		}
 	},
 
@@ -2342,7 +2373,7 @@ turntablePlayerEngine.prototype = {
 	 */
 	playlistButtonClicked : function (event) {
 		if (event.target.data != undefined && this._powerON && (
-			this.options.autoPlay
+			this.options.mode == 'automatic'
 			|| (this._playerPaused && !this._inTransition)
 		))
 			this.loadTrack(event.target.data);

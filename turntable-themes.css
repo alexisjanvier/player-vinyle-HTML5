@@ -7,7 +7,7 @@
 	font-family: Impact;
 }
 #player svg {
-	z-index: 1;
+	z-index: 2;
 }
 
 /* THEMES */
@@ -15,7 +15,13 @@
 #player.default {
 	height: 255px;
 	margin: 5px auto;
+	position: relative;
 	width: 455px;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	-o-transition: all 1s;
+	transition: all 1s;
 }
 #player.default.with-cover {
 	width: 700px;
@@ -23,6 +29,7 @@
 #player.default.with-shadow {
 	width: 555px;
 }
+#player.default.with-playlist,
 #player.default.with-infos,
 #player.default.with-shadow {
 	height: 355px;
@@ -30,8 +37,9 @@
 #player.default.with-shadow.with-cover {
 	width: 780px;
 }
+#player.default.with-shadow.with-playlist,
 #player.default.with-shadow.with-infos {
-	height: 555px;
+	height: 455px;
 }
 #player.default .bg {
 	-webkit-border-radius: 5px;
@@ -45,7 +53,7 @@
 	top: 0;
 	position: absolute;
 	width: 450px;
-	z-index: 1;
+	z-index: 2;
 }
 #player.default.with-shadow .bg {
 	-webkit-box-shadow: 0 0 30px 10px #000;
@@ -98,7 +106,7 @@
 	position: absolute;
 	right: 10px;
 	top: 10px;
-	z-index: 1;
+	z-index: 2;
 }
 #player.default .remote .button {
 	border: 2px solid;
@@ -226,12 +234,14 @@
 /** COVER PANEL **/
 #player.default .cover {
 	background: url(default/paper-cover.png) no-repeat 0 0;
-	top: 55px;
 	cursor: pointer;
+	display: none;
 	height: 242px;
-	position: absolute;
 	left: 300px;
+	position: absolute;
+	top: 55px;
 	width: 250px;
+	z-index: 1;
 	-webkit-transition: all 1s;
 	-moz-transition: all 1s;
 	-ms-transition: all 1s;
@@ -242,7 +252,9 @@
 	-ms-transform: rotate(90deg);
 	-o-transform: rotate(90deg);
 	transform: rotate(90deg);
-	z-index: 0;
+}
+#player.default.with-cover .cover {
+	display: block;
 }
 #player.default .cover.active {
 	left: 525px;
@@ -306,9 +318,14 @@
 	border-radius: 3px;
 	bottom: 10px;
 	color: #444;
+	display: none;
 	padding: 10px;
 	position: absolute;
 	text-align: right;
+}
+#player.default.with-infos .infos,
+#player.default.with-playlist .playlist {
+	display: block;
 }
 
 /*** OTHER PANELS / INFOS ***/
