@@ -1,6 +1,7 @@
 body {
 	background-color: #eee;
 	color: #333;
+	font: 11px Arial, Helvetica, sans-serif;
 	text-align: center;
 }
 
@@ -8,7 +9,6 @@ body {
 	background-color: #ddd;
 	border-right: 1px solid #999;
 	bottom: 0;
-	font-size: 11px;
 	left: 0;
 	overflow-y: auto;
 	padding: 10px;
@@ -17,8 +17,17 @@ body {
 	top: 0;
 	width: 179px;
 }
+#demo-remote input[type=radio] {
+	vertical-align: text-bottom;
+}
 #demo-remote input[type=checkbox] {
 	vertical-align: middle;
+}
+#demo-remote label {
+	font-weight: bold;
+}
+#demo-remote span label {
+	font-weight: normal;
 }
 
 #demo-player {

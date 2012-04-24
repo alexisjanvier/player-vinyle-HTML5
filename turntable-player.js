@@ -13,9 +13,9 @@ turntablePlayerEngine.prototype = {
 	 */
 	options: {
 		enable: true, // Load on init
-		mode: 'automatic', // The turntable type, choose between : automatic, manual and semi-automatic
+		mode: 'manual', // The turntable type, choose between : manual, automatic and semi-automatic
 		
-		debugMode : true, // Show log infos
+		debug : false, // Show log infos
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 
 		paths: { // The path to needed folders
@@ -321,27 +321,27 @@ turntablePlayerEngine.prototype = {
 			}
 
 			this.updateInterface();
+			this.loadLogger();
 		}
 	},
 
 	/**
-	 * Disable/enable the console outputs according to the debugMode option
-	 * @param  {Mixed} s the debugMode value
+	 * Disable/enable the console outputs according to the debug option
 	 */
-	loadLogger : function (s) {
+	loadLogger : function () {
 		if (!window.console) window.console = {};
 		var
-			s = s || this.options.debugMode || false,
+			s = this.options.debug || false,
 			methods = this.options.logMethodNames || ["log", "debug", "warn", "info"]
 		;
 
 		if (!s || s == 'false' || s == 0)
-			this.options.debugMode = false;
+			this.options.debug = false;
 		else if (s || s == 'true' || s == 1)
-			this.options.debugMode = true;
+			this.options.debug = true;
 
 		for (var i = 0; i < methods.length; i++) {
-			if (!this.options.debugMode) {
+			if (!this.options.debug) {
 				if (this._logMethods[methods[i]] == undefined)
 					this._logMethods[methods[i]] = console[methods[i]];
 				console[methods[i]] = function () {};
@@ -737,7 +737,7 @@ turntablePlayerEngine.prototype = {
 				audio = document.createElementNS('http://www.w3.org/1999/xhtml', 'audio')
 			;
 
-			if (this.options.debugMode) {
+			if (this.options.debug) {
 				this._wrapper.appendChild(audio);
 				audio.controls = 'controls';
 			}

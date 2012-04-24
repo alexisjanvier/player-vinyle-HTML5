@@ -16,10 +16,19 @@
 			<h1>Vinyl player</h1>
 
 			<p>
+				<label for="mode-choice">Choose the mode you want</label>
+				<span>
+					<br />
+					<label for="mode-manual">manual</label>
+					<input type="radio" value="manual" id="mode-manual" name="mode-choice" /><br />
+					<label for="mode-automatic">automatic</label>
+					<input type="radio" value="automatic" id="mode-automatic" name="mode-choice" />
+				</span>
+			</p>
+			<p>
 				<label for="panel-cover">Display the cover</label>
 				<input type="checkbox" value="1" id="panel-cover" name="panel-cover" />
 			</p>
-
 
 			<p>
 				<label for="panel-playlist">Display the playlist panel</label>
@@ -36,17 +45,18 @@
 				<span>
 					<br />
 					<label for="panel-infos-choice-duration">duration</label>
-					<input type="checkbox" value="1" id="panel-infos-choice-duration" name="panel-infos-choice" />
-					<br />
+					<input type="checkbox" value="1" id="panel-infos-choice-duration" name="panel-infos-choice" /><br />
 					<label for="panel-infos-choice-current">current</label>
-					<input type="checkbox" value="1" id="panel-infos-choice-current" name="panel-infos-choice" />
-					<br />
+					<input type="checkbox" value="1" id="panel-infos-choice-current" name="panel-infos-choice" /><br />
 					<label for="panel-infos-choice-timer">timer</label>
-					<input type="checkbox" value="1" id="panel-infos-choice-timer" name="panel-infos-choice" />
-					<br />
+					<input type="checkbox" value="1" id="panel-infos-choice-timer" name="panel-infos-choice" /><br />
 					<label for="panel-infos-choice-position">position</label>
 					<input type="checkbox" value="1" id="panel-infos-choice-position" name="panel-infos-choice" />
 				</span>
+			</p>
+			<p>
+				<label for="debug">Debug mode (console)</label>
+				<input type="checkbox" value="1" id="debug" name="debug" />
 			</p>
 			
 		</div>
