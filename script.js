@@ -44,8 +44,8 @@ window.addEventListener('load', function () {
 		document.getElementById('debug').checked = false;
 }, false);
 
-// Load the remote-demo
 
+// Load the remote-demo
 // mode
 var elements = document.querySelectorAll('input[name~=mode-choice]'); 
 for (var d in elements) {

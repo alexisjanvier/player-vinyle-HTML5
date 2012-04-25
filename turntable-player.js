@@ -13,9 +13,9 @@ turntablePlayerEngine.prototype = {
 	 */
 	options: {
 		enable: true, // Load on init
-		mode: 'manual', // The turntable type, choose between : manual, automatic and semi-automatic
+		mode: 'automatic', // The turntable type, choose between : manual, automatic and semi-automatic
 		
-		debug : true, // Show log infos
+		debug : false, // Show log infos
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 
 		paths: { // The path to needed folders
@@ -1354,7 +1354,7 @@ turntablePlayerEngine.prototype = {
 						'stroke': theme.arm.stroke
 					}),
 			ftCallback = function(ft, events) {
-				// console.info('FT events : ', events);
+				console.info('FT events : ', events);
 				self._armRotation = ft.attrs.rotate;
 				if (events.indexOf('rotate start') != -1) {
 					self.pause();
@@ -1943,8 +1943,7 @@ turntablePlayerEngine.prototype = {
 			if (this.options.mode == 'automatic' && this._armRotation != 0)
 				this.placeTheArmOffTheDisc();
 
-			if (!this.options.useTransitions)
-				this.enableRemote('stop');
+			this.enableRemote('stop');
 
 			if (!this._needRestart)
 				this.switchOffTheButton();
