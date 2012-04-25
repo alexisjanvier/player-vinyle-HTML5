@@ -15,7 +15,7 @@ turntablePlayerEngine.prototype = {
 		enable: true, // Load on init
 		mode: 'manual', // The turntable type, choose between : manual, automatic and semi-automatic
 		
-		debug : false, // Show log infos
+		debug : true, // Show log infos
 		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
 
 		paths: { // The path to needed folders
@@ -274,6 +274,7 @@ turntablePlayerEngine.prototype = {
 	_inRotation: false,
 	_inTransition: false,
 	_needRestart: false,
+	_playerInit: false,
 	_playerPaused: true,
 
 	_armRotation: 0,
@@ -304,6 +305,7 @@ turntablePlayerEngine.prototype = {
 			this.initInfos();
 			this.initTurntable();
 			this.initCover();
+			this.browserCompat();
 		}
 	},
 
@@ -385,6 +387,91 @@ turntablePlayerEngine.prototype = {
 
 		return element;
 	},
+
+	/**
+	 * Fix browsers compatibilities
+	 */
+	browserCompat : function () {
+		if (this.isiOS()) {
+			this.fixiOSlabels();
+			this.disableTouchMove();
+		}
+	},
+
+  /**
+   * Check the compatible event name. Especially for touch events.
+   */
+  getEventCompatibilityName: function (eventName) {
+    if (this.isiOS() && eventName == 'mouseleave')
+      eventName = 'touchend';
+    else if (this.isiOS() && eventName == 'mousemove')
+      eventName = 'touchmove';
+
+    return eventName;
+  },
+
+	/**
+	 * Detect iOS
+	 * @return {Boolean} iOS detection
+	 */
+	isiOS : function () {
+		if (
+			(navigator.userAgent.indexOf('iPhone') != -1) 
+			|| (navigator.userAgent.indexOf('iPod') != -1) 
+			|| (navigator.userAgent.indexOf('iPad') != -1)
+		)
+			return true;
+		return false;
+	},
+
+	/**
+	 * Fix iOS labels which FOR attributes are not linked to the INPUT
+	 */
+	fixiOSlabels : function () {
+		function fix() {
+			var 
+				labels = document.getElementsByTagName('label'),
+				target_id,
+				el;
+			for (var i = 0; labels[i]; i++) {
+				if (labels[i].getAttribute('for')) {
+					labels[i].onclick = labelClick;
+				}
+			}
+		};
+
+		function labelClick() {
+			var el = document.getElementById(this.getAttribute('for'));
+			if (['radio', 'checkbox'].indexOf(el.getAttribute('type')) != -1) {
+				el.setAttribute('selected', !el.getAttribute('selected'));
+			} 
+			else {
+				el.focus();
+			}
+		};
+
+		return {
+			fix: fix()
+		}
+	},
+
+	/**
+   * Disable touch move event
+   */
+  disableTouchMove : function () {
+    document.ontouchmove = function (event) {
+      return event.preventDefault();
+    }
+  },
+
+  /**
+   * Enable touch move event
+   */
+  enableTouchMove : function () {
+    document.ontouchmove = function (event) {
+      return event;
+    }
+  },
 
 	/**
 	 * Create a XHR object
@@ -746,16 +833,16 @@ turntablePlayerEngine.prototype = {
 			this._player = audio;
 			this.loadTrack(this._playlistIndex);
 
-			audio.addEventListener('loadedmetadata', function (event) {
+			this._player.addEventListener('loadedmetadata', function (event) {
 				self.playerLoadedMetaData(event);
 			}, false);
-			audio.addEventListener('loadeddata', function (event) {
+			this._player.addEventListener('loadeddata', function (event) {
 				self.playerLoadedData(event);
 			}, false);
-			audio.addEventListener('timeupdate', function (event) {
+			this._player.addEventListener('timeupdate', function (event) {
 				self.playerTimeUpdated(event);
 			}, false);
-			audio.addEventListener('ended', function (event) {
+			this._player.addEventListener('ended', function (event) {
 				self.playerEnded(event);
 			}, false);
 		}
@@ -834,6 +921,7 @@ turntablePlayerEngine.prototype = {
 	initRemote : function () {
 		this.initPowerButton();
 		this.initNextButton();
+		this.browserCompat();
 	},
 
 	/**
@@ -867,13 +955,6 @@ turntablePlayerEngine.prototype = {
 			labelOFF.htmlFor = inputOFF.id;
 			labelOFF.innerHTML = this.options.buttonLabels.powerOFF;
 
-			inputON.addEventListener('click', function (event) {
-				self.powerButtonClicked(event);
-			}, false);
-			inputOFF.addEventListener('click', function (event) {
-				self.powerButtonClicked(event);
-			}, false);
-
 			button.appendChild(inputOFF);
 			button.appendChild(labelOFF);
 			button.appendChild(inputON);
@@ -884,6 +965,13 @@ turntablePlayerEngine.prototype = {
 			this._powerButtons.labelON = labelON;
 			this._powerButtons.inputOFF = inputOFF;
 			this._powerButtons.labelOFF = labelOFF;
+
+			inputON.addEventListener('click', function (event) {
+				self.powerButtonClicked(event);
+			}, false);
+			inputOFF.addEventListener('click', function (event) {
+				self.powerButtonClicked(event);
+			}, false);
 		}
 	},
 
@@ -901,7 +989,7 @@ turntablePlayerEngine.prototype = {
 			this.toggleClass(button, 'next button', 'add');
 			button.innerHTML = this.options.buttonLabels.next;
 
-			button.addEventListener('mouseup', function (event) {
+			button.addEventListener('click', function (event) {
 				self.nextButtonClicked(event);
 			}, false);
 
@@ -941,7 +1029,7 @@ turntablePlayerEngine.prototype = {
 					button.innerHTML = this.getTrackTitle(i);
 					button.data = i;
 					this._playlist.appendChild(button);
-					button.addEventListener('mouseup', function (event) {
+					button.addEventListener('click', function (event) {
 						self.playlistButtonClicked(event);
 					}, false);
 
@@ -969,7 +1057,7 @@ turntablePlayerEngine.prototype = {
 
 				this._cover = cover;
 
-				this._cover.addEventListener('mouseup', function (event) {
+				this._cover.addEventListener('click', function (event) {
 					var r = /active/i;
 					self.toggleClass(self._cover, 'active', r.test(self._cover.className) ? 'remove' : 'add');
 				}, false);
@@ -1641,6 +1729,9 @@ turntablePlayerEngine.prototype = {
 	powerON : function () {
 		console.info('POWER ON');
 
+		if (this._playerInit == false)
+			this.loadTrack(this._playlistIndex);
+
 		this.switchOnTheButton();
 
 		if (this.options.mode == 'automatic')
@@ -2282,6 +2373,8 @@ turntablePlayerEngine.prototype = {
 		console.info('Audio player "' + event.target.id + '" event: loadedMetaData.');
 
 		if (event.target.id == 'turntable-player') {
+			this._playerInit = true;
+
 			if (!this.options.mode == 'automatic'){
 				this.updateTrackInfos();
 				this.updateInfos();
@@ -2351,7 +2444,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Event 'mouseup' called on the power button
+	 * Event 'click' called on the power button
 	 */
 	powerButtonClicked : function (event) {
 		if (this._powerON && event.target.id == 'power-off')
@@ -2361,7 +2454,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Event 'mouseup' called on the next button
+	 * Event 'click' called on the next button
 	 */
 	nextButtonClicked : function (event) {
 		if (!this._powerON)
@@ -2369,7 +2462,7 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Event 'mouseup' called on the playlist tracks
+	 * Event 'click' called on the playlist tracks
 	 */
 	playlistButtonClicked : function (event) {
 		if (event.target.data != undefined && this._powerON && (

@@ -173,7 +173,8 @@
 	box-shadow: 0 0 5px green;
 }
 #player.default .remote .power input[type=radio] {
-	display: none;
+	visibility: hidden;
+	cursor: pointer;
 }
 #player.default .remote .power label {
 	bottom: 0;
