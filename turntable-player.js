@@ -34,7 +34,7 @@ turntablePlayerEngine.prototype = {
 
 		rpm: 45, // Round per minute
 		animateDelay: 2000, // Delay for the animations of the arm and the disc
-		autoStop: 60000, // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
+		autoStop: 600000, // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
 		endTransitionDuration: 0, // Duration in ms of the repetition of the end transition in manual mode
 		buttonLabels: { // Customize the labels of the buttons
 			powerON: 'I',
@@ -1200,7 +1200,6 @@ turntablePlayerEngine.prototype = {
 		this.toggleClass(discTitle, 'discTitle', 'add');
 		discTitle.width = theme.disc.pos.x * 2;
 		discTitle.height = theme.disc.pos.x * 2;
-		
 	},
 
 	/**
@@ -1354,7 +1353,7 @@ turntablePlayerEngine.prototype = {
 						'stroke': theme.arm.stroke
 					}),
 			ftCallback = function(ft, events) {
-				console.info('FT events : ', events);
+				// console.info('FT events : ', events);
 				self._armRotation = ft.attrs.rotate;
 				if (events.indexOf('rotate start') != -1) {
 					self.pause();
@@ -2222,6 +2221,37 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Calculate the full duration of rotation of the disc
+	 * @return {Number} The duration
+	 */
+	calculatePlayRemainingTime : function () {
+		var
+			area = this.getArmArea(),
+			time = 0
+		;
+
+		// first animation
+		if (area == 'stop' || area == 'undefined')
+			time += (this.options.animateDelay / 1000);
+
+		// start transition
+		if (area != 'track' || area != 'end')
+			time += (this._playerTransitions['start'].duration - this._playerTransitions['start'].currentTime);
+
+		// track
+		if (area != 'end')
+			time += (this._player.duration - this._player.currentTime);
+
+		// stop transition
+		time += (this._playerTransitions['stop'].duration - this._playerTransitions['stop'].currentTime);
+
+		// last animation
+		time += (this.options.animateDelay / 1000);
+
+		return time;
+	},
+
+	/**
 	 * Start the rotation of the disc according to the settings
 	 */
 	startDiscRotation : function (options) {
@@ -2236,22 +2266,24 @@ turntablePlayerEngine.prototype = {
 		if (o.withTransition == undefined || !this.options.useTransitions)
 		  o.withTransition = this.options.useTransitions;
 
+		console.log('o.withTransition', o.withTransition);
+
 		if (name == 'track')
 			time = this._player.duration - this._player.currentTime;
 		else if (name == 'manualstart' || name == 'manualstop')
-			time = parseInt(this.options.autoStop) / 1000;
+			time = this.options.autoStop / 1000;
 		else if (o.withTransition)
-			time = parseInt(this.options.animateDelay + this.options.transitions[name].duration) / 1000
+			time = this.options.animateDelay + this.options.transitions[name].duration / 1000
 		else
 			time = this.options.animateDelay / 1000;
 
-		this.stopDiscRotation();
-
 		var
 			deg = parseInt(this.options.rpm * 360 * time / 60) + this._discRotation,
-			s = parseInt(time),
-			ms = s * 1000
+			s = time + 1,
+			ms = parseInt(s * 1000)
 		;
+
+		s = Math.round(s * 100) / 100;
 
 		if (this.options.useCssAnimations) {
 			this._cssAnimation.rotationIteration = 360;
@@ -2294,7 +2326,7 @@ turntablePlayerEngine.prototype = {
 
 		this._inRotation = true;
 
-		console.info('Rotation "' + name + '": ' + deg + 'deg for ' + ms + 'ms.');
+		console.info('Rotation "' + name + '": ' + deg + 'deg for ' + s + 's.');
 	},
 
 	/**
