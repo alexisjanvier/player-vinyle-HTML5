@@ -3,6 +3,10 @@ body {
 	color: #333;
 	font: 11px Arial, Helvetica, sans-serif;
 	text-align: center;
+}	
+.mentions {
+	font-size: 11px;
+	text-align: center;
 }
 
 #demo-remote {
@@ -12,7 +16,7 @@ body {
 	left: 0;
 	overflow-y: auto;
 	padding: 10px;
-	position: absolute;
+	position: fixed;
 	text-align: right;
 	top: 0;
 	width: 179px;
@@ -35,7 +39,4 @@ body {
 	min-width: 800px;
 	position: absolute;
 	right: 0;
-}	
-#demo-player .mentions {
-	font-size: 11px;
 }
