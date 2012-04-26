@@ -8,7 +8,7 @@ player: true
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
     turntablePlayer.init({
-      useInfos: true,
+      panels: { cover: true, infos: true, playlist: false },
       infos: ['duration', 'current', 'timer', 'position'],
       paths: {
         audio: 'turntable-player/audio/',
@@ -24,7 +24,7 @@ player: true
   var turntablePlayer = new turntablePlayerEngine();
   window.addEventListener('load', function () {
     turntablePlayer.init({
-      useInfos: true,
+      panels: { cover: true, infos: true, playlist: false },
       infos: ['duration', 'current', 'timer', 'position'],
       paths: {
         audio: 'turntable-player/audio/',

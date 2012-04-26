@@ -5,58 +5,179 @@ player: false
 ---
 
 <h2>All the config settings :</h2>
-<pre>
-{
-  // The path to needed folders
-  paths: { 
-    audio: 'audio/',
-    music: 'music/',
-    playlists: 'playlists/',
-    themes: ''
-  },
-  
-  // Delay for the animations of the arm and the disc
-  animateDelay : 2000, 
-  // Automatic turntable
-  autoPlay : false, 
-  // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
-  autoStop : 60000,
-  // Customize the labels of the buttons 
-  buttonLabels: { 
-    play: 'POWER ON',
-    pause: 'POWER OFF'
-  },
-  // Show log infos
-  debugMode : false, 
-  // Easing customization
-  easing: { 
-    start: '<',
-    pause: 'cubic-bezier(.81, .79, .57, 1.01)',
-    stop: 'cubic-bezier(.81, .79, .57, 1.01)'
-  },
-  // Load on init
-  enable: true, 
-  // Duration of the repetition of the end transition in manual mode (false or in ms)
-  endTransitionDuration: false, 
-  // Force the request to retrieve an updated playlist
-  forceDateInUri : true, 
-  // Choices : duration, current, timer, position
-  infos: ["duration", "timer"], 
-  // Log informations in the console
-  logMethodNames: ["log", "debug", "warn", "info"],
-  // Dom ID to use to build the player, if not found, the element will be created
-  playedId: 'player', 
-  // Dom ID to use to build the remote, if not found, the element will be created
-  remoteId: 'player', 
-  // Uri of the playlist in json format
-  playlistLocation: '/data/playlist.json', 
-  // Display the paper panel
-  useCover: true, 
-  // Display the informations panel
-  useInfos: true, 
-  // Display the playlist panel
-  usePlaylist: true, 
-  // Use audio transition at the beginning and the end of the track
-  useTransitions: true, 
-}
-</pre>
+
+<ul>
+  <li>
+    <strong>enable</strong><br />
+    You can set if to false to defer the initialization and load the player when you want.<br />
+    <pre>
+      enable: true</pre>
+  </li>
+  <li>
+    <strong>mode</strong><br />
+    You have the choice betwwen the 'automatic' and the 'manual' mode. The last one requires the user drags the arm on the disc to play it.<br />
+    <pre>
+      mode: 'automatic'</pre>
+  </li>
+  <li>
+    <strong>debug</strong><br />
+    Enable the debug mode by logging all the informations and events in the console.<br />
+    <pre>
+      debug: false</pre>
+  </li>
+  <li>
+    <strong>logMethodNames</strong><br />
+    As the player switches on/off the console methods, you can list the method which will be overriden.<br />
+    <pre>
+      logMethodNames: ["log", "debug", "warn", "info"]</pre>
+  </li>
+  <li>
+    <strong>paths</strong><br />
+    You can set your own directories.<br />
+    <pre>
+      paths: { 
+        audio: 'audio/',
+        music: 'music/',
+        playlists: 'playlists/',
+        themes: ''
+      }</pre>
+  </li>
+  <li>
+    <strong>ids</strong><br />
+    You can set your own ids for the element created by the player.<br />
+    <pre>
+      ids: {
+        player: 'player',
+        remote: 'remote',
+        infos: 'infos',
+        cover: 'cover',
+        audioplayer: 'turntable-player',
+        nextbutton: 'next',
+        powerbutton: 'power',
+        powerbuttonon: 'power-on',
+        powerbuttonoff: 'power-off',
+      }</pre>
+  </li>
+  <li>
+    <strong>rpm</strong><br />
+    The round per minute of the disc. WARNING : this option will be modified soon since we will add several disc formats (12'', 10'' et 8'')<br />
+    <pre>
+      rpm: 45</pre>
+  </li>
+  <li>
+    <strong>animateDelay</strong><br />
+    The duration of the arm animations at the beginning and the end, in automatic mode.<br />
+    <pre>
+      animateDelay: 2000</pre>
+  </li>
+  <li>
+    <strong>autoStop</strong><br />
+    Duration in ms when the turntable auto-shutdowns when it turns with no track, in manual mode.<br />
+    <pre>
+      autoStop: 600000</pre>
+  </li>
+  <li>
+    <strong>endTransitionDuration</strong><br />
+    Duration in ms of the repetition of the end transition, in manual mode.<br />
+    <pre>
+      endTransitionDuration: 0</pre>
+  </li>
+  <li>
+    <strong>buttonLabels</strong><br />
+    Customize the labels of the buttons.<br />
+    <pre>
+      buttonLabels: {
+        powerON: 'I',
+        powerOFF: 'O',
+        next: '&#x27F3;'
+      }</pre>
+  </li>
+  <li>
+    <strong>easing</strong><br />
+    You can set different easing effect for the disc rotation.<br />
+    <pre>
+      easing: { 
+        start: '<',
+        pause: 'cubic-bezier(.81, .79, .57, 1.01)',
+        stop: 'cubic-bezier(.81, .79, .57, 1.01)'
+      }</pre>
+  </li>
+  <li>
+    <strong>forceDateInUri</strong><br />
+    Force the request to retrieve an updated playlist.<br />
+    <pre>
+      forceDateInUri: true</pre>
+  </li>
+  <li>
+    <strong>playlistLocation</strong><br />
+    Name of the playlist file.<br />
+    <pre>
+      playlistLocation: 'playlist.json'</pre>
+  </li>
+  <li>
+    <strong>infos</strong><br />
+    Choose the informations to display in the 'infos' panel : duration, current, timer, position.<br />
+    <pre>
+      infos: ["duration", "timer"]</pre>
+  </li>
+  <li>
+    <strong>panels</strong><br />
+    Choose the panels to display.<br />
+    <pre>
+      panels: { // The panels to display
+        'cover': true, 
+        'infos': false, 
+        'playlist': false
+      }</pre>
+  </li>
+  <li>
+    <strong>useTransitions</strong><br />
+    Enable the audio transitions<br />
+    <pre>
+      useTransitions: true</pre>
+  </li>
+  <li>
+    <strong>useCssAnimations</strong><br />
+    Enable the CSS animations or use SVG with Raphael.js.<br />
+    <pre>
+      useCssAnimations: true</pre>
+  </li>
+  <li>
+    <strong>useShadow</strong><br />
+    Enable the background drop shadow.<br />
+    <pre>
+      useShadow: true</pre>
+  </li>
+  <li>
+    <strong>theme</strong><br />
+    Choose your theme among the given ones or the ones your provided.<br />
+    <pre>
+      theme: 'wood'</pre>
+  </li>
+  <li>
+    <strong>themes</strong><br />
+    You can provided new themes to the list of themes set by default. Look at the code to create a new one.<br />
+    <pre>
+      themes: {
+        'mytheme': {
+          cssClass: 'my-theme-class my-other-needed-theme-class',
+          ...
+        }
+      }</pre>
+  </li>
+  <li>
+    <strong>transitions</strong><br />
+    The audio transitions<br />
+    <pre>
+      transitions: {
+        start: {
+          loop: false,
+          src: {
+            mp3: 'start.mp3',
+            ogg: 'start.ogg'
+          }
+        },
+        ...
+      }</pre>
+  </li>
+</ul>
