@@ -12,20 +12,20 @@ turntablePlayerEngine.prototype = {
 	 * @type {Object}
 	 */
 	options: {
-		enable: true, // Load on init
-		mode: 'automatic', // The turntable type, choose between : manual, automatic and semi-automatic
+		enable: true,
+		mode: 'automatic',
 		
-		debug : true, // Show log infos
-		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console to switch on/off
+		debug : false,
+		logMethodNames: ["log", "debug", "warn", "info"],
 
-		paths: { // The path to needed folders
+		paths: {
 			audio: 'audio/',
 			music: 'music/',
 			playlists: 'playlists/',
 			themes: ''
 		},
 
-		ids: { // Dom ID to use to build the player, if not found, the element will be created
+		ids: {
 			player: 'player',
 			remote: 'remote',
 			infos: 'infos',
@@ -37,35 +37,35 @@ turntablePlayerEngine.prototype = {
 			powerbuttonoff: 'power-off',
 		},
 
-		rpm: 45, // Round per minute
-		animateDelay: 2000, // Delay for the animations of the arm and the disc
-		autoStop: 600000, // Duration in ms when the turntable auto-shutdowns when it turns with no track in manual mode
-		endTransitionDuration: 0, // Duration in ms of the repetition of the end transition in manual mode
-		buttonLabels: { // Customize the labels of the buttons
+		rpm: 45,
+		animateDelay: 2000,
+		autoStop: 600000,
+		endTransitionDuration: 0,
+		buttonLabels: {
 			powerON: 'I',
 			powerOFF: 'O',
 			next: '&#x27F3;'
 		},
-		easing: { // Easing customization
+		easing: {
 			start: '<',
 			pause: 'cubic-bezier(.81, .79, .57, 1.01)',
 			stop: 'cubic-bezier(.81, .79, .57, 1.01)'
 		},
-		forceDateInUri : true, // Force the request to retrieve an updated playlist
-		playlistLocation: 'playlist.json', // Uri of the playlist in json format
-		infos: ["duration", "timer"], // Choices : duration, current, timer, position
-		panels: { // The panels to display
+		forceDateInUri : true,
+		playlistLocation: 'playlist.json',
+		infos: ["duration", "timer"],
+		panels: {
 			'cover': true, 
 			'infos': false, 
 			'playlist': false
 		},
 
-		useTransitions: true, // Use the audio transitions
-		useCssAnimations: true, // Use CSS animations (beta)
-		useShadow: true, // Use shadow around the player
+		useTransitions: true,
+		useCssAnimations: true,
+		useShadow: true,
 
-		theme: 'wood', // The name of the chosen theme
-		themes : { // The list of the available themes with their settings
+		theme: 'wood',
+		themes : {
 			wood: {
 				cssClass: 'default wood',
 				dim: { w: 454, h: 255 },
@@ -1455,6 +1455,9 @@ turntablePlayerEngine.prototype = {
 		for (var button in this._playlistButtons)
 			this._playlistButtons[button].disabled = false;
 
+		if (this._nextButton)
+			this._nextButton.disabled = false;
+
 		console.info('Remote enabled (' + s + ').');
 	},
 
@@ -1470,6 +1473,9 @@ turntablePlayerEngine.prototype = {
 
 		for (var button in this._playlistButtons)
 			this._playlistButtons[button].disabled = true;
+
+		if (this._nextButton)
+			this._nextButton.disabled = true;
 
 		console.info('Remote disabled (' + s + ').');
 	},
@@ -1594,7 +1600,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc informations such as the position of the track
 	 */
 	updateInfos : function () {
-		if (this._player && this.options.panels.infos) {
+		if (this._player && this.options.panels.infos && !isNaN(this._player.duration)) {
 			var
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
 				pos = (this._player.currentTime / this._player.duration) * 100,
@@ -1625,10 +1631,11 @@ turntablePlayerEngine.prototype = {
 	 */
 	updateDiscNeedlePosition : function (options) {
 		var o = options || {};
-		if (o.element && this.options.themes[this.options.theme].arm.turnable && (
-			(o.name == 'track' && !this._playerPaused)
-			|| (o.name == 'start' && this._inTransition)
-			|| (o.name == 'end' && this._inTransition)
+		if (o.element && !isNaN(o.element.duration) && !isNaN(o.element.currentTime)
+			&& this.options.themes[this.options.theme].arm.turnable && (
+				(o.name == 'track' && !this._playerPaused)
+				|| (o.name == 'start' && this._inTransition)
+				|| (o.name == 'end' && this._inTransition)
 		)) {
 			var from, to;
 			if (o.name == 'track') {
@@ -1871,10 +1878,10 @@ turntablePlayerEngine.prototype = {
 				this.play(avoidTransition);
 			}
 			else if (area == 'start') {
-				this.play(); //avoidTransition);
+				this.play();
 			}
 			else if (area == 'end') {
-				this.end(); //avoidTransition);
+				this.end();
 			}
 		}
 	},
@@ -1967,7 +1974,7 @@ turntablePlayerEngine.prototype = {
 				this.switchOffTheButton();
 		}
 		else {
-			if (!this.options.mode == 'automatic' && this.options.endTransitionDuration)
+			if (this.options.mode != 'automatic' && this.options.endTransitionDuration)
 				o.duration = this.options.endTransitionDuration;
 			this.playTransition(o);
 		}
@@ -2285,8 +2292,6 @@ turntablePlayerEngine.prototype = {
 		if (o.withTransition == undefined || !this.options.useTransitions)
 		  o.withTransition = this.options.useTransitions;
 
-		console.log('o.withTransition', o.withTransition);
-
 		if (name == 'track')
 			time = this._player.duration - this._player.currentTime;
 		else if (name == 'manualstart' || name == 'manualstop')
@@ -2405,7 +2410,7 @@ turntablePlayerEngine.prototype = {
 		if (event.target.id == 'turntable-player') {
 			this.enableRemote('playerLoaded');
 
-			if (!this.options.mode == 'automatic') {
+			if (this.options.mode != 'automatic') {
 				this.updateTrackInfos();
 				this.updateInfos();
 				this.updatePlayerPosition();
@@ -2425,12 +2430,14 @@ turntablePlayerEngine.prototype = {
 		if (event.target.id == 'turntable-player') {
 			this._playerInit = true;
 
-			if (!this.options.mode == 'automatic'){
+			if (this.options.mode != 'automatic') {
 				this.updateTrackInfos();
 				this.updateInfos();
 			}
 
-			if (this._playerPaused == true)
+			if (this.options.mode != 'automatic' 
+				|| (this.options.mode == 'automatic' && this._playerPaused && !this._inTransition)
+			)
 				this.updateDiscInfos();
 		}
 		else {
@@ -2507,7 +2514,7 @@ turntablePlayerEngine.prototype = {
 	 * Event 'click' called on the next button
 	 */
 	nextButtonClicked : function (event) {
-		if (!this._powerON)
+		if (!this._powerON || this.options.mode == 'automatic')
 			this.next();
 	},
 
