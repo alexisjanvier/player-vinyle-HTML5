@@ -15,8 +15,8 @@ turntablePlayerEngine.prototype = {
 		enable: true, // Load on init
 		mode: 'automatic', // The turntable type, choose between : manual, automatic and semi-automatic
 		
-		debug : false, // Show log infos
-		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console
+		debug : true, // Show log infos
+		logMethodNames: ["log", "debug", "warn", "info"], // Log informations in the console to switch on/off
 
 		paths: { // The path to needed folders
 			audio: 'audio/',
@@ -29,7 +29,12 @@ turntablePlayerEngine.prototype = {
 			player: 'player',
 			remote: 'remote',
 			infos: 'infos',
-			cover: 'cover'
+			cover: 'cover',
+			audioplayer: 'turntable-player',
+			nextbutton: 'next',
+			powerbutton: 'power',
+			powerbuttonon: 'power-on',
+			powerbuttonoff: 'power-off',
 		},
 
 		rpm: 45, // Round per minute
@@ -251,6 +256,7 @@ turntablePlayerEngine.prototype = {
 	_armFt: null,
 	_armFtCallback: null,
 	_cover: null,
+	_currentTheme: null,
 	_disc: null,
 	_discTitle: null,
 	_mainWrapper: null,
@@ -313,7 +319,10 @@ turntablePlayerEngine.prototype = {
 	 * Override options with given ones
 	 */
 	setOptions : function (options) {
-		if (options != {}) {
+		if (typeof options == 'object' && options.length == undefined) {
+			if (options.theme)
+				this._currentTheme = this.options.theme;
+
 			for ( var i in options ) {
 				if (typeof options[i] == 'object' && options[i].length == undefined)
 					for ( var j in options[i] )
@@ -321,10 +330,10 @@ turntablePlayerEngine.prototype = {
 				else
 					this.options[i] = options[i];
 			}
-
-			this.updateInterface();
-			this.loadLogger();
 		}
+
+		this.updateInterface();
+		this.loadLogger();
 	},
 
 	/**
@@ -366,8 +375,15 @@ turntablePlayerEngine.prototype = {
 			return;
 
 		if (typeof(element) == 'object' && element.length) {
-			for (var el in element){
-				this.toggleClass(element[el], className);
+			for (var el in element) {
+				this.toggleClass(element[el], className, operation);
+			}
+			return;
+		}
+		else if (className.split(' ').length > 1) {
+			var classNames = className.split(' ');
+			for (var c in classNames) {
+				this.toggleClass(element, classNames[c], operation);
 			}
 			return;
 		}
@@ -734,12 +750,17 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Update the interface with the selected panels
-	 * @return {[type]} [description]
 	 */
 	updateInterface: function () {
 		if (!this._mainWrapper)
 			this.loadWrapper();
 		var wrapper = this._mainWrapper;
+
+		if (this._currentTheme != this.options.theme) {
+			this.toggleClass(wrapper, this.options.themes[this._currentTheme].cssClass, 'remove');
+			this._currentTheme = null;
+		}
+		this.toggleClass(wrapper, this.options.themes[this.options.theme].cssClass, 'add');
 
 		this.toggleClass(wrapper, 'with-infos', 
 			this.options.panels.infos ? 'add' : 'remove'
@@ -783,8 +804,7 @@ turntablePlayerEngine.prototype = {
 			this.toggleClass(bg, 'bg', 'add');
 			wrapper.appendChild(bg);
 
-			this.toggleClass(wrapper, this.options.themes[this.options.theme].cssClass, 'add');
-
+			this._currentTheme = this.options.theme;
 			this._wrapper = bg;
 			this._mainWrapper = wrapper;
 		}
@@ -829,7 +849,7 @@ turntablePlayerEngine.prototype = {
 				audio.controls = 'controls';
 			}
 			audio.preload = 'metadata';
-			audio.id = 'turntable-player';
+			audio.id = this.options.ids.audioplayer;
 			this._player = audio;
 			this.loadTrack(this._playlistIndex);
 
@@ -938,14 +958,13 @@ turntablePlayerEngine.prototype = {
 				labelOFF = document.createElementNS('http://www.w3.org/1999/xhtml', 'label')
 			;
 
-			button.id = 'remote';
-			button.id = 'power';
+			button.id = this.options.ids.powerbutton;
 			this.toggleClass(button, 'power button', 'add');
 
-			inputON.id = 'power-on';
+			inputON.id = this.options.ids.powerbuttonon;
 			inputON.name = 'power';
 			inputON.type = 'radio';
-			inputOFF.id = 'power-off';
+			inputOFF.id = this.options.ids.powerbuttonoff;
 			inputOFF.name = 'power';
 			inputOFF.type = 'radio';
 			inputOFF.checked = true;
@@ -985,7 +1004,7 @@ turntablePlayerEngine.prototype = {
 				button = document.createElementNS('http://www.w3.org/1999/xhtml', 'button')
 			;
 
-			button.id = 'next';
+			button.id = this.options.ids.nextbutton;
 			this.toggleClass(button, 'next button', 'add');
 			button.innerHTML = this.options.buttonLabels.next;
 

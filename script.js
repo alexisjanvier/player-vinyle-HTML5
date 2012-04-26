@@ -37,6 +37,15 @@ window.addEventListener('load', function () {
 			document.getElementById('mode-' + modes[i]).checked = false;	
 	}
 
+	// theme
+	var themes = ['wood', 'alu'];
+	for (var i in themes) {
+		if (turntablePlayer.options.theme == themes[i])
+			document.getElementById('theme-' + themes[i]).checked = true;
+		else
+			document.getElementById('theme-' + themes[i]).checked = false;	
+	}
+
 	// debug
 	if (turntablePlayer.options.debug)
 		document.getElementById('debug').checked = true;
@@ -53,6 +62,17 @@ for (var d in elements) {
 	el.addEventListener('click', function (event) {
 		turntablePlayer.setOptions({
 			mode: event.target.value
+		});
+	}, false);
+}
+
+// theme
+var elements = document.querySelectorAll('input[name~=theme-choice]'); 
+for (var d in elements) {
+	var el = elements.item(d);
+	el.addEventListener('click', function (event) {
+		turntablePlayer.setOptions({
+			theme: event.target.value
 		});
 	}, false);
 }
