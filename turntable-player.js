@@ -1,6 +1,6 @@
 String.prototype.ucfirst = function()
 {
-    return this.charAt(0).toUpperCase() + this.substr(1);
+	return this.charAt(0).toUpperCase() + this.substr(1);
 }
 
 var turntablePlayerEngine = function () {};
@@ -14,7 +14,7 @@ turntablePlayerEngine.prototype = {
 	options: {
 		enable: true,
 		mode: 'automatic',
-		
+
 		debug : false,
 		logMethodNames: ["log", "debug", "warn", "info"],
 
@@ -55,8 +55,8 @@ turntablePlayerEngine.prototype = {
 		playlistLocation: 'playlist.json',
 		infos: ["duration", "timer"],
 		panels: {
-			'cover': true, 
-			'infos': false, 
+			'cover': true,
+			'infos': false,
 			'playlist': false
 		},
 
@@ -78,7 +78,7 @@ turntablePlayerEngine.prototype = {
 						to: 41,
 						end: 46
 					},
-					dim: { 
+					dim: {
 						w: 65,
 						h: 334
 					},
@@ -86,7 +86,7 @@ turntablePlayerEngine.prototype = {
 						fill: '#000',
 						stroke: 'transparent'
 					},
-					pos: { 
+					pos: {
 						x: 230,
 						y: -120
 					}
@@ -95,7 +95,7 @@ turntablePlayerEngine.prototype = {
 					fill: '#000',
 					stroke: '#111',
 					turnable: true,
-					pos: { 
+					pos: {
 						x: 125,
 						y: 125
 					},
@@ -160,7 +160,7 @@ turntablePlayerEngine.prototype = {
 						to: 41,
 						end: 46
 					},
-					dim: { 
+					dim: {
 						w: 65,
 						h: 334
 					},
@@ -168,7 +168,7 @@ turntablePlayerEngine.prototype = {
 						fill: '#000',
 						stroke: 'transparent'
 					},
-					pos: { 
+					pos: {
 						x: 230,
 						y: -120
 					}
@@ -177,7 +177,7 @@ turntablePlayerEngine.prototype = {
 					fill: '#000',
 					stroke: '#111',
 					turnable: true,
-					pos: { 
+					pos: {
 						x: 125,
 						y: 125
 					},
@@ -364,11 +364,11 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Lets 
+	 * Lets
 	 * @param  {Object} element   The DOM node element
 	 * @param  {String} className The class to toggle
 	 * @param  {String  operation The operation status
-	 * @return {Object}           The DOM node element
+	 * @return {Object}		   The DOM node element
 	 */
 	toggleClass : function (element, className, operation) {
 		if (!operation)
@@ -388,7 +388,7 @@ turntablePlayerEngine.prototype = {
 			return;
 		}
 
-		var 
+		var
 			naturalClassName = element.getAttribute('class') ? element.getAttribute('class') : '',
 			naturalClassNames = naturalClassName.split(' '),
 			classIndex = naturalClassNames.indexOf(className)
@@ -418,12 +418,12 @@ turntablePlayerEngine.prototype = {
    * Check the compatible event name. Especially for touch events.
    */
   getEventCompatibilityName: function (eventName) {
-    if (this.isiOS() && eventName == 'mouseleave')
-      eventName = 'touchend';
-    else if (this.isiOS() && eventName == 'mousemove')
-      eventName = 'touchmove';
+	if (this.isiOS() && eventName == 'mouseleave')
+	  eventName = 'touchend';
+	else if (this.isiOS() && eventName == 'mousemove')
+	  eventName = 'touchmove';
 
-    return eventName;
+	return eventName;
   },
 
 	/**
@@ -432,8 +432,8 @@ turntablePlayerEngine.prototype = {
 	 */
 	isiOS : function () {
 		if (
-			(navigator.userAgent.indexOf('iPhone') != -1) 
-			|| (navigator.userAgent.indexOf('iPod') != -1) 
+			(navigator.userAgent.indexOf('iPhone') != -1)
+			|| (navigator.userAgent.indexOf('iPod') != -1)
 			|| (navigator.userAgent.indexOf('iPad') != -1)
 		)
 			return true;
@@ -445,7 +445,7 @@ turntablePlayerEngine.prototype = {
 	 */
 	fixiOSlabels : function () {
 		function fix() {
-			var 
+			var
 				labels = document.getElementsByTagName('label'),
 				target_id,
 				el;
@@ -460,7 +460,7 @@ turntablePlayerEngine.prototype = {
 			var el = document.getElementById(this.getAttribute('for'));
 			if (['radio', 'checkbox'].indexOf(el.getAttribute('type')) != -1) {
 				el.setAttribute('selected', !el.getAttribute('selected'));
-			} 
+			}
 			else {
 				el.focus();
 			}
@@ -472,22 +472,22 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-   * Disable touch move event
-   */
-  disableTouchMove : function () {
-    document.ontouchmove = function (event) {
-      return event.preventDefault();
-    }
-  },
+	 * Disable touch move event
+	 */
+	disableTouchMove : function () {
+		document.ontouchmove = function (event) {
+			return event.preventDefault();
+		}
+	},
 
-  /**
-   * Enable touch move event
-   */
-  enableTouchMove : function () {
-    document.ontouchmove = function (event) {
-      return event;
-    }
-  },
+	/**
+	 * Enable touch move event
+	 */
+	enableTouchMove : function () {
+		document.ontouchmove = function (event) {
+			return event;
+		}
+	},
 
 	/**
 	 * Create a XHR object
@@ -520,7 +520,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Get the response of the XHR
 	 * @param  {Object} httpRequest The XHR object
-	 * @return {String}             The text response of the XHR
+	 * @return {String}			 The text response of the XHR
 	 */
 	getResponseXHR : function (httpRequest) {
 		var self = this;
@@ -539,47 +539,49 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
-	 * Get a random number according to the min and max numbers 
+	 * Get a random number according to the min and max numbers
 	 * @param  {Number} min Minimum
 	 * @param  {Number} max Maximum
-	 * @return {Number}     Random number result
+	 * @return {Number}	 Random number result
 	 */
-	getRandomArbitrary : function (min, max)  
-	{  
+	getRandomArbitrary : function (min, max)
+	{
 	  return Math.random() * (max - min) + min;
 	},
 
 	/**
 	 * Get the rotation status, in degrees, of a DOM element
 	 * @param  {Object} element The element to measure
-	 * @return {Number}         The rotation in degrees
+	 * @return {Number}		 The rotation in degrees
 	 */
 	getRotationDegrees : function (element) {
-    // get the computed style object for the element
-    var style = window.getComputedStyle(element, null);
-    // this string will be in the form 'matrix(a, b, c, d, tx, ty)'
-    var transformString = style['-webkit-transform']
-                       || style['WebkitTransform']
-                       || style['-moz-transform']
-                       || style['MozTransform']
-                       || style['-ms-transform']
-                       || style['MsTransform']
-                       || style['-o-transform']
-                       || style['OTransform']
-                       || style['transform'] ;
-    if (!transformString || transformString == 'none')
-        return 0;
-    var splits = transformString.split(',');
-    // parse the string to get a and b
-    var a = parseFloat(splits[0].substr(7));
-    var b = parseFloat(splits[1]);
-    // doing atan2 on b, a will give you the angle in radians
-    var rad = Math.atan2(b, a);
-    var deg = 180 * rad / Math.PI;
-    // instead of having values from -180 to 180, get 0 to 360
-    if (deg < 0) deg += 360;
-    
-    return deg;
+		// get the computed style object for the element
+		var style = window.getComputedStyle(element, null);
+		// this string will be in the form 'matrix(a, b, c, d, tx, ty)'
+		var transformString =
+			style['-webkit-transform']
+			|| style['WebkitTransform']
+			|| style['-moz-transform']
+			|| style['MozTransform']
+			|| style['-ms-transform']
+			|| style['MsTransform']
+			|| style['-o-transform']
+			|| style['OTransform']
+			|| style['transform']
+		;
+		if (!transformString || transformString == 'none')
+			return 0;
+		var splits = transformString.split(',');
+		// parse the string to get a and b
+		var a = parseFloat(splits[0].substr(7));
+		var b = parseFloat(splits[1]);
+		// doing atan2 on b, a will give you the angle in radians
+		var rad = Math.atan2(b, a);
+		var deg = 180 * rad / Math.PI;
+		// instead of having values from -180 to 180, get 0 to 360
+		if (deg < 0) deg += 360;
+
+		return deg;
 	},
 
 	/**
@@ -634,7 +636,7 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Create an arc string as a path for a SVG element
-	 * @return {String}              The path of the arc string
+	 * @return {String}			  The path of the arc string
 	 */
 	arcString : function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
 		// opts 4 and 5 are:
@@ -648,7 +650,7 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Create the furrows of the disc as a path for a SVG element
-	 * @return {String}              The path of the furrows
+	 * @return {String}			  The path of the furrows
 	 */
 	getFurrowsPath : function (centerX, centerY, spacing, maxRadius) {
 		var
@@ -695,21 +697,21 @@ turntablePlayerEngine.prototype = {
 			;
 
 			if (r.test(uri))
-				uri += ('&' + ymd); 
+				uri += ('&' + ymd);
 			else
 				uri += ('?' + ymd);
 		}
 
 		req.open("GET", uri, false);
 		req.onreadystatechange = function () {
-			var 
+			var
 				response = eval(self.getResponseXHR(req))
 			;
 			if (typeof(response) == 'object' && response.length) {
 				var
 					playlist = response[0]
 				;
-				if (typeof(playlist) == 'object'  
+				if (typeof(playlist) == 'object'
 					&& typeof(playlist.tracks) == 'object' && playlist.tracks.length
 				) {
 					self._playlistInfos.title = playlist.title;
@@ -762,19 +764,19 @@ turntablePlayerEngine.prototype = {
 		}
 		this.toggleClass(wrapper, this.options.themes[this.options.theme].cssClass, 'add');
 
-		this.toggleClass(wrapper, 'with-infos', 
+		this.toggleClass(wrapper, 'with-infos',
 			this.options.panels.infos ? 'add' : 'remove'
 		);
 		if (this.options.panels.infos)
 			this.initInfos();
 
-		this.toggleClass(wrapper, 'with-playlist', 
+		this.toggleClass(wrapper, 'with-playlist',
 			this.options.panels.playlist ? 'add' : 'remove'
 		);
 		if (this.options.panels.playlist)
 			this.initPlaylist();
 
-		this.toggleClass(wrapper, 'with-cover', 
+		this.toggleClass(wrapper, 'with-cover',
 			this.options.panels.cover ? 'add' : 'remove'
 		);
 		if (this.options.panels.cover && this._tracks.length)
@@ -791,7 +793,7 @@ turntablePlayerEngine.prototype = {
 	 */
 	loadWrapper : function () {
 		if (!this._wrapper) {
-			var 
+			var
 				id = this.options.ids.player,
 				wrapper = document.getElementById(id),
 				bg = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
@@ -818,7 +820,7 @@ turntablePlayerEngine.prototype = {
 	 */
 	getRemote : function () {
 		if (!this._remote) {
-			var 
+			var
 				id = this.options.ids.remote,
 				remote = document.getElementById(id)
 			;
@@ -876,15 +878,15 @@ turntablePlayerEngine.prototype = {
 		if (this.options.useTransitions && !this._playerTransitions.start) {
 
 			this._playerTransitions.start = this.loadTransition(
-				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'), 
+				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'),
 				'start'
 			);
 			this._playerTransitions.stop = this.loadTransition(
-				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'), 
+				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'),
 				'stop'
 			);
 			this._playerTransitions.drag = this.loadTransition(
-				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'), 
+				document.createElementNS('http://www.w3.org/1999/xhtml', 'audio'),
 				'drag'
 			);
 		}
@@ -895,11 +897,11 @@ turntablePlayerEngine.prototype = {
 	 */
 	initInfos : function () {
 		if (this.options.panels.infos && this.options.infos.length) {
-			var 
+			var
 				infos,
 				a = {
-					duration: 'Duration:', 
-					current: 'Past time:', 
+					duration: 'Duration:',
+					current: 'Past time:',
 					timer: 'Time left:',
 					position: 'Position:'
 				}
@@ -917,7 +919,7 @@ turntablePlayerEngine.prototype = {
 
 			for (var i in a) {
 				if (this.options.infos.indexOf(i) != -1) {
-					var 
+					var
 						p = document.createElementNS('http://www.w3.org/1999/xhtml', 'p'),
 						s = document.createElementNS('http://www.w3.org/1999/xhtml', 'span')
 					;
@@ -1030,7 +1032,7 @@ turntablePlayerEngine.prototype = {
 				var playlist = document.getElementById(this.options.ids.playlist);
 				if (!playlist) {
 					playlist = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
-					this.toggleClass(playlist, 'playlist', 'add');					
+					this.toggleClass(playlist, 'playlist', 'add');
 				}
 				this._playlist = playlist;
 				this._wrapper.appendChild(this._playlist);
@@ -1067,7 +1069,7 @@ turntablePlayerEngine.prototype = {
 		if (this.options.panels.cover) {
 
 		 if (!this._cover) {
-				var 
+				var
 					self = this,
 					cover = document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
 				;
@@ -1118,7 +1120,7 @@ turntablePlayerEngine.prototype = {
 			discTitle = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas')
 		;
 
-	  // DISC
+		// DISC
 		this.toggleClass(disc, 'disc', 'add');
 		disc.width = theme.disc.pos.x * 2;
 		disc.height = theme.disc.pos.x * 2;
@@ -1128,84 +1130,84 @@ turntablePlayerEngine.prototype = {
 		discCtx.strokeStyle = theme.disc.fill;
 		discCtx.beginPath();
 		discCtx.arc(
-			theme.disc.pos.x, 
-			theme.disc.pos.y, 
-			theme.disc.start.r, 
-			0, 
-			2 * Math.PI, 
+			theme.disc.pos.x,
+			theme.disc.pos.y,
+			theme.disc.start.r,
+			0,
+			2 * Math.PI,
 			false
 		);
 		discCtx.fill();
 
-    // furrows bg
-    discCtx.fillStyle = theme.disc.stroke;
+		// furrows bg
+		discCtx.fillStyle = theme.disc.stroke;
 		discCtx.beginPath();
 		discCtx.arc(
-			theme.disc.pos.x, 
-			theme.disc.pos.y, 
-			theme.disc.furrows.r, 
-			0, 
-			2 * Math.PI, 
+			theme.disc.pos.x,
+			theme.disc.pos.y,
+			theme.disc.furrows.r,
+			0,
+			2 * Math.PI,
 			false
 		);
 		discCtx.fill();
 
-    // furrows fg
-    var length = theme.disc.furrows.r - theme.disc.end.r;
-    for (var i = theme.disc.furrows.r; i > theme.disc.end.r; i--) {
-    	if (i%2)
-		    discCtx.fillStyle = theme.disc.fill;
-		  else
-		    discCtx.fillStyle = theme.disc.stroke;
+		// furrows fg
+		var length = theme.disc.furrows.r - theme.disc.end.r;
+		for (var i = theme.disc.furrows.r; i > theme.disc.end.r; i--) {
+			if (i%2)
+				discCtx.fillStyle = theme.disc.fill;
+			  else
+				discCtx.fillStyle = theme.disc.stroke;
 
-			discCtx.beginPath();
-			discCtx.arc(
-				theme.disc.pos.x, 
-				theme.disc.pos.y, 
-				i, 
-				0, 
-				2 * Math.PI, 
-				false
-			);
+				discCtx.beginPath();
+				discCtx.arc(
+					theme.disc.pos.x,
+					theme.disc.pos.y,
+					i,
+					0,
+					2 * Math.PI,
+					false
+				);
 
-  		discCtx.fill();
-    }
+	  		discCtx.fill();
+		}
 
-    // end
-    discCtx.fillStyle = theme.disc.fill;
+		// end
+		discCtx.fillStyle = theme.disc.fill;
 		discCtx.beginPath();
 		discCtx.arc(
-			theme.disc.pos.x, 
-			theme.disc.pos.y, 
-			theme.disc.end.r, 
-			0, 
-			2 * Math.PI, 
+			theme.disc.pos.x,
+			theme.disc.pos.y,
+			theme.disc.end.r,
+			0,
+			2 * Math.PI,
 			false
 		);
 		discCtx.fill();
 
-    // cover
-    discCtx.fillStyle = theme.disc.cover.fill;
+		// cover
+		discCtx.fillStyle = theme.disc.cover.fill;
 		discCtx.beginPath();
 		discCtx.arc(
-			theme.disc.pos.x, 
-			theme.disc.pos.y, 
-			theme.disc.cover.r, 
-			0, 
-			2 * Math.PI, 
+			theme.disc.pos.x,
+			theme.disc.pos.y,
+			theme.disc.cover.r,
+			0,
+			2 * Math.PI,
 			false
 		);
 		discCtx.fill();
 
 		// axis
-    discCtx.fillStyle = theme.disc.axis.fill;
+		discCtx.fillStyle = theme.disc.axis.fill;
 		discCtx.beginPath();
 		discCtx.arc(
-			theme.disc.pos.x, 
-			theme.disc.pos.y, 
-			theme.disc.axis.r, 
-			0, 
-			2 * Math.PI, 
+			theme.disc.pos.x,
+			theme.disc.pos.y,
+			theme.disc.axis.r,
+			0,
+			2 * Math.PI,
 			false
 		);
 		discCtx.fill();
@@ -1225,29 +1227,29 @@ turntablePlayerEngine.prototype = {
 	 * Draw the title of the current track on the disc
 	 */
 	drawTitleAlongDisc : function () {
-		var 
+		var
 			theme = this.options.themes[this.options.theme],
 			discTitleCtx = this._discTitle.getContext('2d'),
-    	text = this.getTrackTitleDashed(),
-    	angle = Math.PI * 2,
-    	radius = 35
+			text = this.getTrackTitleDashed(),
+			angle = Math.PI * 2,
+			radius = 35
 		;
 		discTitleCtx.font = "bold 8px sans-serif";
 		discTitleCtx.fillStyle = "#eee";
-    discTitleCtx.clearRect(0, 0, this._discTitle.width, this._discTitle.height);
-    discTitleCtx.save();
-    discTitleCtx.translate(theme.disc.pos.x, theme.disc.pos.y);
-    discTitleCtx.rotate(-1 * angle / 2);
-    discTitleCtx.rotate(-1 * (angle / text.length) / 2);
-    for (var n = 0; n < text.length; n++) {
-        discTitleCtx.rotate(angle / text.length);
-        discTitleCtx.save();
-        discTitleCtx.translate(0, -1 * radius);
-        var char = text[n];
-        discTitleCtx.fillText(char, 0, 0);
-        discTitleCtx.restore();
-    }
-    discTitleCtx.restore();
+		discTitleCtx.clearRect(0, 0, this._discTitle.width, this._discTitle.height);
+		discTitleCtx.save();
+		discTitleCtx.translate(theme.disc.pos.x, theme.disc.pos.y);
+		discTitleCtx.rotate(-1 * angle / 2);
+		discTitleCtx.rotate(-1 * (angle / text.length) / 2);
+		for (var n = 0; n < text.length; n++) {
+			discTitleCtx.rotate(angle / text.length);
+			discTitleCtx.save();
+			discTitleCtx.translate(0, -1 * radius);
+			var char = text[n];
+			discTitleCtx.fillText(char, 0, 0);
+			discTitleCtx.restore();
+		}
+		discTitleCtx.restore();
 	},
 
 	/**
@@ -1259,7 +1261,7 @@ turntablePlayerEngine.prototype = {
 			theme = this.options.themes[this.options.theme],
 			paper = Raphael(
 				this._wrapper,
-				theme.dim.w, 
+				theme.dim.w,
 				theme.dim.h),
 			defs = document.getElementsByTagName('defs')[0],
 			discShadow = paper
@@ -1283,8 +1285,8 @@ turntablePlayerEngine.prototype = {
 					theme.disc.pos.y,
 					theme.disc.furrows.size,
 					theme.disc.furrows.r))
-				.attr({ 
-					'fill': theme.disc.furrows.fill, 
+				.attr({
+					'fill': theme.disc.furrows.fill,
 					'stroke': theme.disc.furrows.stroke }),
 			discEnd = paper
 				.circle(
@@ -1292,7 +1294,7 @@ turntablePlayerEngine.prototype = {
 					theme.disc.pos.y,
 					theme.disc.end.r)
 				.attr('fill', theme.disc.fill),
-			discCover = theme.disc.cover.src 
+			discCover = theme.disc.cover.src
 				? paper.image(
 					this.options.paths.themes + theme.disc.cover.src,
 					theme.disc.cover.pos.x,
@@ -1353,9 +1355,9 @@ turntablePlayerEngine.prototype = {
 			theme = this.options.themes[this.options.theme],
 			paper = this._paper || Raphael(
 				this._wrapper,
-				theme.dim.w, 
+				theme.dim.w,
 				theme.dim.h),
-			arm = theme.arm.src 
+			arm = theme.arm.src
 				? paper.image(
 					this.options.paths.themes + theme.arm.src,
 					theme.arm.pos.x,
@@ -1568,7 +1570,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Object} options Settings
 	 */
 	loadCoverLegend : function (options) {
-		var 
+		var
 			o = options || {},
 			tag = o.tag || 'div'
 			element = document.createElementNS('http://www.w3.org/1999/xhtml', tag)
@@ -1639,15 +1641,15 @@ turntablePlayerEngine.prototype = {
 		)) {
 			var from, to;
 			if (o.name == 'track') {
-				from = this.options.themes[this.options.theme].arm.area.from; 
+				from = this.options.themes[this.options.theme].arm.area.from;
 				to = this.options.themes[this.options.theme].arm.area.to;
 			}
 			else if (o.name == 'start') {
-				from = this.options.themes[this.options.theme].arm.area.start; 
+				from = this.options.themes[this.options.theme].arm.area.start;
 				to = this.options.themes[this.options.theme].arm.area.from;
 			}
 			else if (o.name == 'end') {
-				from = this.options.themes[this.options.theme].arm.area.to; 
+				from = this.options.themes[this.options.theme].arm.area.to;
 				to = this.options.themes[this.options.theme].arm.area.end;
 			}
 
@@ -1813,7 +1815,7 @@ turntablePlayerEngine.prototype = {
 
 		this.playDiscArea(true);
 
-		this.startDiscRotation({ 
+		this.startDiscRotation({
 			easing: 'linear',
 			transition: 'manualstart'
 		});
@@ -1826,7 +1828,7 @@ turntablePlayerEngine.prototype = {
 	stopManual : function () {
 		console.info('STOP MANUAL');
 
-		this.startDiscRotation({ 
+		this.startDiscRotation({
 			easing: this.options.easing.stop,
 			transition: 'stop',
 			withTransition: false
@@ -1846,7 +1848,7 @@ turntablePlayerEngine.prototype = {
 
 		this.placeTheArmOnTheDisc();
 
-		this.startDiscRotation({ 
+		this.startDiscRotation({
 			easing: this.options.easing.start,
 			transition: 'start'
 		});
@@ -1871,7 +1873,11 @@ turntablePlayerEngine.prototype = {
 
 		var area = this.getArmArea();
 
-		if (this._powerON || (this.options.mode == 'automatic' && !this._powerON)) {
+		if (
+			this._powerON
+			|| this.options.mode == 'semiautomatic'
+			|| (this.options.mode == 'automatic' && !this._powerON)
+		) {
 			this.switchOnTheButton();
 
 			if (area == 'track') {
@@ -1931,7 +1937,7 @@ turntablePlayerEngine.prototype = {
 	next: function () {
 		console.info('NEXT');
 
-		var next = this._tracks[this._playlistIndex + 1] != undefined 
+		var next = this._tracks[this._playlistIndex + 1] != undefined
 			? this._playlistIndex + 1
 			: 0;
 
@@ -1957,7 +1963,7 @@ turntablePlayerEngine.prototype = {
 			this._player.currentTime = 0;
 		}
 
-		if (this._armRotation != 0)
+		if (this.options.mode != 'manual')
 			this.startDiscRotation({
 				easing: this.options.easing.stop,
 				withTransition: avoidTransition ? false : this.options.useTransitions,
@@ -1970,7 +1976,7 @@ turntablePlayerEngine.prototype = {
 
 			this.enableRemote('stop');
 
-			if (!this._needRestart)
+			if (!this._needRestart && this.options.mode != 'manual')
 				this.switchOffTheButton();
 		}
 		else {
@@ -2005,14 +2011,14 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Add the source to the audio element
 	 * @param {Object} element The audio element
-	 * @param {Mixed} src     The source(s) as string or object
+	 * @param {Mixed} src	 The source(s) as string or object
 	 */
 	addSrcToAudio : function (element, src, type) {
 		while (element.firstChild) {
 		  element.removeChild(element.firstChild);
 		}
 
-		var 
+		var
 			path = this.options.paths[type],
 			r = /http/i
 		;
@@ -2069,7 +2075,7 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Load the transition played when the playlist starts and/or stops
-	 * @param  {Object} element    The DOM node element
+	 * @param  {Object} element	The DOM node element
 	 * @param  {String} transition The transition type
 	 * @return {Object} The DOM node element
 	 */
@@ -2079,7 +2085,7 @@ turntablePlayerEngine.prototype = {
 			return;
 		}
 
-		var 
+		var
 			self = this,
 			option = this.options.transitions[transition]
 		;
@@ -2114,7 +2120,7 @@ turntablePlayerEngine.prototype = {
 
 	/**
 	 * Update the duration time of the transitions
-	 * @param  {Object} element    The DOM node element
+	 * @param  {Object} element	The DOM node element
 	 */
 	updateTransition : function (element) {
 		var transition;
@@ -2136,12 +2142,12 @@ turntablePlayerEngine.prototype = {
  	 * @param  {Object} options Settings
 	 */
 	playTransition: function (options) {
-		var 
+		var
 			self = this,
 			o = options || {},
 			transition = o.transition || 'transition'
-			useTransitions = o.useTransitions != undefined 
-				? o.useTransitions 
+			useTransitions = o.useTransitions != undefined
+				? o.useTransitions
 				: this.options.useTransitions
 		;
 
@@ -2168,7 +2174,7 @@ turntablePlayerEngine.prototype = {
 				if (pos != 'stop' && pos != undefined){
 					console.info('Playing transition "' + transition + '".');
 					this._playerTransitions[transition].currentTime = 0;
-					if (!this.options.transitions[transition].random 
+					if (!this.options.transitions[transition].random
 						|| this.getRandomArbitrary(0, this.options.transitions[transition].random) <= 1
 					)
 						this._playerTransitions[transition].play();
@@ -2203,15 +2209,15 @@ turntablePlayerEngine.prototype = {
 	 */
 	checkCssAnimations : function () {
 		if (this.options.useCssAnimations) {
-			var 
+			var
 				animation = false,
 				animationstring = 'animation',
 				animationPlayState = 'animationPlayState',
-				domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),  
-				keyframeprefix = '',  
+				domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),
+				keyframeprefix = '',
 				pfx  = '',
 				turntable = this._wrapper
-			;  
+			;
 
 			this._cssAnimation.animationstring = animationstring;
 			this._cssAnimation.animationPlayState = animationPlayState;
@@ -2219,22 +2225,22 @@ turntablePlayerEngine.prototype = {
 			this._cssAnimation.pfx = pfx;
 
 			if (turntable.style.animationName)
-				animation = true;      
+				animation = true;
 
 			if (animation === false) {
 				for ( var i = 0; i < domPrefixes.length; i++ ) {
 					if (turntable.style[ domPrefixes[i] + 'AnimationName' ] !== undefined) {
-						pfx = domPrefixes[ i ];  
-						keyframeprefix = '-' + pfx.toLowerCase() + '-';  
+						pfx = domPrefixes[ i ];
+						keyframeprefix = '-' + pfx.toLowerCase() + '-';
 
 						this._cssAnimation.animationstring = pfx + animationstring.ucfirst();
 						this._cssAnimation.animationPlayState = pfx + animationPlayState.ucfirst();
 						this._cssAnimation.keyframeprefix = keyframeprefix;
 						this._cssAnimation.pfx = pfx;
 
-						animation = true;  
+						animation = true;
 
-						break;  
+						break;
 					}
 				}
 			}
@@ -2311,9 +2317,9 @@ turntablePlayerEngine.prototype = {
 
 		if (this.options.useCssAnimations) {
 			this._cssAnimation.rotationIteration = 360;
-			var 
+			var
 				anim = 'rotate' + deg + ' ' + s + 's linear forwards',
-				keyframes = 
+				keyframes =
 					'@' + this._cssAnimation.keyframeprefix + 'keyframes rotate' + deg + ' {'
 					+ 'from {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + this._discRotation + 'deg) }'
 					+ 'to {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + deg + 'deg) }'
@@ -2321,11 +2327,11 @@ turntablePlayerEngine.prototype = {
 			;
 
 		  if (document.styleSheets && document.styleSheets.length)
-	      document.styleSheets[0].insertRule(keyframes, 0);
-		  else {  
-				var st = document.createElement('style');  
-				st.innerHTML = keyframes;  
-				document.getElementsByTagName('head')[0].appendChild(st);  
+		  document.styleSheets[0].insertRule(keyframes, 0);
+		  else {
+				var st = document.createElement('style');
+				st.innerHTML = keyframes;
+				document.getElementsByTagName('head')[0].appendChild(st);
  			}
 
 			if (this._disc && this.options.themes[this.options.theme].disc.turnable) {
@@ -2387,7 +2393,7 @@ turntablePlayerEngine.prototype = {
 				console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
 			}
 			else {
-				var 
+				var
 					t = element.transform(),
 					rIndex = t[0] && t[0].indexOf('r') != -1 ? t[0].indexOf('r') : null,
 					r = rIndex != null ? t[0][rIndex + 1] : null
@@ -2435,13 +2441,13 @@ turntablePlayerEngine.prototype = {
 				this.updateInfos();
 			}
 
-			if (this.options.mode != 'automatic' 
+			if (this.options.mode != 'automatic'
 				|| (this.options.mode == 'automatic' && this._playerPaused && !this._inTransition)
 			)
 				this.updateDiscInfos();
 		}
 		else {
-			var 
+			var
 				r = /turntable-player-transition/i,
 				s = event.target.id
 			;
@@ -2459,7 +2465,7 @@ turntablePlayerEngine.prototype = {
 			this.end();
 		}
 		else {
-			var 
+			var
 				r = /turntable-player-transition/i,
 				s = event.target.id
 			;
@@ -2478,22 +2484,22 @@ turntablePlayerEngine.prototype = {
 	 */
 	playerTimeUpdated : function (event) {
 		if (event.target.id == 'turntable-player') {
-			this.updateDiscNeedlePosition({ 
-				name: 'track', 
-				element: this._player 
+			this.updateDiscNeedlePosition({
+				name: 'track',
+				element: this._player
 			});
 			this.updateInfos();
 		}
 		else if (this._playerPaused && this._inTransition) {
 			if (event.target.id == 'turntable-player-transition-start') {
-				this.updateDiscNeedlePosition({ 
-					name: 'start', 
+				this.updateDiscNeedlePosition({
+					name: 'start',
 					element: this._playerTransitions.start
 				});
 			}
 			else if (event.target.id == 'turntable-player-transition-stop') {
-				this.updateDiscNeedlePosition({ 
-					name: 'end', 
+				this.updateDiscNeedlePosition({
+					name: 'end',
 					element: this._playerTransitions.stop
 				});
 			}
