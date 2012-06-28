@@ -1097,12 +1097,10 @@ turntablePlayerEngine.prototype = {
 		if (!this._disc) {
 			this.checkCssAnimations();
 
-			if (this.options.useCssAnimations) {
+			if (this.options.useCssAnimations)
 				this.initTurntableDisc();
-			}
-			else {
+			else
 				this.initTurntableDiscUsingSVG();
-			}
 
 			this.initTurntableArm();
 		}
@@ -2309,50 +2307,13 @@ turntablePlayerEngine.prototype = {
 
 		var
 			deg = parseInt(this.options.rpm * 360 * time / 60) + this._discRotation,
-			s = time + 1,
-			ms = parseInt(s * 1000)
+			s = time + 1
 		;
 
-		s = Math.round(s * 100) / 100;
-
-		if (this.options.useCssAnimations) {
-			this._cssAnimation.rotationIteration = 360;
-			var
-				anim = 'rotate' + deg + ' ' + s + 's linear forwards',
-				keyframes =
-					'@' + this._cssAnimation.keyframeprefix + 'keyframes rotate' + deg + ' {'
-					+ 'from {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + this._discRotation + 'deg) }'
-					+ 'to {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + deg + 'deg) }'
-					+ '}'
-			;
-
-		  if (document.styleSheets && document.styleSheets.length)
-		  document.styleSheets[0].insertRule(keyframes, 0);
-		  else {
-				var st = document.createElement('style');
-				st.innerHTML = keyframes;
-				document.getElementsByTagName('head')[0].appendChild(st);
- 			}
-
-			if (this._disc && this.options.themes[this.options.theme].disc.turnable) {
-				this._disc.style[this._cssAnimation.animationPlayState] = 'running';
-				this._disc.style[this._cssAnimation.animationstring] = anim;
-			}
-			if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable) {
-				this._discTitle.style[this._cssAnimation.animationPlayState] = 'running';
-				this._discTitle.style[this._cssAnimation.animationstring] = anim;
-			}
-		}
-		else {
-			if (this._disc && this.options.themes[this.options.theme].disc.turnable)
-				this._disc.animate({ transform: 'r' +	deg}, ms, 'linear', function () {
-					self.updateDiscRotationIndex(this);
-				});
-			if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable)
-				this._discTitle.animate({ transform: 'r' +	deg}, ms, 'linear');
-			if (this._discCover && this.options.themes[this.options.theme].disc.cover.turnable)
-				this._discCover.animate({ transform: 'r' +	deg}, ms, 'linear');
-		}
+		if (this.options.useCssAnimations)
+			this.startDiscRotationUsingCSS(deg, s);
+		else
+			this.startDiscRotationUsingSVG(deg, s);
 
 		this._inRotation = true;
 
@@ -2360,26 +2321,97 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Start the rotation of the disc using CSS
+	 */
+	startDiscRotationUsingCSS: function (deg, s) {
+		s = Math.round(s * 100) / 100;
+
+		this._cssAnimation.rotationIteration = 360;
+
+		var
+			anim = 'rotate' + deg + ' ' + s + 's linear forwards',
+			keyframes =
+				'@' + this._cssAnimation.keyframeprefix + 'keyframes rotate' + deg + ' {'
+				+ 'from {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + this._discRotation + 'deg) }'
+				+ 'to {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + deg + 'deg) }'
+				+ '}'
+		;
+
+		if (document.styleSheets && document.styleSheets.length)
+			document.styleSheets[0].insertRule(keyframes, 0);
+		else {
+			var st = document.createElement('style');
+			st.innerHTML = keyframes;
+			document.getElementsByTagName('head')[0].appendChild(st);
+		}
+
+		if (this._disc && this.options.themes[this.options.theme].disc.turnable) {
+			this._disc.style[this._cssAnimation.animationPlayState] = 'running';
+			this._disc.style[this._cssAnimation.animationstring] = anim;
+		}
+
+		if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable) {
+			this._discTitle.style[this._cssAnimation.animationPlayState] = 'running';
+			this._discTitle.style[this._cssAnimation.animationstring] = anim;
+		}
+	},
+
+	/**
+	 * Start the rotation of the disc using SVG
+	 */
+	startDiscRotationUsingSVG: function (deg, s) {
+		var ms = parseInt(s * 1000);
+
+		if (this._disc && this.options.themes[this.options.theme].disc.turnable)
+			this._disc.animate({ transform: 'r' +	deg}, ms, 'linear', function () {
+				self.updateDiscRotationIndex(this);
+			});
+
+		if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable)
+			this._discTitle.animate({ transform: 'r' +	deg}, ms, 'linear');
+
+		if (this._discCover && this.options.themes[this.options.theme].disc.cover.turnable)
+			this._discCover.animate({ transform: 'r' +	deg}, ms, 'linear');
+
+	},
+
+	/**
 	 * Stop all the disc rotations
 	 */
 	stopDiscRotation : function () {
-		if (this.options.useCssAnimations) {
-			if (this._disc && this.options.themes[this.options.theme].disc.turnable)
-				this._disc.style[this._cssAnimation.animationPlayState] = 'paused';
-			if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable)
-				this._discTitle.style[this._cssAnimation.animationPlayState] = 'paused';
-			this.updateDiscRotationIndex(this._disc);
-		}
-		else {
-			if (this._disc && this.options.themes[this.options.theme].disc.turnable)
-				this.updateDiscRotationIndex(this._disc.stop());
-			if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable)
-				this._discTitle.stop();
-			if (this._discCover && this.options.themes[this.options.theme].disc.cover.turnable)
-				this._discCover.stop();
-		}
+		if (this.options.useCssAnimations)
+			stopDiscRotationUsingCSS();
+		else
+			stopDiscRotationUsingSVG();
 
 		this._inRotation = false;
+	},
+
+	/**
+	 * Stop all the disc rotations using CSS
+	 */
+	stopDiscRotationUsingCSS : function () {
+		if (this._disc && this.options.themes[this.options.theme].disc.turnable)
+			this._disc.style[this._cssAnimation.animationPlayState] = 'paused';
+
+		if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable)
+			this._discTitle.style[this._cssAnimation.animationPlayState] = 'paused';
+
+		this.updateDiscRotationIndex(this._disc);
+	},
+
+	/**
+	 * Stop all the disc rotations using SVG
+	 */
+	stopDiscRotationUsingSVG : function () {
+		if (this._disc && this.options.themes[this.options.theme].disc.turnable)
+			this.updateDiscRotationIndex(this._disc.stop());
+
+		if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable)
+			this._discTitle.stop();
+
+		if (this._discCover && this.options.themes[this.options.theme].disc.cover.turnable)
+			this._discCover.stop();
 	},
 
 	/**
@@ -2388,22 +2420,36 @@ turntablePlayerEngine.prototype = {
 	 */
 	updateDiscRotationIndex : function (element) {
 		if (element && this._inRotation) {
-			if (this.options.useCssAnimations) {
-				this._discRotation = parseInt(this.getRotationDegrees(this._disc));
-				console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
-			}
-			else {
-				var
-					t = element.transform(),
-					rIndex = t[0] && t[0].indexOf('r') != -1 ? t[0].indexOf('r') : null,
-					r = rIndex != null ? t[0][rIndex + 1] : null
-				;
+			if (this.options.useCssAnimations)
+				updateDiscRotationIndexUsingCSS(element);
+			else
+				updateDiscRotationIndexUsingSVG(element);
+		}
+	},
 
-				if (r) {
-					this._discRotation = parseInt(r);
-					console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
-				}
-			}
+	/**
+	 * Get and update the index of the disc rotation using CSS
+	 * @see updateDiscRotationIndex
+	 */
+	updateDiscRotationIndexUsingCSS : function (element) {
+		this._discRotation = parseInt(this.getRotationDegrees(this._disc));
+		console.info('Disc rotation index is now : ' + this._discRotation + 'deg.');
+	},
+
+	/**
+	 * Get and update the index of the disc rotation using SVG
+	 * @see updateDiscRotationIndex
+	 */
+	updateDiscRotationIndexUsingSVG : function (element) {
+		var
+			t = element.transform(),
+			rIndex = t[0] && t[0].indexOf('r') != -1 ? t[0].indexOf('r') : null,
+			r = rIndex != null ? t[0][rIndex + 1] : null
+		;
+
+		if (r) {
+			this._discRotation = parseInt(r);
+			console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
 		}
 	},
 
