@@ -15,7 +15,7 @@ turntablePlayerEngine.prototype = {
 		enable: true,
 		mode: 'automatic',
 
-		debug : false,
+		debug : true,
 		logMethodNames: ["log", "debug", "warn", "info"],
 
 		paths: {
@@ -70,7 +70,8 @@ turntablePlayerEngine.prototype = {
 				cssClass: 'default wood',
 				dim: { w: 454, h: 255 },
 				arm: {
-					src: 'default/arm-200-314.png',
+					src: 'default/arm-200-314-2.png',
+					srcTilted: 'default/arm-200-314-3.png',
 					turnable: true,
 					area: {
 						start: 19,
@@ -89,6 +90,10 @@ turntablePlayerEngine.prototype = {
 					pos: {
 						x: 230,
 						y: -120
+					},
+					shadow: {
+						offset: 5,
+						opacity: .5,
 					}
 				},
 				disc: {
@@ -152,7 +157,8 @@ turntablePlayerEngine.prototype = {
 				cssClass: 'default alu',
 				dim: { w: 454, h: 255 },
 				arm: {
-					src: 'default/arm-200-314.png',
+					src: 'default/arm-200-314-2.png',
+					srcTilted: 'default/arm-200-314-3.png',
 					turnable: true,
 					area: {
 						start: 19,
@@ -171,6 +177,10 @@ turntablePlayerEngine.prototype = {
 					pos: {
 						x: 230,
 						y: -120
+					},
+					shadow: {
+						offset: 5,
+						opacity: .5,
 					}
 				},
 				disc: {
@@ -255,6 +265,7 @@ turntablePlayerEngine.prototype = {
 	_arm: null,
 	_armFt: null,
 	_armFtCallback: null,
+	_armShadow: null,
 	_cover: null,
 	_currentTheme: null,
 	_disc: null,
@@ -291,7 +302,7 @@ turntablePlayerEngine.prototype = {
 	 * Init the turntable
 	 * @param  {Object} options Settings
 	 */
-	init : function (options) {
+	init: function (options) {
 		this.setOptions(options);
 		this.loadLogger();
 		console.info('Init!');
@@ -301,7 +312,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Loads the turntable elements
 	 */
-	load : function () {
+	load: function () {
 		console.info('Load!');
 		if (this.check()) {
 			this.initPlayer();
@@ -318,7 +329,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Override options with given ones
 	 */
-	setOptions : function (options) {
+	setOptions: function (options) {
 		if (typeof options == 'object' && options.length == undefined) {
 			if (options.theme)
 				this._currentTheme = this.options.theme;
@@ -339,7 +350,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Disable/enable the console outputs according to the debug option
 	 */
-	loadLogger : function () {
+	loadLogger: function () {
 		if (!window.console) window.console = {};
 		var
 			s = this.options.debug || false,
@@ -370,7 +381,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {String  operation The operation status
 	 * @return {Object}		   The DOM node element
 	 */
-	toggleClass : function (element, className, operation) {
+	toggleClass: function (element, className, operation) {
 		if (!operation)
 			return;
 
@@ -407,7 +418,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Fix browsers compatibilities
 	 */
-	browserCompat : function () {
+	browserCompat: function () {
 		if (this.isiOS()) {
 			this.fixiOSlabels();
 			this.disableTouchMove();
@@ -430,7 +441,7 @@ turntablePlayerEngine.prototype = {
 	 * Detect iOS
 	 * @return {Boolean} iOS detection
 	 */
-	isiOS : function () {
+	isiOS: function () {
 		if (
 			(navigator.userAgent.indexOf('iPhone') != -1)
 			|| (navigator.userAgent.indexOf('iPod') != -1)
@@ -443,7 +454,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Fix iOS labels which FOR attributes are not linked to the INPUT
 	 */
-	fixiOSlabels : function () {
+	fixiOSlabels: function () {
 		function fix() {
 			var
 				labels = document.getElementsByTagName('label'),
@@ -474,7 +485,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Disable touch move event
 	 */
-	disableTouchMove : function () {
+	disableTouchMove: function () {
 		document.ontouchmove = function (event) {
 			return event.preventDefault();
 		}
@@ -483,7 +494,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Enable touch move event
 	 */
-	enableTouchMove : function () {
+	enableTouchMove: function () {
 		document.ontouchmove = function (event) {
 			return event;
 		}
@@ -493,7 +504,7 @@ turntablePlayerEngine.prototype = {
 	 * Create a XHR object
 	 * @return {Object} The XHR just created
 	 */
-	createXHR : function ()
+	createXHR: function ()
 	{
 		var request = false;
 		try {
@@ -522,7 +533,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Object} httpRequest The XHR object
 	 * @return {String}			 The text response of the XHR
 	 */
-	getResponseXHR : function (httpRequest) {
+	getResponseXHR: function (httpRequest) {
 		var self = this;
 		try {
 			if (httpRequest.readyState === 4) {
@@ -544,7 +555,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Number} max Maximum
 	 * @return {Number}	 Random number result
 	 */
-	getRandomArbitrary : function (min, max)
+	getRandomArbitrary: function (min, max)
 	{
 	  return Math.random() * (max - min) + min;
 	},
@@ -554,7 +565,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Object} element The element to measure
 	 * @return {Number}		 The rotation in degrees
 	 */
-	getRotationDegrees : function (element) {
+	getRotationDegrees: function (element) {
 		// get the computed style object for the element
 		var style = window.getComputedStyle(element, null);
 		// this string will be in the form 'matrix(a, b, c, d, tx, ty)'
@@ -589,7 +600,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Object} t The time informations
 	 * @return {String}   The formatted time
 	 */
-	formatTime : function (t) {
+	formatTime: function (t) {
 		return t.mins + ':' + (t.secs > 9 ? t.secs : '0' + t.secs);
 	},
 
@@ -598,7 +609,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Object} t The track object
 	 * @return {String}   The formatted title
 	 */
-	formatTrackTitle : function (t) {
+	formatTrackTitle: function (t) {
 		return t.artist + ' - ' + t.title;
 	},
 
@@ -607,7 +618,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {Number} i The index of the track in the playlist
 	 * @see formatTrackTitle()
 	 */
-	getTrackTitle : function (index) {
+	getTrackTitle: function (index) {
 		var
 			i = typeof index == 'number' ? index : this._playlistIndex,
 			track = this._tracks[i]
@@ -621,7 +632,7 @@ turntablePlayerEngine.prototype = {
 	 * @see getTrackTitle()
 	 * @return {String} The title of the track
 	 */
-	getTrackTitleDashed : function () {
+	getTrackTitleDashed: function () {
 		return this.getTrackTitle() + ' - ';
 	},
 
@@ -630,7 +641,7 @@ turntablePlayerEngine.prototype = {
 	 * @see getTrackTitle()
 	 * @return {String} The title of the track
 	 */
-	getTrackTitleLineBreak : function () {
+	getTrackTitleLineBreak: function () {
 		return this.getTrackTitle().replace(' - ', '\n \n');
 	},
 
@@ -638,7 +649,7 @@ turntablePlayerEngine.prototype = {
 	 * Create an arc string as a path for a SVG element
 	 * @return {String}			  The path of the arc string
 	 */
-	arcString : function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
+	arcString: function(startX, startY, endX, endY, radius1, radius2, angle, largeArcFlag) {
 		// opts 4 and 5 are:
 		// large-arc-flag: 0 for smaller arc
 		// sweep-flag: 1 for clockwise
@@ -652,7 +663,7 @@ turntablePlayerEngine.prototype = {
 	 * Create the furrows of the disc as a path for a SVG element
 	 * @return {String}			  The path of the furrows
 	 */
-	getFurrowsPath : function (centerX, centerY, spacing, maxRadius) {
+	getFurrowsPath: function (centerX, centerY, spacing, maxRadius) {
 		var
 			paselftributes = ['M', centerX, centerY],
 			angle = 0,
@@ -677,7 +688,7 @@ turntablePlayerEngine.prototype = {
 	 * Get a playlist thanks to his uri
 	 * @param  {String} uri The uri of the playlist
 	 */
-	getPlaylist : function (uri) {
+	getPlaylist: function (uri) {
 		var
 			self = this,
 			uri = uri || (this.options.paths.playlists + this.options.playlistLocation),
@@ -732,7 +743,7 @@ turntablePlayerEngine.prototype = {
 	 * Load a new playlist thanks to his uri
 	 * @param  {String} uri The uri of the playlist
 	 */
-	newPlaylist : function (uri) {
+	newPlaylist: function (uri) {
 		this.getPlaylist(uri);
 	},
 
@@ -740,7 +751,7 @@ turntablePlayerEngine.prototype = {
 	 * Check if the turntable can be loaded
 	 * @return {Boolean} The status of the check
 	 */
-	check : function () {
+	check: function () {
 		this._wrapper;
 		if (!this._tracks.length && this.options.enable) {
 			this.options.enable = false;
@@ -791,7 +802,7 @@ turntablePlayerEngine.prototype = {
 	 * Load the turntable wrapper
 	 * @return {Object} The DOM node element
 	 */
-	loadWrapper : function () {
+	loadWrapper: function () {
 		if (!this._wrapper) {
 			var
 				id = this.options.ids.player,
@@ -818,7 +829,7 @@ turntablePlayerEngine.prototype = {
 	 * Get the remote node
 	 * @return {Object} The DOM node element
 	 */
-	getRemote : function () {
+	getRemote: function () {
 		if (!this._remote) {
 			var
 				id = this.options.ids.remote,
@@ -839,7 +850,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the audio player
 	 */
-	initPlayer : function () {
+	initPlayer: function () {
 		if (!this._player) {
 			var
 				self = this,
@@ -874,7 +885,7 @@ turntablePlayerEngine.prototype = {
 	 * Init the audio transitions
 	 * @return {[type]} [description]
 	 */
-	initTransitions : function () {
+	initTransitions: function () {
 		if (this.options.useTransitions && !this._playerTransitions.start) {
 
 			this._playerTransitions.start = this.loadTransition(
@@ -895,7 +906,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the track informations
 	 */
-	initInfos : function () {
+	initInfos: function () {
 		if (this.options.panels.infos && this.options.infos.length) {
 			var
 				infos,
@@ -940,7 +951,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the remote control
 	 */
-	initRemote : function () {
+	initRemote: function () {
 		this.initPowerButton();
 		this.initNextButton();
 		this.browserCompat();
@@ -949,7 +960,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Add the power button in the remote panel
 	 */
-	initPowerButton : function () {
+	initPowerButton: function () {
 		if (!this._powerButtons.inputON) {
 			var
 				self = this,
@@ -999,7 +1010,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Add the next button in the remote panel
 	 */
-	initNextButton : function () {
+	initNextButton: function () {
 		if (!this._nextButton) {
 			var
 				self = this,
@@ -1023,7 +1034,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the playlist
 	 */
-	initPlaylist : function () {
+	initPlaylist: function () {
 		if (this.options.panels.playlist) {
 			var
 				self = this
@@ -1065,7 +1076,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the cover panel
 	 */
-	initCover : function () {
+	initCover: function () {
 		if (this.options.panels.cover) {
 
 		 if (!this._cover) {
@@ -1093,7 +1104,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the turntable disc
 	 */
-	initTurntable : function () {
+	initTurntable: function () {
 		if (!this._disc) {
 			this.checkCssAnimations();
 
@@ -1109,7 +1120,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the turntable disc with CANVAS
 	 */
-	initTurntableDisc : function () {
+	initTurntableDisc: function () {
 		var
 			self = this,
 			turntable = this._wrapper,
@@ -1224,7 +1235,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Draw the title of the current track on the disc
 	 */
-	drawTitleAlongDisc : function () {
+	drawTitleAlongDisc: function () {
 		var
 			theme = this.options.themes[this.options.theme],
 			discTitleCtx = this._discTitle.getContext('2d'),
@@ -1253,7 +1264,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the turntable disc with SVG
 	 */
-	initTurntableDiscUsingSVG : function () {
+	initTurntableDiscUsingSVG: function () {
 		var
 			self = this,
 			theme = this.options.themes[this.options.theme],
@@ -1347,7 +1358,128 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Init the turntable arm
 	 */
-	initTurntableArm : function () {
+	initTurntableArm: function () {
+		this.initTurntableArmBase();
+		if (this.options.useCssAnimations)
+			this.initTurntableArmShadow();
+		this.initTurntableArmUsingSVG();
+	},
+
+	/**
+	 * Init the turntable arm
+	 */
+	initTurntableArmBase: function () {
+		var
+			turntable = this._wrapper,
+			theme = this.options.themes[this.options.theme],
+			armBase = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas')
+		;
+
+		this.toggleClass(armBase, 'armBase', 'add');
+		turntable.appendChild(armBase);
+		armBase.width = 60;
+		armBase.height = 60;
+		armBase.style.left = theme.disc.dim.w + 'px';
+		armBase.style.top = 20 + 'px';
+		var armBaseCtx = armBase.getContext('2d');
+		armBaseCtx.fillStyle = '#000';
+		armBaseCtx.lineWidth = 4;
+
+		var
+			armBaseCtxG1 = armBaseCtx.createRadialGradient(
+				armBase.width / 5,
+				armBase.height / 5,
+				10,
+				armBase.width / 4,
+				armBase.height / 4,
+				55
+			),
+			armBaseCtxG2 = armBaseCtx.createRadialGradient(
+				armBase.width / 5,
+				armBase.height / 5,
+				10,
+				armBase.width / 4,
+				armBase.height / 4,
+				60
+			)
+		;
+
+		armBaseCtx.save();
+		armBaseCtx.beginPath();
+		armBaseCtx.arc(
+			armBase.width / 2,
+			armBase.height / 2,
+			30,
+			0,
+			2 * Math.PI,
+			false
+		);
+		armBaseCtxG2.addColorStop(0, '#fff');
+		armBaseCtxG2.addColorStop(1, '#666');
+		armBaseCtx.fillStyle = armBaseCtxG2;
+		armBaseCtx.fill();
+
+		armBaseCtx.save();
+		armBaseCtx.beginPath();
+		armBaseCtx.arc(
+			armBase.width / 2,
+			armBase.height / 2,
+			28,
+			0,
+			2 * Math.PI,
+			false
+		);
+		armBaseCtxG1.addColorStop(0, '#000');
+		armBaseCtxG1.addColorStop(1, '#333');
+		armBaseCtx.fillStyle = armBaseCtxG1;
+		armBaseCtx.fill();
+	},
+
+	/**
+	 * Init the turntable arm shadow
+	 */
+	initTurntableArmShadow: function () {
+		var
+			self = this,
+			turntable = this._wrapper,
+			theme = this.options.themes[this.options.theme],
+			armShadow = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas')
+		;
+
+		this.toggleClass(armShadow, 'armShadow', 'add');
+		var base_image = new Image();
+		base_image.onload = function() {
+			armShadow.width = base_image.naturalWidth;
+			armShadow.height = base_image.naturalHeight;
+			armShadow.style.left = theme.arm.pos.x + 'px';
+			armShadow.style.top = theme.arm.pos.y + 'px';
+			armShadow.style.opacity = theme.arm.shadow.opacity;
+			armShadow.getContext('2d').drawImage(base_image, 0, 0);
+
+			var
+				imageData = armShadow.getContext('2d').getImageData(0, 0, armShadow.width, armShadow.height),
+				data = imageData.data
+			;
+			for (var i = 0; i < data.length; i += 4) {
+				var brightness = 0;//0.1 * data[i] + 0.1 * data[i + 1] + 0.1 * data[i + 2];
+
+				data[i] = brightness; // red
+				data[i + 1] = brightness; // green
+				data[i + 2] = brightness; // blue
+				// i+3 is alpha (the fourth element)
+			}
+			armShadow.getContext('2d').putImageData(imageData, 0, 0);
+			turntable.appendChild(armShadow);
+
+			self._armShadow = armShadow;
+		};
+		base_image.src = theme.arm.src;
+	},
+
+	/**
+	 * Init the turntable arm using SVG
+	 */
+	initTurntableArmUsingSVG: function () {
 		var
 			self = this,
 			theme = this.options.themes[this.options.theme],
@@ -1355,26 +1487,15 @@ turntablePlayerEngine.prototype = {
 				this._wrapper,
 				theme.dim.w,
 				theme.dim.h),
-			arm = theme.arm.src
-				? paper.image(
-					this.options.paths.themes + theme.arm.src,
-					theme.arm.pos.x,
-					theme.arm.pos.y,
-					theme.arm.dim.w,
-					theme.arm.dim.h)
-				: paper.rect(
-					theme.arm.pos.x,
-					theme.arm.pos.y,
-					theme.arm.dim.w,
-					theme.arm.dim.h)
-					.attr({
-						'fill': theme.arm.fill,
-						'stroke': theme.arm.stroke
-					}),
+			arm = this.drawArmusingSVG(paper, false),
 			ftCallback = function(ft, events) {
 				// console.info('FT events : ', events);
+
 				self._armRotation = ft.attrs.rotate;
+
 				if (events.indexOf('rotate start') != -1) {
+					self._armDragging = true;
+					self.drawArmusingSVG(paper, true);
 					self.pause();
 					self.pauseTransitions();
 					self.playTransition({
@@ -1415,6 +1536,20 @@ turntablePlayerEngine.prototype = {
 					else
 						self.enableRemote('start');
 				}
+
+				if (events.indexOf('rotate end') != -1) {
+					self._armDragging = false;
+					self.drawArmusingSVG(paper, false);
+				}
+
+				if (
+					(events.indexOf('init') == -1 && ft.attrs.rotate != 0)
+					&& events.indexOf('animate') == -1
+					&& events.indexOf('animate start') == -1
+					&& events.indexOf('animate end') == -1
+				)
+					self.rotateArmShadow();
+
 			},
 			ft = paper.freeTransform(
 				arm,
@@ -1443,10 +1578,54 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Draw the arm using SVG
+	 * @param  {Object}  paper    Raphael JS paper
+	 * @param  {Boolean} isTilted Is the arm titled
+	 * @return {Object}          Raphael JS paper image or rect
+	 */
+	drawArmusingSVG: function (paper, isTilted) {
+		if (!paper)
+			paper = this._paper;
+
+		if (!isTilted)
+			isTilted = false;
+
+		var
+			theme = this.options.themes[this.options.theme],
+			src = isTilted && theme.arm.srcTilted
+				? theme.arm.srcTilted
+				: theme.arm.src
+		;
+
+		if (this._arm) {
+			this._arm.node.href.baseVal = src;
+		}
+		else {
+			return theme.arm.src
+				? paper.image(
+					this.options.paths.themes + src,
+					theme.arm.pos.x,
+					theme.arm.pos.y,
+					theme.arm.dim.w,
+					theme.arm.dim.h)
+				: paper.rect(
+					theme.arm.pos.x,
+					theme.arm.pos.y,
+					theme.arm.dim.w,
+					theme.arm.dim.h)
+					.attr({
+						'fill': theme.arm.fill,
+						'stroke': theme.arm.stroke
+					})
+			;
+		}
+	},
+
+	/**
 	 * Enable the remote control
 	 * @param  {String} s The message, mostly the name of the function calling this one
 	 */
-	enableRemote : function (s) {
+	enableRemote: function (s) {
 		var s = s || '-';
 
 		for (var button in this._powerButtons)
@@ -1465,7 +1644,7 @@ turntablePlayerEngine.prototype = {
 	 * Disable the remote control
 	 * @param  {String} s The message, mostly the name of the function calling this one
 	 */
-	disableRemote : function (s) {
+	disableRemote: function (s) {
 		var s = s || '-';
 
 		for (var button in this._powerButtons)
@@ -1483,7 +1662,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Reset the remote control by removing the buttons, mostly called on re-init
 	 */
-	resetRemote : function () {
+	resetRemote: function () {
 		for (var button in this._playlistButtons) {
 			this._playlist.removeChild(this._playlistButtons[button]);
 			delete this._playlistButtons[button];
@@ -1495,7 +1674,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Update the disc informations such as the title of the track
 	 */
-	updateDiscInfos : function () {
+	updateDiscInfos: function () {
 		if (this._discTitle) {
 			if (this.options.useCssAnimations)
 				this.drawTitleAlongDisc();
@@ -1509,7 +1688,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Update the cover with title, artist and tracks names
 	 */
-	updateCoverInfos : function () {
+	updateCoverInfos: function () {
 		this._cover.innerHTML = '';
 
 		if (this._playlistInfos.artist) {
@@ -1567,7 +1746,7 @@ turntablePlayerEngine.prototype = {
 	 * Add the legend to the cover
 	 * @param  {Object} options Settings
 	 */
-	loadCoverLegend : function (options) {
+	loadCoverLegend: function (options) {
 		var
 			o = options || {},
 			tag = o.tag || 'div'
@@ -1585,7 +1764,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Update the disc informations such as the duration of the track
 	 */
-	updateTrackInfos : function () {
+	updateTrackInfos: function () {
 		if (this._player && this.options.panels.infos && this.options.infos.indexOf('duration') != -1) {
 			this._infos['duration'].innerHTML = this.formatTime({
 				mins: Math.floor(this._player.duration / 60, 10),
@@ -1599,7 +1778,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Update the disc informations such as the position of the track
 	 */
-	updateInfos : function () {
+	updateInfos: function () {
 		if (this._player && this.options.panels.infos && !isNaN(this._player.duration)) {
 			var
 				rem = parseInt(this._player.duration - this._player.currentTime, 10),
@@ -1629,7 +1808,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the disc arm according to the current position of the track
 	 * @param {Object} options Settings
 	 */
-	updateDiscNeedlePosition : function (options) {
+	updateDiscNeedlePosition: function (options) {
 		var o = options || {};
 		if (o.element && !isNaN(o.element.duration) && !isNaN(o.element.currentTime)
 			&& this.options.themes[this.options.theme].arm.turnable && (
@@ -1666,7 +1845,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Update the track current position according to the current position of the disc arm
 	 */
-	updatePlayerPosition : function () {
+	updatePlayerPosition: function () {
 		var
 			percent = (this._armRotation - this.options.themes[this.options.theme].arm.area.from) * 100 / (this.options.themes[this.options.theme].arm.area.to - this.options.themes[this.options.theme].arm.area.from),
 			currentTime = this._player.duration * percent / 100
@@ -1686,7 +1865,7 @@ turntablePlayerEngine.prototype = {
 	 * Get the name of the area where the arm is placed
 	 * @return {String} The name of the area
 	 */
-	getArmArea : function () {
+	getArmArea: function () {
 		var area;
 
 		if (
@@ -1714,10 +1893,11 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Place the arm on the disc in order to be ready to play
 	 */
-	placeTheArmOnTheDisc : function () {
+	placeTheArmOnTheDisc: function () {
 		this.disableRemote('start');
 
 		if (this._armFt) {
+			this.rotateArmShadow(this.options.themes[this.options.theme].arm.area.start, true);
 			this._armFt.setOpts({ animate: true }, this._armFtCallback);
 			this._armFt.attrs.rotate = this.options.themes[this.options.theme].arm.area.start;
 			this._armFt.apply();
@@ -1732,11 +1912,12 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Place the arm off the disc in order to be powered off
 	 */
-	placeTheArmOffTheDisc : function () {
+	placeTheArmOffTheDisc: function () {
 		if (this._armRotation != 0) {
 			this.disableRemote('stop');
 
 			if (this._armFt) {
+				this.rotateArmShadow(0, true);
 				this._armFt.setOpts({ animate: true }, this._armFtCallback);
 				this._armFt.attrs.rotate = 0;
 				this._armFt.apply();
@@ -1751,7 +1932,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Switch on the turntable
 	 */
-	powerON : function () {
+	powerON: function () {
 		console.info('POWER ON');
 
 		if (this._playerInit == false)
@@ -1768,7 +1949,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Switch off the turntable
 	 */
-	powerOFF : function () {
+	powerOFF: function () {
 		console.info('POWER OFF');
 
 		this.switchOffTheButton();
@@ -1782,7 +1963,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Switch on the play/pause button
 	 */
-	switchOnTheButton : function () {
+	switchOnTheButton: function () {
 		this._powerON = true;
 
 		if (this.options.panels.playlist)
@@ -1795,7 +1976,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Switch off the play/pause button
 	 */
-	switchOffTheButton : function () {
+	switchOffTheButton: function () {
 		this._powerON = false;
 
 		if (this.options.panels.playlist)
@@ -1808,7 +1989,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Start the manual turntable
 	 */
-	startManual : function () {
+	startManual: function () {
 		console.info('START MANUAL');
 
 		this.playDiscArea(true);
@@ -1823,7 +2004,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop the manual turntable
 	 */
-	stopManual : function () {
+	stopManual: function () {
 		console.info('STOP MANUAL');
 
 		this.startDiscRotation({
@@ -1841,7 +2022,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Start the automatic turntable
 	 */
-	startAuto : function () {
+	startAuto: function () {
 		console.info('START AUTO');
 
 		this.placeTheArmOnTheDisc();
@@ -1856,7 +2037,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop the automatic turntable
 	 */
-	stopAuto : function () {
+	stopAuto: function () {
 		console.info('STOP AUTO');
 
 		this.end(true);
@@ -1866,7 +2047,7 @@ turntablePlayerEngine.prototype = {
 	 * Play the audio track or transition according to the arm position
 	 * @param  {Boolean} avoidTransition Avoid use of transition or not
 	 */
-	playDiscArea : function (avoidTransition) {
+	playDiscArea: function (avoidTransition) {
 		console.info("DRAGGED'N'DROPPED");
 
 		var area = this.getArmArea();
@@ -1894,7 +2075,7 @@ turntablePlayerEngine.prototype = {
 	 * Play the audio track or the start transition
 	 * @param  {Boolean} avoidTransition Avoid use of transitions or not
 	 */
-	play : function (avoidTransition) {
+	play: function (avoidTransition) {
 		console.info('PLAY');
 
 		if (!avoidTransition)
@@ -1915,7 +2096,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Play the track
 	 */
-	playTrack : function () {
+	playTrack: function () {
 		if (this._powerON || (this.options.mode == 'automatic' && !this._powerON)) {
 			this._player.play();
 			this._playerPaused = false;
@@ -1946,7 +2127,7 @@ turntablePlayerEngine.prototype = {
 	 * Stop the audio track and/or play the stop transition
 	 * @param  {Boolean} avoidTransition Avoid use of transition or not
 	 */
-	end : function (avoidTransition) {
+	end: function (avoidTransition) {
 		console.info('END');
 
 		if (!avoidTransition)
@@ -1987,7 +2168,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Pause the audio player
 	 */
-	pause : function () {
+	pause: function () {
 		console.info('PAUSE');
 
 		if (this._playerPaused != true) {
@@ -1999,7 +2180,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop and start the turntable
 	 */
-	restart : function () {
+	restart: function () {
 		console.info('RESTART');
 
 		this._needRestart = true;
@@ -2011,7 +2192,7 @@ turntablePlayerEngine.prototype = {
 	 * @param {Object} element The audio element
 	 * @param {Mixed} src	 The source(s) as string or object
 	 */
-	addSrcToAudio : function (element, src, type) {
+	addSrcToAudio: function (element, src, type) {
 		while (element.firstChild) {
 		  element.removeChild(element.firstChild);
 		}
@@ -2044,7 +2225,7 @@ turntablePlayerEngine.prototype = {
 	 * Load the track according to his index in the playlist
 	 * @param  {Number} i The index of the track in the playlist
 	 */
-	loadTrack : function (index) {
+	loadTrack: function (index) {
 		if (this._tracks.length) {
 			var
 				i = typeof index == 'number' ? index : 0,
@@ -2077,7 +2258,7 @@ turntablePlayerEngine.prototype = {
 	 * @param  {String} transition The transition type
 	 * @return {Object} The DOM node element
 	 */
-	loadTransition : function (element, transition) {
+	loadTransition: function (element, transition) {
 		if (!element || !transition) {
 			console.error('No transition track to load.')
 			return;
@@ -2120,7 +2301,7 @@ turntablePlayerEngine.prototype = {
 	 * Update the duration time of the transitions
 	 * @param  {Object} element	The DOM node element
 	 */
-	updateTransition : function (element) {
+	updateTransition: function (element) {
 		var transition;
 
 		if (element.id == 'turntable-player-transition-start')
@@ -2184,7 +2365,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Pause all the transitions
 	 */
-	pauseTransitions : function () {
+	pauseTransitions: function () {
 		for (var t in this._playerTransitions) {
 			this._playerTransitions[t].pause();
 		}
@@ -2194,7 +2375,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop all the transitions
 	 */
-	stopTransitions : function () {
+	stopTransitions: function () {
 		for (var t in this._playerTransitions) {
 			this._playerTransitions[t].pause();
 			this._playerTransitions[t].currentTime = 0;
@@ -2205,21 +2386,22 @@ turntablePlayerEngine.prototype = {
 	 * Check if the css animation can be done on this browser
 	 * @return {[type]} [description]
 	 */
-	checkCssAnimations : function () {
+	checkCssAnimations: function () {
 		if (this.options.useCssAnimations) {
 			var
 				animation = false,
-				animationstring = 'animation',
+				transformString = 'transform',
+				animationString = 'animation',
 				animationPlayState = 'animationPlayState',
 				domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),
-				keyframeprefix = '',
+				vendorPrefix = '',
 				pfx  = '',
 				turntable = this._wrapper
 			;
 
-			this._cssAnimation.animationstring = animationstring;
+			this._cssAnimation.animationString = animationString;
 			this._cssAnimation.animationPlayState = animationPlayState;
-			this._cssAnimation.keyframeprefix = keyframeprefix;
+			this._cssAnimation.vendorPrefix = vendorPrefix;
 			this._cssAnimation.pfx = pfx;
 
 			if (turntable.style.animationName)
@@ -2229,11 +2411,12 @@ turntablePlayerEngine.prototype = {
 				for ( var i = 0; i < domPrefixes.length; i++ ) {
 					if (turntable.style[ domPrefixes[i] + 'AnimationName' ] !== undefined) {
 						pfx = domPrefixes[ i ];
-						keyframeprefix = '-' + pfx.toLowerCase() + '-';
+						vendorPrefix = '-' + pfx.toLowerCase() + '-';
 
-						this._cssAnimation.animationstring = pfx + animationstring.ucfirst();
+						this._cssAnimation.transformString = pfx + transformString.ucfirst();
+						this._cssAnimation.animationString = pfx + animationString.ucfirst();
 						this._cssAnimation.animationPlayState = pfx + animationPlayState.ucfirst();
-						this._cssAnimation.keyframeprefix = keyframeprefix;
+						this._cssAnimation.vendorPrefix = vendorPrefix;
 						this._cssAnimation.pfx = pfx;
 
 						animation = true;
@@ -2254,7 +2437,7 @@ turntablePlayerEngine.prototype = {
 	 * Calculate the full duration of rotation of the disc
 	 * @return {Number} The duration
 	 */
-	calculatePlayRemainingTime : function () {
+	calculatePlayRemainingTime: function () {
 		var
 			area = this.getArmArea(),
 			time = 0
@@ -2282,9 +2465,61 @@ turntablePlayerEngine.prototype = {
 	},
 
 	/**
+	 * Start the rotation of the disc
+	 */
+	rotateArmShadow: function (deg, withDelay) {
+		var
+			deg = deg != null ? deg : this._armRotation,
+			delay = withDelay === true
+				? this.options.animateDelay / 1000
+				: false
+		;
+
+		deg = parseInt(deg);
+
+		if (this._armDragging === true)
+			deg += this.options.themes[this.options.theme].arm.shadow.offset;
+
+		this.rotateArmShadowUsingCSS(deg, delay);
+	},
+
+	/**
+	 * Start the rotation of the disc using CSS
+	 */
+	rotateArmShadowUsingCSS: function (deg, delay) {
+
+		if (this._armShadow && delay === false) {
+			this._armShadow.style[this._cssAnimation.animationString] = '';
+			this._armShadow.style[this._cssAnimation.transformString] = 'rotate(' + deg + 'deg)';
+		}
+		else if (this._armShadow) {
+			var
+				name = 'rotate' + parseInt(this._armRotation) +  'to' + deg,
+				anim = name + ' ' + delay + 's linear forwards',
+				keyframes =
+					'@' + this._cssAnimation.vendorPrefix + 'keyframes ' + name + ' {'
+					+ 'from {' + this._cssAnimation.vendorPrefix + 'transform: rotate(' + this._armRotation + 'deg) }'
+					+ 'to {' + this._cssAnimation.vendorPrefix + 'transform: rotate(' + deg + 'deg) }'
+					+ '}'
+			;
+
+			if (document.styleSheets && document.styleSheets.length)
+				document.styleSheets[0].insertRule(keyframes, 0);
+			else {
+				var st = document.createElement('style');
+				st.innerHTML = keyframes;
+				document.getElementsByTagName('head')[0].appendChild(st);
+			}
+
+			this._armShadow.style[this._cssAnimation.animationPlayState] = 'running';
+			this._armShadow.style[this._cssAnimation.animationString] = anim;
+		}
+	},
+
+	/**
 	 * Start the rotation of the disc according to the settings
 	 */
-	startDiscRotation : function (options) {
+	startDiscRotation: function (options) {
 		var
 			self = this,
 			o = options || {},
@@ -2326,14 +2561,15 @@ turntablePlayerEngine.prototype = {
 	startDiscRotationUsingCSS: function (deg, s) {
 		s = Math.round(s * 100) / 100;
 
-		this._cssAnimation.rotationIteration = 360;
+		this._cssAnimation.discRotationIteration = 360;
 
 		var
-			anim = 'rotate' + deg + ' ' + s + 's linear forwards',
+			name = 'rotate' + this._discRotation +  'to' + deg,
+			anim = name + ' ' + s + 's linear forwards',
 			keyframes =
-				'@' + this._cssAnimation.keyframeprefix + 'keyframes rotate' + deg + ' {'
-				+ 'from {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + this._discRotation + 'deg) }'
-				+ 'to {' + this._cssAnimation.keyframeprefix + 'transform: rotate(' + deg + 'deg) }'
+				'@' + this._cssAnimation.vendorPrefix + 'keyframes ' + name + ' {'
+				+ 'from {' + this._cssAnimation.vendorPrefix + 'transform: rotate(' + this._discRotation + 'deg) }'
+				+ 'to {' + this._cssAnimation.vendorPrefix + 'transform: rotate(' + deg + 'deg) }'
 				+ '}'
 		;
 
@@ -2347,12 +2583,12 @@ turntablePlayerEngine.prototype = {
 
 		if (this._disc && this.options.themes[this.options.theme].disc.turnable) {
 			this._disc.style[this._cssAnimation.animationPlayState] = 'running';
-			this._disc.style[this._cssAnimation.animationstring] = anim;
+			this._disc.style[this._cssAnimation.animationString] = anim;
 		}
 
 		if (this._discTitle && this.options.themes[this.options.theme].disc.title.turnable) {
 			this._discTitle.style[this._cssAnimation.animationPlayState] = 'running';
-			this._discTitle.style[this._cssAnimation.animationstring] = anim;
+			this._discTitle.style[this._cssAnimation.animationString] = anim;
 		}
 	},
 
@@ -2372,13 +2608,12 @@ turntablePlayerEngine.prototype = {
 
 		if (this._discCover && this.options.themes[this.options.theme].disc.cover.turnable)
 			this._discCover.animate({ transform: 'r' +	deg}, ms, 'linear');
-
 	},
 
 	/**
 	 * Stop all the disc rotations
 	 */
-	stopDiscRotation : function () {
+	stopDiscRotation: function () {
 		if (this.options.useCssAnimations)
 			stopDiscRotationUsingCSS();
 		else
@@ -2390,7 +2625,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop all the disc rotations using CSS
 	 */
-	stopDiscRotationUsingCSS : function () {
+	stopDiscRotationUsingCSS: function () {
 		if (this._disc && this.options.themes[this.options.theme].disc.turnable)
 			this._disc.style[this._cssAnimation.animationPlayState] = 'paused';
 
@@ -2403,7 +2638,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Stop all the disc rotations using SVG
 	 */
-	stopDiscRotationUsingSVG : function () {
+	stopDiscRotationUsingSVG: function () {
 		if (this._disc && this.options.themes[this.options.theme].disc.turnable)
 			this.updateDiscRotationIndex(this._disc.stop());
 
@@ -2418,7 +2653,7 @@ turntablePlayerEngine.prototype = {
 	 * Get and update the index of the disc rotation
 	 * @param  {Object} element The DOM node element
 	 */
-	updateDiscRotationIndex : function (element) {
+	updateDiscRotationIndex: function (element) {
 		if (element && this._inRotation) {
 			if (this.options.useCssAnimations)
 				updateDiscRotationIndexUsingCSS(element);
@@ -2431,32 +2666,42 @@ turntablePlayerEngine.prototype = {
 	 * Get and update the index of the disc rotation using CSS
 	 * @see updateDiscRotationIndex
 	 */
-	updateDiscRotationIndexUsingCSS : function (element) {
+	updateDiscRotationIndexUsingCSS: function (element) {
 		this._discRotation = parseInt(this.getRotationDegrees(this._disc));
 		console.info('Disc rotation index is now : ' + this._discRotation + 'deg.');
 	},
 
 	/**
-	 * Get and update the index of the disc rotation using SVG
+	 * Update the index of the disc rotation using SVG
 	 * @see updateDiscRotationIndex
 	 */
-	updateDiscRotationIndexUsingSVG : function (element) {
+	updateDiscRotationIndexUsingSVG: function (element) {
+		var r = this.getRotationIndexFromSVGElement(element);
+
+		if (r) {
+			this._discRotation = r;
+			console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
+		}
+	},
+
+	/**
+	 * Get the rotation index in degree from a SVG element
+	 * @see updateDiscRotationIndex
+	 */
+	getRotationIndexFromSVGElement: function (element) {
 		var
 			t = element.transform(),
 			rIndex = t[0] && t[0].indexOf('r') != -1 ? t[0].indexOf('r') : null,
 			r = rIndex != null ? t[0][rIndex + 1] : null
 		;
 
-		if (r) {
-			this._discRotation = parseInt(r);
-			console.info('Disc rotation index is now : ' + this._discRotation + 'deg.')
-		}
+		return r ? parseInt(r) : null;
 	},
 
 	/**
 	 * Event 'loadeddata' called on media elements
 	 */
-	playerLoadedData : function (event) {
+	playerLoadedData: function (event) {
 		console.info('Audio player "' + event.target.id + '" event: loadedData.');
 
 		if (event.target.id == 'turntable-player') {
@@ -2476,7 +2721,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Event 'loadedmetadata' called on media elements
 	 */
-	playerLoadedMetaData : function (event) {
+	playerLoadedMetaData: function (event) {
 		console.info('Audio player "' + event.target.id + '" event: loadedMetaData.');
 
 		if (event.target.id == 'turntable-player') {
@@ -2505,7 +2750,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Event 'ended' called on media elements
 	 */
-	playerEnded : function (event) {
+	playerEnded: function (event) {
 		if (event.target.id == 'turntable-player' && !this._playerPaused) {
 			console.info('Player event: ended.');
 			this.end();
@@ -2528,7 +2773,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Event 'timeupdated' called on media elements
 	 */
-	playerTimeUpdated : function (event) {
+	playerTimeUpdated: function (event) {
 		if (event.target.id == 'turntable-player') {
 			this.updateDiscNeedlePosition({
 				name: 'track',
@@ -2555,7 +2800,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Event 'click' called on the power button
 	 */
-	powerButtonClicked : function (event) {
+	powerButtonClicked: function (event) {
 		if (this._powerON && event.target.id == 'power-off')
 			this.powerOFF();
 		else if (!this._powerON && event.target.id == 'power-on')
@@ -2565,7 +2810,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Event 'click' called on the next button
 	 */
-	nextButtonClicked : function (event) {
+	nextButtonClicked: function (event) {
 		if (!this._powerON || this.options.mode == 'automatic')
 			this.next();
 	},
@@ -2573,7 +2818,7 @@ turntablePlayerEngine.prototype = {
 	/**
 	 * Event 'click' called on the playlist tracks
 	 */
-	playlistButtonClicked : function (event) {
+	playlistButtonClicked: function (event) {
 		if (event.target.data != undefined && this._powerON && (
 			this.options.mode == 'automatic'
 			|| (this._playerPaused && !this._inTransition)
