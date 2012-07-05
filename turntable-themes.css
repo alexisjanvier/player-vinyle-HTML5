@@ -90,7 +90,10 @@
 	outline: 0;
 }
 
-/** DISC **/
+/** ARM & DISC **/
+#player.default .arm,
+#player.default .armBase,
+#player.default .armShadow,
 #player.default .disc,
 #player.default .discEnd,
 #player.default .discCover,
@@ -110,7 +113,7 @@
 }
 #player.default .remote .button {
 	border: 2px solid;
-	display: block;	
+	display: block;
 	height: 25px;
 	margin-bottom: 20px;
 	padding: 0;
@@ -349,7 +352,7 @@
 	background: transparent;
 	border: none;
 	color: #444;
-	display: block;	
+	display: block;
 	font-size: 11px;
 	padding-left: 15px;
 }
@@ -402,7 +405,7 @@
 	-moz-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
 	-ms-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
 	-o-box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
-	box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;	
+	box-shadow: 0 0 5px #230700, 0 0 5px #222 inset;
 }
 
 /** THEMES / ALU **/
@@ -419,5 +422,5 @@
 	-moz-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
 	-ms-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
 	-o-box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
-	box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;	
+	box-shadow: 0 0 5px #727272, 0 0 5px #222 inset;
 }

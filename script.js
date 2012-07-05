@@ -25,16 +25,16 @@ window.addEventListener('load', function () {
 		if (turntablePlayer.options.infos.indexOf(infos[i]) != -1)
 			document.getElementById('panel-infos-choice-' + infos[i]).checked = true;
 		else
-			document.getElementById('panel-infos-choice-' + infos[i]).checked = false;		
-	} 
+			document.getElementById('panel-infos-choice-' + infos[i]).checked = false;
+	}
 
 	// mode
-	var modes = ['manual', 'automatic'];
+	var modes = ['manual', 'automatic', 'semiautomatic'];
 	for (var i in modes) {
 		if (turntablePlayer.options.mode == modes[i])
 			document.getElementById('mode-' + modes[i]).checked = true;
 		else
-			document.getElementById('mode-' + modes[i]).checked = false;	
+			document.getElementById('mode-' + modes[i]).checked = false;
 	}
 
 	// theme
@@ -43,7 +43,7 @@ window.addEventListener('load', function () {
 		if (turntablePlayer.options.theme == themes[i])
 			document.getElementById('theme-' + themes[i]).checked = true;
 		else
-			document.getElementById('theme-' + themes[i]).checked = false;	
+			document.getElementById('theme-' + themes[i]).checked = false;
 	}
 
 	// debug
@@ -56,7 +56,7 @@ window.addEventListener('load', function () {
 
 // Load the remote-demo
 // mode
-var elements = document.querySelectorAll('input[name~=mode-choice]'); 
+var elements = document.querySelectorAll('input[name~=mode-choice]');
 for (var d in elements) {
 	var el = elements.item(d);
 	el.addEventListener('click', function (event) {
@@ -67,7 +67,7 @@ for (var d in elements) {
 }
 
 // theme
-var elements = document.querySelectorAll('input[name~=theme-choice]'); 
+var elements = document.querySelectorAll('input[name~=theme-choice]');
 for (var d in elements) {
 	var el = elements.item(d);
 	el.addEventListener('click', function (event) {
@@ -106,7 +106,7 @@ document.getElementById('panel-infos').addEventListener('click', function (event
 }, false);
 
 // panel : infos choice
-var elements = document.querySelectorAll('input[name~=panel-infos-choice]'); 
+var elements = document.querySelectorAll('input[name~=panel-infos-choice]');
 for (var d in elements) {
 	var el = elements.item(d);
 	el.addEventListener('click', function (event) {
